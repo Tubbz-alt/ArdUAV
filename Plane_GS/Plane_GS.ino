@@ -14,6 +14,11 @@
 #define LANDING_GEAR_TOGGLE_COMMAND 5
 #define FLAPS_TOGGLE_COMMAND        5
 
+#define PITCH_ANALOG_PIN    3
+#define ROLL_ANALOG_PIN     2
+#define YAW_ANALOG_PIN      0
+#define THROTTLE_ANALOG_PIN 1
+
 #define PITCH_RATE_PIN  0
 #define ROLL_RATE_PIN   1
 #define YAW_RATE_PIN    2
@@ -21,6 +26,7 @@
 #define AILERON_OFFSET  0
 #define ELEVATOR_OFFSET 0
 #define RUDDER_OFFSET   0
+#define THROTTLE_OFFSET 0
 
 #define THROTTLE_MAX            170 //full throttle
 #define AILERON_MAX_HIGHRATES   320 //roll left
@@ -40,15 +46,15 @@
 #define ELEVATOR_MIN_LOWRATES 264
 #define RUDDER_MIN_LOWRATES   264
 
-#define THROTTLE_MIN_ADC  36960
-#define AILERON_MIN_ADC   36300
-#define ELEVATOR_MIN_ADC  37550
-#define RUDDER_MIN_ADC    38380
+#define THROTTLE_MIN_ADC  35880
+#define AILERON_MIN_ADC   35300
+#define ELEVATOR_MIN_ADC  36620
+#define RUDDER_MIN_ADC    37330
 
-#define THROTTLE_MAX_ADC  62800
-#define AILERON_MAX_ADC   61700
-#define ELEVATOR_MAX_ADC  63710
-#define RUDDER_MAX_ADC    63800
+#define THROTTLE_MAX_ADC  61220
+#define AILERON_MAX_ADC   60180
+#define ELEVATOR_MAX_ADC  62300
+#define RUDDER_MAX_ADC    62170
 
 
 
@@ -127,6 +133,7 @@ AirComms telemetryRadio;
 struct controlSurfaces
 {
   byte command_index;
+  byte analog_pin;
   byte rate_pin;
   uint16_t _offset;
   uint16_t high_rates_surface_max;
@@ -139,26 +146,58 @@ struct controlSurfaces
 
 struct controlSurfaces ailerons
 {
-  ROLL_COMMAND, ROLL_RATE_PIN, AILERON_MAX_HIGHRATES, AILERON_MIN_HIGHRATES, 
-  AILERON_MAX_LOWRATES, AILERON_MIN_LOWRATES, AILERON_MAX_ADC, AILERON_MIN_ADC
+  ROLL_COMMAND,           //command_index
+  ROLL_ANALOG_PIN,        //analog_pin
+  ROLL_RATE_PIN,          //rate_pin
+  AILERON_OFFSET,         //_offset
+  AILERON_MAX_HIGHRATES,  //high_rates_surface_max
+  AILERON_MIN_HIGHRATES,  //high_rates_surface_min
+  AILERON_MAX_LOWRATES,   //low_rates_surface_max
+  AILERON_MIN_LOWRATES,   //low_rates_surface_min
+  AILERON_MAX_ADC,        //ADC_max
+  AILERON_MIN_ADC         //ADC_min
 };
 
 struct controlSurfaces elevator
 {
-  PITCH_COMMAND, PITCH_RATE_PIN, ELEVATOR_MAX_HIGHRATES, ELEVATOR_MIN_HIGHRATES, 
-  ELEVATOR_MAX_LOWRATES, ELEVATOR_MIN_LOWRATES, ELEVATOR_MAX_ADC, ELEVATOR_MIN_ADC
+  PITCH_COMMAND,          //command_index
+  PITCH_ANALOG_PIN,       //analog_pin
+  PITCH_RATE_PIN,         //rate_pin
+  ELEVATOR_OFFSET,        //_offset
+  ELEVATOR_MAX_HIGHRATES, //high_rates_surface_max
+  ELEVATOR_MIN_HIGHRATES, //high_rates_surface_min
+  ELEVATOR_MAX_LOWRATES,  //low_rates_surface_max
+  ELEVATOR_MIN_LOWRATES,  //low_rates_surface_min
+  ELEVATOR_MAX_ADC,       //ADC_max
+  ELEVATOR_MIN_ADC        //ADC_min
 };
 
 struct controlSurfaces rudder
 {
-  YAW_COMMAND, YAW_RATE_PIN, AILERON_MAX_HIGHRATES, AILERON_MIN_HIGHRATES, 
-  AILERON_MAX_LOWRATES, AILERON_MIN_LOWRATES, AILERON_MAX_ADC, AILERON_MIN_ADC
+  YAW_COMMAND,            //command_index
+  YAW_ANALOG_PIN,         //analog_pin
+  YAW_RATE_PIN,           //rate_pin
+  RUDDER_OFFSET,          //_offset
+  RUDDER_MAX_HIGHRATES,   //high_rates_surface_max
+  RUDDER_MIN_HIGHRATES,   //high_rates_surface_min
+  RUDDER_MAX_LOWRATES,    //low_rates_surface_max
+  RUDDER_MIN_LOWRATES,    //low_rates_surface_min
+  RUDDER_MAX_ADC,         //ADC_max
+  RUDDER_MIN_ADC          //ADC_max
 };
 
 struct controlSurfaces throttle
 {
-  THROTTLE_COMMAND, PWR_LED_PIN, THROTTLE_MAX, THROTTLE_MIN, 0, 0, THROTTLE_MAX_ADC, 
-  THROTTLE_MIN_ADC
+  THROTTLE_COMMAND,       //command_index
+  THROTTLE_ANALOG_PIN,    //analog_pin
+  0,                      //rate_pin
+  THROTTLE_OFFSET,        //_offset
+  THROTTLE_MAX,           //high_rates_surface_max
+  THROTTLE_MIN,           //high_rates_surface_min
+  0,                      //low_rates_surface_max
+  0,                      //low_rates_surface_min
+  THROTTLE_MAX_ADC,       //ADC_max
+  THROTTLE_MIN_ADC        //ADC_max
 };
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -175,7 +214,7 @@ const byte rollPin      = 2;
 const byte pitchPin     = 3;
 
 //loop total delay in ms
-const byte delayTime    = 2;
+const byte delayTime    = 25;
 
 //variables for control surface values
 unsigned int pitchValue     = 0;
@@ -218,6 +257,12 @@ void loop()
   //DAQ from joystick/switches
   updateCommands();
 
+  /*Serial.print(commandsRadio.outgoingArray[0]); Serial.print(" ");
+  Serial.print(commandsRadio.outgoingArray[1]); Serial.print(" ");
+  Serial.print(commandsRadio.outgoingArray[2]); Serial.print(" ");
+  Serial.print(commandsRadio.outgoingArray[3]); Serial.print(" ");
+  Serial.println();*/
+
   //send data to plane IFC
   sendData();
 
@@ -250,11 +295,31 @@ void updateCommand(controlSurfaces controlSurface)
   uint16_t commandValue = 0;
   
   //read the analog voltage of the potentiometer
-  uint16_t analogValue = analogRead(controlSurface.rate_pin);
-
+  uint16_t analogValue = analogRead(controlSurface.analog_pin);
+  
+  //Serial.print("ADC_min: "); Serial.println(controlSurface.ADC_min);
+  //Serial.print("Analog: "); Serial.println(analogValue);
+  //Serial.print("ADC_max: "); Serial.println(controlSurface.ADC_max);
+  //Serial.print("high_rates_surface_min: "); Serial.println(controlSurface.high_rates_surface_min);
+  
   //convert to a servo command format
-  commandValue = map(analogValue, controlSurface.ADC_min, controlSurface.ADC_max, controlSurface.high_rates_surface_max, controlSurface.high_rates_surface_min) + controlSurface._offset;
-  commandValue = constrain(analogValue, controlSurface.high_rates_surface_min, controlSurface.high_rates_surface_max);
+  commandValue = map(analogValue,                             //value to be mapped
+                      controlSurface.ADC_min,                 //input minimum expected value
+                      controlSurface.ADC_max,                 //input maximum expected value
+                      controlSurface.high_rates_surface_min,  //output minimum value
+                      controlSurface.high_rates_surface_max   //output maximum value
+                      ) + controlSurface._offset;             //add the offset (bias)
+  
+  //Serial.print("Command: "); Serial.println(commandValue);
+  //Serial.print("high_rates_surface_max: "); Serial.println(controlSurface.high_rates_surface_max);
+  //Serial.print("_offset: "); Serial.println(controlSurface._offset);
+  
+  commandValue = constrain(commandValue,                            //value to be constrained
+                            controlSurface.high_rates_surface_min,  //minimum value
+                            controlSurface.high_rates_surface_max   //maximum value
+                            );
+
+  //Serial.print("Command (clamped): "); Serial.println(commandValue);
 
   //set the respective commandArray index to true so that the servo data will be sent to
   //the plane
