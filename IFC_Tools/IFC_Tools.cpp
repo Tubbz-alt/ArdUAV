@@ -226,7 +226,7 @@ int IFC_Class::grabData_Radio()
 	if (result == AIR_NEW_DATA)
 	{
 		controlInputs.pitch_command = myRadio.incomingArray[AIR_PITCH_INDEX];
-		controlInputs.roll_command = myRadio.incomingArray[AIR_ROLL_ANGLE_INDEX];
+		controlInputs.roll_command = myRadio.incomingArray[AIR_ROLL_INDEX];
 		controlInputs.yaw_command = myRadio.incomingArray[AIR_YAW_INDEX];
 		controlInputs.throttle_command = myRadio.incomingArray[AIR_THROTTLE_INDEX];
 		controlInputs.autopilot_command = myRadio.incomingArray[AIR_AUTOPILOT_INDEX];
