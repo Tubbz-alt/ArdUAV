@@ -17,14 +17,14 @@
 //macros
 #define GS
 
-#define YAW_ANALOG_PIN			    0
-#define THROTTLE_ANALOG_PIN		    1
-#define ROLL_ANALOG_PIN			    2
-#define PITCH_ANALOG_PIN		    3
+#define YAW_ANALOG_PIN		    0
+#define THROTTLE_ANALOG_PIN	    1
+#define ROLL_ANALOG_PIN		    2
+#define PITCH_ANALOG_PIN	    3
 
-#define PITCH_RATE_PIN			    0
-#define ROLL_RATE_PIN			    1
-#define YAW_RATE_PIN				2
+#define PITCH_RATE_PIN		    0
+#define ROLL_RATE_PIN		    1
+#define YAW_RATE_PIN                2
 
 #define AILERON_OFFSET              0
 #define ELEVATOR_OFFSET             0
@@ -115,8 +115,8 @@ private:
 		ROLL_ANALOG_PIN,        //analog_pin
 		ROLL_RATE_PIN,          //rate_pin
 		AILERON_OFFSET,         //_offset
-		AILERON_MAX,			//high_rates_surface_max
-		AILERON_MIN,			//high_rates_surface_min
+		AILERON_MAX,		//high_rates_surface_max
+		AILERON_MIN,		//high_rates_surface_min
 		AILERON_MAX_LOWRATES,   //low_rates_surface_max
 		AILERON_MIN_LOWRATES,   //low_rates_surface_min
 		AILERON_MAX_ADC,        //ADC_max
@@ -129,8 +129,8 @@ private:
 		PITCH_ANALOG_PIN,       //analog_pin
 		PITCH_RATE_PIN,         //rate_pin
 		ELEVATOR_OFFSET,        //_offset
-		ELEVATOR_MAX,			//high_rates_surface_max
-		ELEVATOR_MIN,			//high_rates_surface_min
+		ELEVATOR_MAX,		//high_rates_surface_max
+		ELEVATOR_MIN,		//high_rates_surface_min
 		ELEVATOR_MAX_LOWRATES,  //low_rates_surface_max
 		ELEVATOR_MIN_LOWRATES,  //low_rates_surface_min
 		ELEVATOR_MAX_ADC,       //ADC_max
@@ -143,8 +143,8 @@ private:
 		YAW_ANALOG_PIN,         //analog_pin
 		YAW_RATE_PIN,           //rate_pin
 		RUDDER_OFFSET,          //_offset
-		RUDDER_MAX,				//high_rates_surface_max
-		RUDDER_MIN,				//high_rates_surface_min
+		RUDDER_MAX,		//high_rates_surface_max
+		RUDDER_MIN,		//high_rates_surface_min
 		RUDDER_MAX_LOWRATES,    //low_rates_surface_max
 		RUDDER_MIN_LOWRATES,    //low_rates_surface_min
 		RUDDER_MAX_ADC,         //ADC_max
