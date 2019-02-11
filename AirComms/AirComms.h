@@ -10,9 +10,9 @@
 		2       - yaw                             - unsigned 16-Bit Analog
 		3       - throttle                        - unsigned 16-Bit Analog
 		4       - Autopilot Toggle                - unsigned 16-Bit  Boolean (0x0 or 0x1)
-		5		- Pitch/Roll Limiter Toggle       - unsigned 16-Bit  Boolean (0x0 or 0x1)
+		5	- Pitch/Roll Limiter Toggle       - unsigned 16-Bit  Boolean (0x0 or 0x1)
 		6       - Landing Gear Toggle             - unsigned 16-Bit  Boolean (0x0 or 0x1)
-		7		- Flaps Toggle                    - unsigned 16-Bit  Boolean (0x0 or 0x1)
+		7	- Flaps Toggle                    - unsigned 16-Bit  Boolean (0x0 or 0x1)
 		8       - Unused                          - Unused
 		9       - Unused                          - Unused
 		10      - Unused                          - Unused
@@ -98,6 +98,14 @@
 #define AIR_ROLL_ANGLE_INDEX	3
 #define AIR_LATITUDE_INDEX		4
 #define AIR_LONGITUDE_INDEX		5
+#define AIR_UTC_YEAR_INDEX		6
+#define AIR_UTC_MONTH_INDEX		7
+#define AIR_UTC_DAY_INDEX		8
+#define AIR_UTC_HOUR_INDEX		9
+#define AIR_UTC_MINUTE_INDEX	10
+#define AIR_UTC_SECOND_INDEX	11
+#define AIR_SOG_INDEX			12
+#define AIR_COG_INDEX			13
 
 
 
@@ -106,8 +114,9 @@ class airComms
 {
 public:// <<---------------------------------------------------------------------------//public
 
-	String inputString_Radio = "";      // a String to hold incoming data
-	bool stringComplete_Radio = false;  // whether the string is complete
+	byte inputArray_Radio[BUFF_LEN] = { 0 };	//an array to hold incoming data
+	byte inputArray_CurrentIndex = 0;			//index to see where in the input array we are at
+	bool arrayComplete_Radio = false;			//whether the string is complete
 
 	//data received
 	int16_t incomingArray[AIR_DATA_LEN] = { 0 };
@@ -143,9 +152,6 @@ private:// <<-------------------------------------------------------------------
 	//find 8-bit checksum of message
 	byte findChecksum(byte buff[]);
 
-	//find 8-bit checksum of message
-	byte findChecksum(String buff);
-
 
 
 
@@ -153,7 +159,7 @@ private:// <<-------------------------------------------------------------------
 	void writePacket(byte packet[]);
 
 	//unpack and save received data packet
-	int extractData_Radio(byte startingIndex);
+	int extractData_Radio();
 };
 
 //create GPS class
