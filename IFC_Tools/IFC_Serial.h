@@ -1,41 +1,183 @@
-#include "Arduino.h"
+#include "IFC_Serial.h"
+#include "IFC_Tools.h"
 
-
-
-
-#ifndef IFC_Serial_cpp
-#define IFC_Serial_cpp
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//macros
-#define IFC_DEBUG_PORT_NUMBER     0	//Serial
-#define IFC_COMMAND_PORT_NUMBER   2	//Serial2
-#define IFC_GPS_PORT_NUMBER       3	//Serial3
-#define IFC_TELEM_PORT_NUMBER     4	//Serial4
-/////////////////////////////////////////////////////////////////////////////////////////
+#include "Shared_Tools.h"
+#include "AirComms.h"
+#include "neo6mGPS.h"
 
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
-#if IFC_DEBUGD_PORT_NUMBER == 0
-#define IFC_DEBUG_PORT Serial
-#elif IFC_DEBUG_PORT_NUMBER == 1
-#define IFC_DEBUG_PORT Serial1
-#elif IFC_DEBUG_PORT_NUMBER == 2
-#define IFC_DEBUG_PORT Serial2
-#elif IFC_DEBUG_PORT_NUMBER == 3
-#define IFC_DEBUG_PORT Serial3
-#elif IFC_DEBUG_PORT_NUMBER == 4
-#define IFC_DEBUG_PORT Serial4
-#elif IFC_DEBUG_PORT_NUMBER == 5
-#define IFC_DEBUG_PORT Serial5
-#elif IFC_DEBUG_PORT_NUMBER == 6
-#define IFC_DEBUG_PORT Serial6
+#if IFC_GPS_PORT_NUMBER == 0
+
+void serialEvent()
+{
+	while (IFC_GPS_PORT.available())
+	{
+		// get the new byte:
+		char inChar = (char)IFC_GPS_PORT.read();
+
+		// add it to the inputString:
+		if (!myGPS.stringComplete_GPS)
+			myGPS.inputString_GPS += inChar;
+
+		// if the incoming character is a newline, set a flag so the main loop can
+		// do something about it:
+		if (inChar == '\n')
+		{
+			myGPS.stringComplete_GPS = true;
+		}
+	}
+
+	return;
+}
+
+#elif IFC_GPS_PORT_NUMBER == 1
+
+void serialEvent1()
+{
+	while (IFC_GPS_PORT.available())
+	{
+		// get the new byte:
+		char inChar = (char)IFC_GPS_PORT.read();
+
+		// add it to the inputString:
+		if (!myGPS.stringComplete_GPS)
+			myGPS.inputString_GPS += inChar;
+
+		// if the incoming character is a newline, set a flag so the main loop can
+		// do something about it:
+		if (inChar == '\n')
+		{
+			myGPS.stringComplete_GPS = true;
+		}
+	}
+
+	return;
+}
+
+#elif IFC_GPS_PORT_NUMBER == 2
+
+void serialEvent2()
+{
+	while (IFC_GPS_PORT.available())
+	{
+		// get the new byte:
+		char inChar = (char)IFC_GPS_PORT.read();
+
+		// add it to the inputString:
+		if (!myGPS.stringComplete)
+			myGPS.inputString += inChar;
+
+		// if the incoming character is a newline, set a flag so the main loop can
+		// do something about it:
+		if (inChar == '\n')
+		{
+			myGPS.stringComplete = true;
+		}
+	}
+
+	return;
+}
+
+#elif IFC_GPS_PORT_NUMBER == 3
+
+void serialEvent3()
+{
+	while (IFC_GPS_PORT.available())
+	{
+		// get the new byte:
+		char inChar = (char)IFC_GPS_PORT.read();
+
+		// add it to the inputString:
+		if (!myGPS.stringComplete_GPS)
+			myGPS.inputString_GPS += inChar;
+
+		// if the incoming character is a newline, set a flag so the main loop can
+		// do something about it:
+		if (inChar == '\n')
+		{
+			myGPS.stringComplete_GPS = true;
+		}
+	}
+
+	return;
+}
+
+#elif IFC_GPS_PORT_NUMBER == 4
+
+void serialEvent4()
+{
+	while (IFC_GPS_PORT.available())
+	{
+		// get the new byte:
+		char inChar = (char)IFC_GPS_PORT.read();
+
+		// add it to the inputString:
+		if (!myGPS.stringComplete_GPS)
+			myGPS.inputString_GPS += inChar;
+
+		// if the incoming character is a newline, set a flag so the main loop can
+		// do something about it:
+		if (inChar == '\n')
+		{
+			myGPS.stringComplete_GPS = true;
+		}
+	}
+
+	return;
+}
+
+#elif IFC_GPS_PORT_NUMBER == 5
+
+void serialEvent5()
+{
+	while (IFC_GPS_PORT.available())
+	{
+		// get the new byte:
+		char inChar = (char)IFC_GPS_PORT.read();
+
+		// add it to the inputString:
+		if (!myGPS.stringComplete_GPS)
+			myGPS.inputString_GPS += inChar;
+
+		// if the incoming character is a newline, set a flag so the main loop can
+		// do something about it:
+		if (inChar == '\n')
+		{
+			myGPS.stringComplete_GPS = true;
+		}
+	}
+
+	return;
+}
+
+#elif IFC_GPS_PORT_NUMBER == 6
+
+void serialEvent6()
+{
+	while (IFC_GPS_PORT.available())
+	{
+		// get the new byte:
+		char inChar = (char)IFC_GPS_PORT.read();
+
+		// add it to the inputString:
+		if (!myGPS.stringComplete_GPS)
+			myGPS.inputString_GPS += inChar;
+
+		// if the incoming character is a newline, set a flag so the main loop can
+		// do something about it:
+		if (inChar == '\n')
+		{
+			myGPS.stringComplete_GPS = true;
+		}
+	}
+
+	return;
+}
+
 #endif
 
 
@@ -43,100 +185,571 @@
 
 #if IFC_COMMAND_PORT_NUMBER == 0
 
-#define IFC_COMMAND_PORT Serial
-extern void serialEvent();
+void serialEvent()
+{
+	while (IFC_COMMAND_PORT.available())
+	{
+		//add it to the inputString if the packet isn't complete yet:
+		if (!myRadio.arrayComplete_Radio)
+		{
+			//get the new byte:
+			byte inByte = IFC_COMMAND_PORT.read();
+
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
+			{
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
+				{
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			//not time to read from buffer - need to finish processing the completed packet contained in inputString_Radio first
+			//break the loop - otherwise "while (IFC_COMMAND_PORT.available())" could be an infinite blocking loop if bytes aren't being read from the port
+			break;
+		}
+
+		//check size of input buffer to see if it is big enough to fit a full packet
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
+		{
+			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
+			{
+				//optional debugging prints
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
+				}
+				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				//set this flag to true so the data can be processed
+				myRadio.arrayComplete_Radio = true;
+			}
+			else
+			{
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
+			}
+		}
+	}
+
+	return;
+}
 
 #elif IFC_COMMAND_PORT_NUMBER == 1
 
-#define IFC_COMMAND_PORT Serial1
-extern void serialEvent1();
+void serialEvent1()
+{
+	while (IFC_COMMAND_PORT.available())
+	{
+		//add it to the inputString if the packet isn't complete yet:
+		if (!myRadio.arrayComplete_Radio)
+		{
+			//get the new byte:
+			byte inByte = IFC_COMMAND_PORT.read();
+
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
+			{
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
+				{
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			//not time to read from buffer - need to finish processing the completed packet contained in inputString_Radio first
+			//break the loop - otherwise "while (IFC_COMMAND_PORT.available())" could be an infinite blocking loop if bytes aren't being read from the port
+			break;
+		}
+
+		//check size of input buffer to see if it is big enough to fit a full packet
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
+		{
+			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
+			{
+				//optional debugging prints
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
+				}
+				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				//set this flag to true so the data can be processed
+				myRadio.arrayComplete_Radio = true;
+			}
+			else
+			{
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
+			}
+		}
+	}
+
+	return;
+}
 
 #elif IFC_COMMAND_PORT_NUMBER == 2
 
-#define IFC_COMMAND_PORT Serial2
-extern void serialEvent2();
+void serialEvent2()
+{
+	while (IFC_COMMAND_PORT.available())
+	{
+		//add it to the inputString if the packet isn't complete yet:
+		if (!myRadio.arrayComplete_Radio)
+		{
+			//get the new byte:
+			byte inByte = IFC_COMMAND_PORT.read();
+
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
+			{
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
+				{
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			//not time to read from buffer - need to finish processing the completed packet contained in inputString_Radio first
+			//break the loop - otherwise "while (IFC_COMMAND_PORT.available())" could be an infinite blocking loop if bytes aren't being read from the port
+			break;
+		}
+
+		//check size of input buffer to see if it is big enough to fit a full packet
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
+		{
+			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
+			{
+				//optional debugging prints
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
+				}
+				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				//set this flag to true so the data can be processed
+				myRadio.arrayComplete_Radio = true;
+			}
+			else
+			{
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
+			}
+		}
+	}
+
+	return;
+}
 
 #elif IFC_COMMAND_PORT_NUMBER == 3
 
-#define IFC_COMMAND_PORT Serial3
-extern void serialEvent3();
+void serialEvent3()
+{
+	while (IFC_COMMAND_PORT.available())
+	{
+		//add it to the inputString if the packet isn't complete yet:
+		if (!myRadio.arrayComplete_Radio)
+		{
+			//get the new byte:
+			byte inByte = IFC_COMMAND_PORT.read();
+
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
+			{
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
+				{
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			//not time to read from buffer - need to finish processing the completed packet contained in inputString_Radio first
+			//break the loop - otherwise "while (IFC_COMMAND_PORT.available())" could be an infinite blocking loop if bytes aren't being read from the port
+			break;
+		}
+
+		//check size of input buffer to see if it is big enough to fit a full packet
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
+		{
+			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
+			{
+				//optional debugging prints
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
+				}
+				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				//set this flag to true so the data can be processed
+				myRadio.arrayComplete_Radio = true;
+			}
+			else
+			{
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
+			}
+		}
+	}
+
+	return;
+}
 
 #elif IFC_COMMAND_PORT_NUMBER == 4
 
-#define IFC_COMMAND_PORT Serial4
-extern void serialEvent4();
+void serialEvent4()
+{
+	while (IFC_COMMAND_PORT.available())
+	{
+		//add it to the inputString if the packet isn't complete yet:
+		if (!myRadio.arrayComplete_Radio)
+		{
+			//get the new byte:
+			byte inByte = IFC_COMMAND_PORT.read();
+
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
+			{
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
+				{
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			//not time to read from buffer - need to finish processing the completed packet contained in inputString_Radio first
+			//break the loop - otherwise "while (IFC_COMMAND_PORT.available())" could be an infinite blocking loop if bytes aren't being read from the port
+			break;
+		}
+
+		//check size of input buffer to see if it is big enough to fit a full packet
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
+		{
+			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
+			{
+				//optional debugging prints
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
+				}
+				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				//set this flag to true so the data can be processed
+				myRadio.arrayComplete_Radio = true;
+			}
+			else
+			{
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
+			}
+		}
+	}
+
+	return;
+}
 
 #elif IFC_COMMAND_PORT_NUMBER == 5
 
-#define IFC_COMMAND_PORT Serial5
-extern void serialEvent5();
+void serialEvent5()
+{
+	while (IFC_COMMAND_PORT.available())
+	{
+		//add it to the inputString if the packet isn't complete yet:
+		if (!myRadio.arrayComplete_Radio)
+		{
+			//get the new byte:
+			byte inByte = IFC_COMMAND_PORT.read();
+
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
+			{
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
+				{
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			//not time to read from buffer - need to finish processing the completed packet contained in inputString_Radio first
+			//break the loop - otherwise "while (IFC_COMMAND_PORT.available())" could be an infinite blocking loop if bytes aren't being read from the port
+			break;
+		}
+
+		//check size of input buffer to see if it is big enough to fit a full packet
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
+		{
+			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
+			{
+				//optional debugging prints
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
+				}
+				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				//set this flag to true so the data can be processed
+				myRadio.arrayComplete_Radio = true;
+			}
+			else
+			{
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
+			}
+		}
+	}
+
+	return;
+}
 
 #elif IFC_COMMAND_PORT_NUMBER == 6
 
-#define IFC_COMMAND_PORT Serial6
-extern void serialEvent6();
+void serialEvent6()
+{
+	while (IFC_COMMAND_PORT.available())
+	{
+		//add it to the inputString if the packet isn't complete yet:
+		if (!myRadio.arrayComplete_Radio)
+		{
+			//get the new byte:
+			byte inByte = IFC_COMMAND_PORT.read();
 
-#endif
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
+			{
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
 
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
 
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
+				{
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
 
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			//not time to read from buffer - need to finish processing the completed packet contained in inputString_Radio first
+			//break the loop - otherwise "while (IFC_COMMAND_PORT.available())" could be an infinite blocking loop if bytes aren't being read from the port
+			break;
+		}
 
-#if IFC_GPS_PORT_NUMBER == 0
+		//check size of input buffer to see if it is big enough to fit a full packet
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
+		{
+			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
+			{
+				//optional debugging prints
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
+				}
+				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define IFC_GPS_PORT Serial
-extern void serialEvent();
+				//set this flag to true so the data can be processed
+				myRadio.arrayComplete_Radio = true;
+			}
+			else
+			{
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
 
-#elif IFC_GPS_PORT_NUMBER == 1
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
+			}
+		}
+	}
 
-#define IFC_COMMAND_PORT Serial1
-extern void serialEvent1();
+	return;
+}
 
-#elif IFC_GPS_PORT_NUMBER == 2
-
-#define IFC_GPS_PORT Serial2
-extern void serialEvent2();
-
-#elif IFC_GPS_PORT_NUMBER == 3
-
-#define IFC_GPS_PORT Serial3
-extern void serialEvent3();
-
-#elif IFC_GPS_PORT_NUMBER == 4
-
-#define IFC_GPS_PORT Serial4
-extern void serialEvent4();
-
-#elif IFC_GPS_PORT_NUMBER == 5
-
-#define IFC_GPS_PORT Serial5
-extern void serialEvent5();
-
-#elif IFC_GPS_PORT_NUMBER == 6
-
-#define IFC_GPS_PORT Serial6
-extern void serialEvent6();
-
-#endif
-
-
-
-
-#if IFC_TELEM_PORT_NUMBER == 0
-#define IFC_TELEM_PORT Serial
-#elif IFC_TELEM_PORT_NUMBER == 1
-#define IFC_TELEM_PORT Serial1
-#elif IFC_TELEM_PORT_NUMBER == 2
-#define IFC_TELEM_PORT Serial2
-#elif IFC_TELEM_PORT_NUMBER == 3
-#define IFC_TELEM_PORT Serial3
-#elif IFC_TELEM_PORT_NUMBER == 4
-#define IFC_TELEM_PORT Serial4
-#elif IFC_TELEM_PORT_NUMBER == 5
-#define IFC_TELEM_PORT Serial5
-#elif IFC_TELEM_PORT_NUMBER == 6
-#define IFC_TELEM_PORT Serial6
 #endif
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // !1
