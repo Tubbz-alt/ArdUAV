@@ -3,18 +3,6 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//setup user defined global variables and functions here
-//below are variables to make a "pass-through timer" allowing the plane to periodically send telem
-//to the ground station at a fixed rate without blocking processing - default is 100ms = 10Hz
-unsigned long timeBench = millis();
-unsigned long currentTime = timeBench;
-byte transmitPeriod = 100;
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
 void setup()
 {
   //initialize the core flight controller software class
@@ -32,6 +20,14 @@ void loop()
     //optional debugging prints
     /*IFC_DEBUG_PORT.print("Latitude:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.latitude, 5);
     IFC_DEBUG_PORT.print("Longitude:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.longitude, 5);
+    IFC_DEBUG_PORT.print("UTC_year:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_year);
+    IFC_DEBUG_PORT.print("UTC_month:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_month);
+    IFC_DEBUG_PORT.print("UTC_day:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_day);
+    IFC_DEBUG_PORT.print("UTC_hour:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_hour);
+    IFC_DEBUG_PORT.print("UTC_minute:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_minute);
+    IFC_DEBUG_PORT.print("UTC_second:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_second);
+    IFC_DEBUG_PORT.print("Speed Over Ground:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.speedOverGround, 3);
+    IFC_DEBUG_PORT.print("Course Over Ground:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.courseOverGround, 3);
     IFC_DEBUG_PORT.println();*/
   }
 
@@ -41,6 +37,7 @@ void loop()
     //optional debugging prints
     /*IFC_DEBUG_PORT.print("Pitch Angle:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.pitchAngle, 5);
     IFC_DEBUG_PORT.print("Roll Angle:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.rollAngle, 5);
+    //IFC_DEBUG_PORT.print("Course Angle:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.courseAngle, 5);
     IFC_DEBUG_PORT.println();*/
   }
 
@@ -49,6 +46,14 @@ void loop()
   {
     //optional debugging prints
     /*IFC_DEBUG_PORT.print("Converted Altitude:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.convertedAltitude);
+    IFC_DEBUG_PORT.println();*/
+  }
+
+  //get airspeed data from the pitot tube
+  if(myIFC.grabData_Pitot())
+  {
+    //optional debugging prints
+    /*IFC_DEBUG_PORT.print("Converted Airspeed:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.velocity);
     IFC_DEBUG_PORT.println();*/
   }
 
@@ -70,15 +75,8 @@ void loop()
     myIFC.updateServos();
   }
 
-  //use timer to send telemetry data to the ground station at a fixed rate
-  currentTime = millis();
-  if((currentTime - timeBench)>= transmitPeriod)
-  {
-    timeBench = currentTime;
-
-    //send the telemetry to the radio
-    myIFC.sendTelem();
-  }
+  //send the telemetry to the radio
+  myIFC.sendTelem();
 }
 
 
