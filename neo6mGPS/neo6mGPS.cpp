@@ -153,11 +153,16 @@ int neo6mGPS::grabData_GPS()
 }
 
 
-//																			  00000000001111111111222222222233333333334444444444555555555566666666667
-//																			  01234567890123456789012345678901234567890123456789012345678901234567890
-//extract lat and lon data from the GPS stream buffer (Example NMEA Sentence: $GPRMC,083559.00,A,4717.11437,N,00833.91522,E,0.004,77.52,091202,,,A*57)
+
+
+//																			     00000000001111111111222222222233333333334444444444555555555566666666667
+//																			     01234567890123456789012345678901234567890123456789012345678901234567890
+//extract lat and lon data from the GPS stream buffer (Example NMEA Sentence: $GPRMC,083559.00,A,4717.11437,N,00833.91522,E,0.004,77.52,091202,,,A*57		-->		$GPRMC,hhmmss,status,latitude,N,longitude,E,spd,cog,ddmmyy,mv,mvE,mode*cs<CR><LF>)
 int neo6mGPS::extractData_GPS(byte startingIndex)
 {
+	byte startCommaIndex;
+	byte endCommaIndex;
+
 	if (inputString_GPS[startingIndex + 14] == 'A')
 	{
 		GPS_data[UTC_HOUR_POS] = ((inputString_GPS[startingIndex + 4] - '0') * 10) + (inputString_GPS[startingIndex + 5] - '0');
@@ -184,23 +189,46 @@ int neo6mGPS::extractData_GPS(byte startingIndex)
 			GPS_data[LON_POS] = -GPS_data[LON_POS];
 		}
 
-		if (inputString_GPS[startingIndex + 43] != ',')
+		byte endCommaIndex = inputString_GPS.indexOf(',', startingIndex + 43);
+
+		if (endCommaIndex != startingIndex + 43)
 		{
-			GPS_data[SPD_POS] = (inputString_GPS[startingIndex + 43] - '0') + ((inputString_GPS[startingIndex + 45] - '0') / 10) + ((inputString_GPS[startingIndex + 46] - '0') / 100) + ((inputString_GPS[startingIndex + 47] - '0') / 1000);
-			
-			if (inputString_GPS[startingIndex + 49] != ',')
-			{
-				//TO DO
-				//GPS_data[COG_POS] = (inputString[startingIndex + 49] - '0')
-			}
-		}
-		else if (inputString_GPS[startingIndex + 47] != ',')
-		{
-			//TO DO
+			GPS_data[SPD_POS] = (inputString_GPS.substring((startingIndex + 43), endCommaIndex)).toFloat();
 		}
 		else
 		{
-			//TO DO
+			//16 bits of ones to show "error - no data"
+			GPS_data[SPD_POS] = 0xFFFF;
+		}
+
+		startCommaIndex = endCommaIndex;
+		endCommaIndex = inputString_GPS.indexOf(',', startCommaIndex + 1);
+
+		if (endCommaIndex != startCommaIndex + 1)
+		{
+			GPS_data[COG_POS] = (inputString_GPS.substring(startCommaIndex + 1, endCommaIndex)).toFloat();
+		}
+		else
+		{
+			//16 bits of ones to show "error - no data"
+			GPS_data[COG_POS] = 0xFFFF;
+		}
+
+		startCommaIndex = endCommaIndex;
+		endCommaIndex = inputString_GPS.indexOf(',', startCommaIndex + 1);
+
+		if (endCommaIndex != startCommaIndex + 1)
+		{
+			GPS_data[UTC_DAY_POS] = (inputString_GPS.substring(startCommaIndex + 1, startCommaIndex + 3)).toInt();
+			GPS_data[UTC_MONTH_POS] = (inputString_GPS.substring(startCommaIndex + 3, startCommaIndex + 5)).toInt();
+			GPS_data[UTC_YEAR_POS] = (inputString_GPS.substring(startCommaIndex + 5, startCommaIndex + 7)).toInt();
+		}
+		else
+		{
+			//16 bits of ones to show "error - no data"
+			GPS_data[UTC_DAY_POS] = 0xFFFF;
+			GPS_data[UTC_MONTH_POS] = 0xFFFF;
+			GPS_data[UTC_YEAR_POS] = 0xFFFF;
 		}
 
 		return GPS_NEW_DATA;
