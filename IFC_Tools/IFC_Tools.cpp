@@ -7,16 +7,6 @@
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-//sensor variables
-byte LiDAR_Counter = 0;
-unsigned long startTime = millis();
-unsigned long endTime = startTime;
-/////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
 //sensor/actuator classes
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 LIDARLite myLidarLite;
@@ -128,6 +118,7 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.println(F("Initializing LiDAR altimeter..."));
 	myLidarLite.begin(0, true);
 	myLidarLite.configure(0);
+	LiDAR_Counter = 0;
 	IFC_DEBUG_PORT.println(F("\tLiDAR altimeter initialized..."));
 
 
@@ -137,7 +128,7 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.println(F("Initializing servo driver and servos..."));
 	//initialize the servo driver and set the frequency of all outputs to 50Hz
 	pwm.begin();
-	pwm.setPWMFreq(60);
+	pwm.setPWMFreq(SERVO_FREQ);
 
 	//initialize each individual servo to their respective center position
 	pwm.setPWM(RUDDER_PIN, 0, (RUDDER_MAX + RUDDER_MIN) / 2);
@@ -163,12 +154,22 @@ void IFC_Class::begin()
 
 int IFC_Class::grabData_GPS()
 {
+	//get data from the GPS
 	int result = myGPS.grabData_GPS();
 
+	//if a new packet was processed, update the telemetry struct
 	if (result == GPS_NEW_DATA)
 	{
 		telemetry.latitude = myGPS.GPS_data[LAT_POS];
 		telemetry.longitude = myGPS.GPS_data[LON_POS];
+		telemetry.UTC_year = (uint16_t)myGPS.GPS_data[UTC_YEAR_POS];
+		telemetry.UTC_month = (uint16_t)myGPS.GPS_data[UTC_MONTH_POS];
+		telemetry.UTC_day = (uint16_t)myGPS.GPS_data[UTC_DAY_POS];
+		telemetry.UTC_hour = (uint16_t)myGPS.GPS_data[UTC_HOUR_POS];
+		telemetry.UTC_minute = (uint16_t)myGPS.GPS_data[UTC_MINUTE_POS];
+		telemetry.UTC_second = (uint16_t)myGPS.GPS_data[UTC_SECOND_POS];
+		telemetry.speedOverGround = myGPS.GPS_data[SPD_POS];
+		telemetry.courseOverGround = myGPS.GPS_data[COG_POS];
 	}
 
 	return result;
@@ -183,7 +184,8 @@ int IFC_Class::grabData_IMU()
 	sensors_event_t event;
 	bno.getEvent(&event);
 
-	//get pitch and roll angles in degrees
+	//get course, pitch, roll angles in degrees
+	telemetry.courseAngle = event.orientation.x;
 	telemetry.rollAngle = event.orientation.y;
 	telemetry.pitchAngle = event.orientation.z;
 
@@ -219,12 +221,32 @@ int IFC_Class::grabData_LiDAR()
 
 
 
+int IFC_Class::grabData_Pitot()
+{
+	uint16_t rawValue = analogRead(PITOT_PIN);
+
+	telemetry.velocity = rawValue; //(2.0 / 65251.0) * (-24111.0 + sqrt(-5560435134679.0 + 163127500.0 * rawValue));
+
+	return 1;
+}
+
+
+
+
 int IFC_Class::grabData_Radio()
 {
-	int result = myRadio.grabData_Radio();
+	int result;
 
+	//check to see if there is a loss of radio link between GS and IFC
+	checkRadioLink();
+
+	//see if new data is available
+	result = myRadio.grabData_Radio();
+
+	//if a new packet was processed, update the controlInputs struct
 	if (result == AIR_NEW_DATA)
 	{
+		//update controlInputs struct so that the next time the servos can be updated with the latest positions
 		controlInputs.pitch_command = myRadio.incomingArray[AIR_PITCH_INDEX];
 		controlInputs.roll_command = myRadio.incomingArray[AIR_ROLL_INDEX];
 		controlInputs.yaw_command = myRadio.incomingArray[AIR_YAW_INDEX];
@@ -233,6 +255,15 @@ int IFC_Class::grabData_Radio()
 		controlInputs.limiter_command = myRadio.incomingArray[AIR_LIMITER_INDEX];
 		controlInputs.landingGear_command = myRadio.incomingArray[AIR_LANDING_GEAR_INDEX];
 		controlInputs.flaps_command = myRadio.incomingArray[AIR_FLAPS_INDEX];
+
+		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
+		bankPitchLimiter(true);
+	}
+	else if (!linkConnected)
+	{
+		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
+		//update servos with new values automatically if there is a loss of link
+		bankPitchLimiter(false);
 	}
 
 	return result;
@@ -244,16 +275,32 @@ int IFC_Class::grabData_Radio()
 //send telemetry data to GS
 void IFC_Class::sendTelem()
 {
-	//update the radio's outgoing array with the propper information
-	myRadio.outgoingArray[AIR_PITOT_INDEX] = (int16_t)(telemetry.velocity * 100);
-	myRadio.outgoingArray[AIR_ALTITUDE_INDEX] = (int16_t)(telemetry.altitude * 100);
-	myRadio.outgoingArray[AIR_PITCH_ANGLE_INDEX] = (int16_t)(telemetry.pitchAngle * 100);
-	myRadio.outgoingArray[AIR_ROLL_ANGLE_INDEX] = (int16_t)(telemetry.rollAngle * 100);
-	myRadio.outgoingArray[AIR_LATITUDE_INDEX] = (int16_t)(telemetry.latitude * 100);
-	myRadio.outgoingArray[AIR_LONGITUDE_INDEX] = (int16_t)(telemetry.longitude * 100);
+	//use timer to send commands to the plane at a fixed rate
+	currentTime_Telem = millis();
+	if ((currentTime_Telem - timeBench_Telem) >= REPORT_TELEM_PERIOD)
+	{
+		//reset timer
+		timeBench_Telem = currentTime_Telem;
 
-	//send the telemetry data to GS
-	myRadio.sendData();
+		//update the radio's outgoing array with the propper information
+		myRadio.outgoingArray[AIR_PITOT_INDEX] = (int16_t)(telemetry.velocity * 100);
+		myRadio.outgoingArray[AIR_ALTITUDE_INDEX] = (int16_t)(telemetry.altitude * 100);
+		myRadio.outgoingArray[AIR_PITCH_ANGLE_INDEX] = (int16_t)(telemetry.pitchAngle * 100);
+		myRadio.outgoingArray[AIR_ROLL_ANGLE_INDEX] = (int16_t)(telemetry.rollAngle * 100);
+		myRadio.outgoingArray[AIR_LATITUDE_INDEX] = (int16_t)(telemetry.latitude * 100);
+		myRadio.outgoingArray[AIR_LONGITUDE_INDEX] = (int16_t)(telemetry.longitude * 100);
+		myRadio.outgoingArray[AIR_UTC_YEAR_INDEX] = telemetry.UTC_year;
+		myRadio.outgoingArray[AIR_UTC_MONTH_INDEX] = telemetry.UTC_month;
+		myRadio.outgoingArray[AIR_UTC_DAY_INDEX] = telemetry.UTC_day;
+		myRadio.outgoingArray[AIR_UTC_HOUR_INDEX] = telemetry.UTC_hour;
+		myRadio.outgoingArray[AIR_UTC_MINUTE_INDEX] = telemetry.UTC_minute;
+		myRadio.outgoingArray[AIR_UTC_SECOND_INDEX] = telemetry.UTC_second;
+		myRadio.outgoingArray[AIR_SOG_INDEX] = (int16_t)(telemetry.speedOverGround * 100);
+		myRadio.outgoingArray[AIR_COG_INDEX] = (int16_t)(telemetry.courseOverGround * 100);
+
+		//send the telemetry data to GS
+		myRadio.sendData();
+	}
 
 	return;
 }
@@ -305,5 +352,96 @@ void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
 	}
 
 	return;
+}
+
+
+
+
+//check to see if there is a loss of radio link between GS and IFC
+bool IFC_Class::checkRadioLink()
+{
+	//see if new data has arrived - if not, test if the timeout condition is met
+	if (!myRadio.arrayComplete_Radio)
+	{
+		//timer to see if there is a loss of link between GS and plane
+		currentTime_Commands = millis();
+
+		if (!noPacketFlag)
+		{
+			timeBench_Commands = currentTime_Commands;
+			noPacketFlag = true;
+		}
+
+		if ((currentTime_Commands - timeBench_Commands) >= LOSS_LINK_TIMOUT)
+		{
+			//link is severed - unset flag if not alread unset
+			linkConnected = false;
+			IFC_DEBUG_PORT.println("loss link");
+		}
+		else
+		{
+			//not enough time has passed to determine if the link is severed - set flag if not already set
+			//do not reset timer
+			linkConnected = true;
+		}
+	}
+	else
+	{
+		//new data has arrived - link is connected
+		linkConnected = true;
+		noPacketFlag = false;
+	}
+
+	return linkConnected;
+}
+
+
+
+
+//keep the plane from pitching or rolling too much in any direction
+void IFC_Class::bankPitchLimiter(bool _linkConnected)
+{
+	if (_linkConnected)
+	{
+		//update struct based on euler angles
+		updateControlsLimiter(true);	//pitch
+		updateControlsLimiter(false);	//roll
+	}
+	else
+	{
+		//use timer to send commands to the servos at a fixed rate
+		currentTime_Limiter = millis();
+		if ((currentTime_Limiter - timeBench_Limiter) >= REPORT_COMMANDS_PERIOD)
+		{
+			//reset timer
+			timeBench_Limiter = currentTime_Limiter;
+
+			//update struct based on euler angles
+			updateControlsLimiter(true);	//pitch
+			updateControlsLimiter(false);	//roll
+
+			//update servo positions (use controlInputs commands)
+			updateServos();
+		}
+	}
+
+	return;
+}
+
+
+
+
+//update struct based on euler angles
+void IFC_Class::updateControlsLimiter(bool axis)
+{
+	//determine if pitch or roll should be tweaked (axis==true --> pitch, axis==false --> roll)
+	if (axis)
+	{
+		//
+	}
+	else
+	{
+		//
+	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////
