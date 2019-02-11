@@ -10,9 +10,9 @@
 		2       - yaw                             - unsigned 16-Bit Analog
 		3       - throttle                        - unsigned 16-Bit Analog
 		4       - Autopilot Toggle                - unsigned 16-Bit  Boolean (0x0 or 0x1)
-		5		- Pitch/Roll Limiter Toggle       - unsigned 16-Bit  Boolean (0x0 or 0x1)
+		5	- Pitch/Roll Limiter Toggle       - unsigned 16-Bit  Boolean (0x0 or 0x1)
 		6       - Landing Gear Toggle             - unsigned 16-Bit  Boolean (0x0 or 0x1)
-		7		- Flaps Toggle                    - unsigned 16-Bit  Boolean (0x0 or 0x1)
+		7	- Flaps Toggle                    - unsigned 16-Bit  Boolean (0x0 or 0x1)
 		8       - Unused                          - Unused
 		9       - Unused                          - Unused
 		10      - Unused                          - Unused
@@ -163,24 +163,25 @@ void airComms::writePacket(byte packet[])
 //update incomingArray with new data if available
 byte airComms::grabData_Radio()
 {
-	byte buffIndex;
 	int returnVal = AIR_NO_DATA;
 
-	// print the string when a newline arrives:
-	if (stringComplete_Radio)
+	//process the packet when a newline arrives:
+	if (arrayComplete_Radio)
 	{
-		buffIndex = inputString_Radio.indexOf(START_BYTE);
+		//process the data if the packet is uncorrupted
+		returnVal = extractData_Radio();
 
-		//determine if the start byte is at the start of the packet
-		if (buffIndex == 0)
+		//reset the index counter
+		myRadio.inputArray_CurrentIndex = 0;
+
+		//reset the whole array
+		for (byte i = 0; i < BUFF_LEN; i++)
 		{
-			//process the data if the packet is uncorrupted
-			returnVal = extractData_Radio(buffIndex);
+			myRadio.inputArray_Radio[i] = 0;
 		}
 
-		// clear the string:
-		inputString_Radio = "";
-		stringComplete_Radio = false;
+		//reset complete flag
+		arrayComplete_Radio = false;
 	}
 
 	//nothing found
@@ -191,25 +192,45 @@ byte airComms::grabData_Radio()
 
 
 //unpack and save received data packet
-int airComms::extractData_Radio(byte startingIndex)
+int airComms::extractData_Radio()
 {
 	byte k = 0;
+	byte calculatedChecksum = 0;
+	byte receivedChecksum = 0;
 
 	//determine if a full packet was received
-	if ((inputString_Radio.length() == BUFF_LEN) && (inputString_Radio[0] == START_BYTE) && (inputString_Radio[BUFF_LEN-1] == END_BYTE))
+	if ((inputArray_Radio[0] == START_BYTE) && (inputArray_Radio[BUFF_LEN-1] == END_BYTE))
 	{
-		//shuffle all bytes back into ints and save in incomingArray
-		for (byte i = 2; i < (((AIR_DATA_LEN * 2) - 1) + 2); i += 2)
+		//calculate checksum of the received packet
+		calculatedChecksum = findChecksum(inputArray_Radio);
+
+		//find received checksum from packet
+		receivedChecksum = inputArray_Radio[1];
+
+		//only process data if checksums match
+		if (calculatedChecksum == receivedChecksum)
 		{
-			incomingArray[k] = (inputString_Radio[i] << 8) | inputString_Radio[i + 1];
+			//shuffle all bytes back into ints and save in incomingArray
+			for (byte i = 2; i < (((AIR_DATA_LEN * 2) - 1) + 2); i += 2)
+			{
+				incomingArray[k] = (inputArray_Radio[i] << 8) | inputArray_Radio[i + 1];
 
-			k++;
+				k++;
+			}
+
+			return AIR_NEW_DATA;
 		}
-
-		return AIR_NEW_DATA;
+		else
+		{
+			Serial.println("Checksum error");
+			Serial.println();
+			return AIR_CHECKSUM_ERROR;
+		}
+		
 	}
 	else
 	{
+		Serial.println("Payload error");
 		return AIR_PAYLOAD_ERROR;
 	}
 }
@@ -221,37 +242,18 @@ int airComms::extractData_Radio(byte startingIndex)
 byte airComms::findChecksum(byte buff[])
 {
 	//initializw checksum
-	byte checksum = 0;
+	byte arrayChecksum = 0;
 
 	//compute checksum
 	for (byte i = 0; i < BUFF_LEN; i++)
 	{
-		checksum = checksum + buff[i];
+		//don't include the packet's checksum byte in checksum calculations
+		if (i != 1)
+			arrayChecksum = arrayChecksum + (byte)buff[i];
 	}
 
-	checksum = (~checksum) + 1;
+	arrayChecksum = (~arrayChecksum) + 1;
 
 	//checksum updated
-	return checksum;
-}
-
-
-
-
-//find 8-bit checksum of message
-byte airComms::findChecksum(String buff)
-{
-	//initializw checksum
-	byte checksum = 0;
-
-	//compute checksum
-	for (byte i = 0; i < BUFF_LEN; i++)
-	{
-		checksum = checksum + buff[i];
-	}
-
-	checksum = (~checksum) + 1;
-
-	//checksum updated
-	return checksum;
+	return arrayChecksum;
 }
