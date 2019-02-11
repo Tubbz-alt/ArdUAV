@@ -1,6 +1,7 @@
 #include "GS_Serial.h"
 
 #include "Shared_Tools.h"
+#include "GS_Tools.h"
 #include "AirComms.h"
 
 
@@ -15,22 +16,35 @@ void serialEvent()
 	while (GS_TELEM_PORT.available())
 	{
 		//add it to the inputString if the packet isn't complete yet:
-		if (!myRadio.stringComplete_Radio)
+		if (!myRadio.arrayComplete_Radio)
 		{
 			//get the new byte:
-			char inChar = (char)GS_TELEM_PORT.read();
+			byte inByte = GS_TELEM_PORT.read();
 
-			//add char to input string buffer
-			myRadio.inputString_Radio += inChar;
-
-			//test if the length of the string is at least one
-			if (myRadio.inputString_Radio.length() >= 1)
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
 			{
-				//if the first byte isn't correct, clear the string buffer and start over
-				if (myRadio.inputString_Radio[0] != START_BYTE)
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
 				{
-					//clear the string buffer
-					myRadio.inputString_Radio = "";
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -42,25 +56,33 @@ void serialEvent()
 		}
 
 		//check size of input buffer to see if it is big enough to fit a full packet
-		if (myRadio.inputString_Radio.length() >= BUFF_LEN)
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
 		{
 			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
-			if (myRadio.inputString_Radio[BUFF_LEN - 1] == END_BYTE)
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
 			{
 				//optional debugging prints
-				/*for (byte i = 0; i < myRadio.inputString_Radio.length(); i++)
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
 				{
-					Serial.print((int)myRadio.inputString_Radio[i]); Serial.print(" ");
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
 				}
 				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//set this flag to true so the data can be processed
-				myRadio.stringComplete_Radio = true;
+				myRadio.arrayComplete_Radio = true;
 			}
 			else
 			{
-				//clear the string buffer and start over
-				myRadio.inputString_Radio = "";
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
 			}
 		}
 	}
@@ -75,22 +97,35 @@ void serialEvent1()
 	while (GS_TELEM_PORT.available())
 	{
 		//add it to the inputString if the packet isn't complete yet:
-		if (!myRadio.stringComplete_Radio)
+		if (!myRadio.arrayComplete_Radio)
 		{
 			//get the new byte:
-			char inChar = (char)GS_TELEM_PORT.read();
+			byte inByte = GS_TELEM_PORT.read();
 
-			//add char to input string buffer
-			myRadio.inputString_Radio += inChar;
-
-			//test if the length of the string is at least one
-			if (myRadio.inputString_Radio.length() >= 1)
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
 			{
-				//if the first byte isn't correct, clear the string buffer and start over
-				if (myRadio.inputString_Radio[0] != START_BYTE)
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
 				{
-					//clear the string buffer
-					myRadio.inputString_Radio = "";
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -102,25 +137,33 @@ void serialEvent1()
 		}
 
 		//check size of input buffer to see if it is big enough to fit a full packet
-		if (myRadio.inputString_Radio.length() >= BUFF_LEN)
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
 		{
 			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
-			if (myRadio.inputString_Radio[BUFF_LEN - 1] == END_BYTE)
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
 			{
 				//optional debugging prints
-				/*for (byte i = 0; i < myRadio.inputString_Radio.length(); i++)
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
 				{
-					Serial.print((int)myRadio.inputString_Radio[i]); Serial.print(" ");
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
 				}
 				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//set this flag to true so the data can be processed
-				myRadio.stringComplete_Radio = true;
+				myRadio.arrayComplete_Radio = true;
 			}
 			else
 			{
-				//clear the string buffer and start over
-				myRadio.inputString_Radio = "";
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
 			}
 		}
 	}
@@ -135,22 +178,35 @@ void serialEvent2()
 	while (GS_TELEM_PORT.available())
 	{
 		//add it to the inputString if the packet isn't complete yet:
-		if (!myRadio.stringComplete_Radio)
+		if (!myRadio.arrayComplete_Radio)
 		{
 			//get the new byte:
-			char inChar = (char)GS_TELEM_PORT.read();
+			byte inByte = GS_TELEM_PORT.read();
 
-			//add char to input string buffer
-			myRadio.inputString_Radio += inChar;
-
-			//test if the length of the string is at least one
-			if (myRadio.inputString_Radio.length() >= 1)
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
 			{
-				//if the first byte isn't correct, clear the string buffer and start over
-				if (myRadio.inputString_Radio[0] != START_BYTE)
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
 				{
-					//clear the string buffer
-					myRadio.inputString_Radio = "";
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -162,25 +218,33 @@ void serialEvent2()
 		}
 
 		//check size of input buffer to see if it is big enough to fit a full packet
-		if (myRadio.inputString_Radio.length() >= BUFF_LEN)
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
 		{
 			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
-			if (myRadio.inputString_Radio[BUFF_LEN - 1] == END_BYTE)
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
 			{
 				//optional debugging prints
-				/*for (byte i = 0; i < myRadio.inputString_Radio.length(); i++)
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
 				{
-					Serial.print((int)myRadio.inputString_Radio[i]); Serial.print(" ");
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
 				}
 				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//set this flag to true so the data can be processed
-				myRadio.stringComplete_Radio = true;
+				myRadio.arrayComplete_Radio = true;
 			}
 			else
 			{
-				//clear the string buffer and start over
-				myRadio.inputString_Radio = "";
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
 			}
 		}
 	}
@@ -195,22 +259,35 @@ void serialEvent3()
 	while (GS_TELEM_PORT.available())
 	{
 		//add it to the inputString if the packet isn't complete yet:
-		if (!myRadio.stringComplete_Radio)
+		if (!myRadio.arrayComplete_Radio)
 		{
 			//get the new byte:
-			char inChar = (char)GS_TELEM_PORT.read();
+			byte inByte = GS_TELEM_PORT.read();
 
-			//add char to input string buffer
-			myRadio.inputString_Radio += inChar;
-
-			//test if the length of the string is at least one
-			if (myRadio.inputString_Radio.length() >= 1)
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
 			{
-				//if the first byte isn't correct, clear the string buffer and start over
-				if (myRadio.inputString_Radio[0] != START_BYTE)
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
 				{
-					//clear the string buffer
-					myRadio.inputString_Radio = "";
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -222,25 +299,33 @@ void serialEvent3()
 		}
 
 		//check size of input buffer to see if it is big enough to fit a full packet
-		if (myRadio.inputString_Radio.length() >= BUFF_LEN)
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
 		{
 			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
-			if (myRadio.inputString_Radio[BUFF_LEN - 1] == END_BYTE)
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
 			{
 				//optional debugging prints
-				/*for (byte i = 0; i < myRadio.inputString_Radio.length(); i++)
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
 				{
-					Serial.print((int)myRadio.inputString_Radio[i]); Serial.print(" ");
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
 				}
 				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//set this flag to true so the data can be processed
-				myRadio.stringComplete_Radio = true;
+				myRadio.arrayComplete_Radio = true;
 			}
 			else
 			{
-				//clear the string buffer and start over
-				myRadio.inputString_Radio = "";
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
 			}
 		}
 	}
@@ -255,22 +340,35 @@ void serialEvent4()
 	while (GS_TELEM_PORT.available())
 	{
 		//add it to the inputString if the packet isn't complete yet:
-		if (!myRadio.stringComplete_Radio)
+		if (!myRadio.arrayComplete_Radio)
 		{
 			//get the new byte:
-			char inChar = (char)GS_TELEM_PORT.read();
+			byte inByte = GS_TELEM_PORT.read();
 
-			//add char to input string buffer
-			myRadio.inputString_Radio += inChar;
-
-			//test if the length of the string is at least one
-			if (myRadio.inputString_Radio.length() >= 1)
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
 			{
-				//if the first byte isn't correct, clear the string buffer and start over
-				if (myRadio.inputString_Radio[0] != START_BYTE)
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
 				{
-					//clear the string buffer
-					myRadio.inputString_Radio = "";
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -282,25 +380,33 @@ void serialEvent4()
 		}
 
 		//check size of input buffer to see if it is big enough to fit a full packet
-		if (myRadio.inputString_Radio.length() >= BUFF_LEN)
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
 		{
 			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
-			if (myRadio.inputString_Radio[BUFF_LEN - 1] == END_BYTE)
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
 			{
 				//optional debugging prints
-				/*for (byte i = 0; i < myRadio.inputString_Radio.length(); i++)
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
 				{
-					Serial.print((int)myRadio.inputString_Radio[i]); Serial.print(" ");
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
 				}
 				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//set this flag to true so the data can be processed
-				myRadio.stringComplete_Radio = true;
+				myRadio.arrayComplete_Radio = true;
 			}
 			else
 			{
-				//clear the string buffer and start over
-				myRadio.inputString_Radio = "";
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
 			}
 		}
 	}
@@ -315,22 +421,35 @@ void serialEvent5()
 	while (GS_TELEM_PORT.available())
 	{
 		//add it to the inputString if the packet isn't complete yet:
-		if (!myRadio.stringComplete_Radio)
+		if (!myRadio.arrayComplete_Radio)
 		{
 			//get the new byte:
-			char inChar = (char)GS_TELEM_PORT.read();
+			byte inByte = GS_TELEM_PORT.read();
 
-			//add char to input string buffer
-			myRadio.inputString_Radio += inChar;
-
-			//test if the length of the string is at least one
-			if (myRadio.inputString_Radio.length() >= 1)
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
 			{
-				//if the first byte isn't correct, clear the string buffer and start over
-				if (myRadio.inputString_Radio[0] != START_BYTE)
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
 				{
-					//clear the string buffer
-					myRadio.inputString_Radio = "";
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -342,25 +461,33 @@ void serialEvent5()
 		}
 
 		//check size of input buffer to see if it is big enough to fit a full packet
-		if (myRadio.inputString_Radio.length() >= BUFF_LEN)
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
 		{
 			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
-			if (myRadio.inputString_Radio[BUFF_LEN - 1] == END_BYTE)
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
 			{
 				//optional debugging prints
-				/*for (byte i = 0; i < myRadio.inputString_Radio.length(); i++)
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
 				{
-					Serial.print((int)myRadio.inputString_Radio[i]); Serial.print(" ");
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
 				}
 				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//set this flag to true so the data can be processed
-				myRadio.stringComplete_Radio = true;
+				myRadio.arrayComplete_Radio = true;
 			}
 			else
 			{
-				//clear the string buffer and start over
-				myRadio.inputString_Radio = "";
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
 			}
 		}
 	}
@@ -375,22 +502,35 @@ void serialEvent6()
 	while (GS_TELEM_PORT.available())
 	{
 		//add it to the inputString if the packet isn't complete yet:
-		if (!myRadio.stringComplete_Radio)
+		if (!myRadio.arrayComplete_Radio)
 		{
 			//get the new byte:
-			char inChar = (char)GS_TELEM_PORT.read();
+			byte inByte = GS_TELEM_PORT.read();
 
-			//add char to input string buffer
-			myRadio.inputString_Radio += inChar;
-
-			//test if the length of the string is at least one
-			if (myRadio.inputString_Radio.length() >= 1)
+			//test if the index counter is still in the array bound (don't want to access things outside of our array)
+			if (myRadio.inputArray_CurrentIndex < BUFF_LEN)
 			{
-				//if the first byte isn't correct, clear the string buffer and start over
-				if (myRadio.inputString_Radio[0] != START_BYTE)
+				//add char to input string buffer
+				myRadio.inputArray_Radio[myRadio.inputArray_CurrentIndex] = inByte;
+
+				//increment the array counter
+				myRadio.inputArray_CurrentIndex++;
+
+				//test if the length of the string is at least one
+				if (myRadio.inputArray_CurrentIndex >= 1)
 				{
-					//clear the string buffer
-					myRadio.inputString_Radio = "";
+					//if the first byte isn't correct, reset the index counter and start over
+					if (myRadio.inputArray_Radio[0] != START_BYTE)
+					{
+						//reset the index counter
+						myRadio.inputArray_CurrentIndex = 0;
+
+						//reset the whole array
+						for (byte i = 0; i < BUFF_LEN; i++)
+						{
+							myRadio.inputArray_Radio[i] = 0;
+						}
+					}
 				}
 			}
 		}
@@ -402,25 +542,33 @@ void serialEvent6()
 		}
 
 		//check size of input buffer to see if it is big enough to fit a full packet
-		if (myRadio.inputString_Radio.length() >= BUFF_LEN)
+		if (myRadio.inputArray_CurrentIndex == BUFF_LEN)
 		{
 			//check to see if the char in the (BUFF_LEN - 1) position is correctly the value of END_BYTE
-			if (myRadio.inputString_Radio[BUFF_LEN - 1] == END_BYTE)
+			if (myRadio.inputArray_Radio[BUFF_LEN - 1] == END_BYTE)
 			{
 				//optional debugging prints
-				/*for (byte i = 0; i < myRadio.inputString_Radio.length(); i++)
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/*for (byte i = 0; i < BUFF_LEN; i++)
 				{
-					Serial.print((int)myRadio.inputString_Radio[i]); Serial.print(" ");
+					Serial.print(myRadio.inputArray_Radio[i]); Serial.print(" ");
 				}
 				Serial.println();*/
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//set this flag to true so the data can be processed
-				myRadio.stringComplete_Radio = true;
+				myRadio.arrayComplete_Radio = true;
 			}
 			else
 			{
-				//clear the string buffer and start over
-				myRadio.inputString_Radio = "";
+				//reset the index counter
+				myRadio.inputArray_CurrentIndex = 0;
+
+				//reset the whole array
+				for (byte i = 0; i < BUFF_LEN; i++)
+				{
+					myRadio.inputArray_Radio[i] = 0;
+				}
 			}
 		}
 	}
