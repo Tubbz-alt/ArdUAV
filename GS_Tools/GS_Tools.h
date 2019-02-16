@@ -17,32 +17,32 @@
 //macros
 #define GS
 
-#define YAW_ANALOG_PIN			    0
-#define THROTTLE_ANALOG_PIN		    1
-#define ROLL_ANALOG_PIN			    2
-#define PITCH_ANALOG_PIN		    3
+#define YAW_ANALOG_PIN			0
+#define THROTTLE_ANALOG_PIN		1
+#define ROLL_ANALOG_PIN			2
+#define PITCH_ANALOG_PIN		3
 
-#define PITCH_RATE_PIN			    0
-#define ROLL_RATE_PIN			    1
-#define YAW_RATE_PIN				2
+#define PITCH_RATE_PIN			0
+#define ROLL_RATE_PIN			1
+#define YAW_RATE_PIN			2
 
-#define AILERON_MAX_LOWRATES        325
-#define ELEVATOR_MAX_LOWRATES       350
-#define RUDDER_MAX_LOWRATES         292
+#define AILERON_MAX_LOWRATES        	325
+#define ELEVATOR_MAX_LOWRATES       	350
+#define RUDDER_MAX_LOWRATES         	292
 
-#define AILERON_MIN_LOWRATES        289
-#define ELEVATOR_MIN_LOWRATES       264
-#define RUDDER_MIN_LOWRATES         264
+#define AILERON_MIN_LOWRATES       	289
+#define ELEVATOR_MIN_LOWRATES       	264
+#define RUDDER_MIN_LOWRATES         	264
 
-#define THROTTLE_MIN_ADC            35880
-#define AILERON_MIN_ADC             35300
-#define ELEVATOR_MIN_ADC            36620
-#define RUDDER_MIN_ADC              37330
+#define THROTTLE_MIN_ADC            	35880
+#define AILERON_MIN_ADC             	35300
+#define ELEVATOR_MIN_ADC            	36620
+#define RUDDER_MIN_ADC              	37330
 
-#define THROTTLE_MAX_ADC            61220
-#define AILERON_MAX_ADC             60180
-#define ELEVATOR_MAX_ADC            62300
-#define RUDDER_MAX_ADC              62170
+#define THROTTLE_MAX_ADC            	61220
+#define AILERON_MAX_ADC             	60180
+#define ELEVATOR_MAX_ADC            	62300
+#define RUDDER_MAX_ADC              	62170
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
