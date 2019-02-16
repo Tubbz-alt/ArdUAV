@@ -23,6 +23,13 @@ IFC_Class myIFC;
 
 void IFC_Class::begin()
 {
+	//initialize variables
+	dataTimestamp_IMU = 0;
+	controlInputs.limiter_enable = true;
+
+
+
+
 	//initialize serial streams
 	IFC_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
 	IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
@@ -131,10 +138,10 @@ void IFC_Class::begin()
 	pwm.setPWMFreq(SERVO_FREQ);
 
 	//initialize each individual servo to their respective center position
-	pwm.setPWM(RUDDER_PIN, 0, (RUDDER_MAX + RUDDER_MIN) / 2);
-	pwm.setPWM(ELEVATOR_PIN, 0, (ELEVATOR_MAX + ELEVATOR_MIN) / 2);
-	pwm.setPWM(L_AILERON_PIN, 0, (AILERON_MAX + AILERON_MIN) / 2);
-	pwm.setPWM(R_AILERON_PIN, 0, (AILERON_MAX + AILERON_MIN) / 2);
+	pwm.setPWM(RUDDER_PIN, 0, RUDDER_MID);
+	pwm.setPWM(ELEVATOR_PIN, 0, ELEVATOR_MID);
+	pwm.setPWM(L_AILERON_PIN, 0, AILERON_MID);
+	pwm.setPWM(R_AILERON_PIN, 0, AILERON_MID);
 	IFC_DEBUG_PORT.println(F("\tServo driver and servos initialized..."));
 
 
@@ -192,6 +199,9 @@ int IFC_Class::grabData_IMU()
 	//convert Euler angles from degrees to radians - ONLY USED FOR LiDAR CORRECTION
 	telemetry.convertedRoll = (telemetry.rollAngle) * (M_PI / 180);
 	telemetry.convertedPitch = (telemetry.pitchAngle) * (M_PI / 180);
+
+	//timestamp the new data
+	dataTimestamp_IMU = millis();
 
 	return 1;
 }
@@ -257,13 +267,13 @@ int IFC_Class::grabData_Radio()
 		controlInputs.flaps_command = myRadio.incomingArray[AIR_FLAPS_INDEX];
 
 		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
-		bankPitchLimiter(true);
+		bankPitchLimiter(controlInputs.limiter_enable, true);
 	}
 	else if (!linkConnected)
 	{
 		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
 		//update servos with new values automatically if there is a loss of link
-		bankPitchLimiter(false);
+		bankPitchLimiter(controlInputs.limiter_enable, false);
 	}
 
 	return result;
@@ -399,29 +409,34 @@ bool IFC_Class::checkRadioLink()
 
 
 //keep the plane from pitching or rolling too much in any direction
-void IFC_Class::bankPitchLimiter(bool _linkConnected)
+void IFC_Class::bankPitchLimiter(bool enable, bool _linkConnected)
 {
-	if (_linkConnected)
+	//determine if user wants to engage the bank and pitch limiter
+	if (enable)
 	{
-		//update struct based on euler angles
-		updateControlsLimiter(true);	//pitch
-		updateControlsLimiter(false);	//roll
-	}
-	else
-	{
-		//use timer to send commands to the servos at a fixed rate
-		currentTime_Limiter = millis();
-		if ((currentTime_Limiter - timeBench_Limiter) >= REPORT_COMMANDS_PERIOD)
+		//determine if the radio link is healthy and connected
+		if (_linkConnected)
 		{
-			//reset timer
-			timeBench_Limiter = currentTime_Limiter;
-
 			//update struct based on euler angles
-			updateControlsLimiter(true);	//pitch
-			updateControlsLimiter(false);	//roll
+			updateControlsLimiter(PITCH_AXIS);	//pitch
+			updateControlsLimiter(ROLL_AXIS);	//roll
+		}
+		else
+		{
+			//use timer to send commands to the servos at a fixed rate
+			currentTime_Limiter = millis();
+			if ((currentTime_Limiter - timeBench_Limiter) >= REPORT_COMMANDS_PERIOD)
+			{
+				//reset timer
+				timeBench_Limiter = currentTime_Limiter;
 
-			//update servo positions (use controlInputs commands)
-			updateServos();
+				//update struct based on euler angles
+				updateControlsLimiter(PITCH_AXIS);	//pitch
+				updateControlsLimiter(ROLL_AXIS);	//roll
+
+				//update servo positions (use controlInputs commands)
+				updateServos();
+			}
 		}
 	}
 
@@ -434,14 +449,74 @@ void IFC_Class::bankPitchLimiter(bool _linkConnected)
 //update struct based on euler angles
 void IFC_Class::updateControlsLimiter(bool axis)
 {
-	//determine if pitch or roll should be tweaked (axis==true --> pitch, axis==false --> roll)
-	if (axis)
+	//minimum servo command to get back to safe flight
+	uint16_t minServoCommand;
+
+	//determine if the current IMU data is old - if so, get new IMU data
+	if ((millis() - dataTimestamp_IMU) >= LIMITER_PERIOD)
 	{
-		//
+		//grab IMU data
+		grabData_IMU();
 	}
-	else
+
+	//determine if pitch or roll should be tweaked (axis==true --> pitch, axis==false --> roll)
+	if (axis == PITCH_AXIS)
 	{
-		//
+		//determine if the current pitch angle is too low
+		if (telemetry.pitchAngle <= UNSAFE_PITCH_UP)
+		{
+			//determine minimum servo command to get back to safe flight
+			minServoCommand = constrain(map(abs(telemetry.pitchAngle), abs(UNSAFE_PITCH_UP), abs(MAX_PITCH_UP), ELEVATOR_MID, ELEVATOR_MIN), ELEVATOR_MIN, ELEVATOR_MID);
+			
+			//determine if minimum servo command is less than current servo command - if so, replace current command with minimum servo command
+			if (minServoCommand < controlInputs.pitch_command)
+			{
+				//update controlInputs struct
+				controlInputs.pitch_command = minServoCommand;
+			}
+		}
+		//determine if the current pitch angle is too high
+		else if (telemetry.pitchAngle >= UNSAFE_PITCH_DOWN)
+		{
+			//determine minimum servo command to get back to safe flight
+			minServoCommand = constrain(map(abs(telemetry.pitchAngle), abs(UNSAFE_PITCH_DOWN), abs(MAX_PITCH_DOWN), ELEVATOR_MID, ELEVATOR_MAX), ELEVATOR_MID, ELEVATOR_MAX);
+		
+			//determine if minimum servo command is more than current servo command - if so, replace current command with minimum servo command
+			if (minServoCommand > controlInputs.pitch_command)
+			{
+				//update controlInputs struct
+				controlInputs.pitch_command = minServoCommand;
+			}
+		}
+	}
+	else if (axis == ROLL_AXIS)
+	{
+		//determine if the current roll angle is too low
+		if (telemetry.rollAngle <= UNSAFE_ROLL_R)
+		{
+			//determine minimum servo command to get back to safe flight
+			minServoCommand = constrain(map(abs(telemetry.rollAngle), abs(UNSAFE_ROLL_R), abs(MAX_ROLL_R), AILERON_MID, AILERON_MAX), AILERON_MID, AILERON_MAX);
+
+			//determine if minimum servo command is more than current servo command - if so, replace current command with minimum servo command
+			if (minServoCommand > controlInputs.roll_command)
+			{
+				//update controlInputs struct
+				controlInputs.roll_command = minServoCommand;
+			}
+		}
+		//determine if the current roll angle is too high
+		else if (telemetry.rollAngle >= UNSAFE_ROLL_L)
+		{
+			//determine minimum servo command to get back to safe flight
+			minServoCommand = constrain(map(abs(telemetry.rollAngle), abs(UNSAFE_ROLL_L), abs(MAX_ROLL_L), AILERON_MID, AILERON_MIN), AILERON_MIN, AILERON_MID);
+
+			//determine if minimum servo command is less than current servo command - if so, replace current command with minimum servo command
+			if (minServoCommand < controlInputs.roll_command)
+			{
+				//update controlInputs struct
+				controlInputs.roll_command = minServoCommand;
+			}
+		}
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////
