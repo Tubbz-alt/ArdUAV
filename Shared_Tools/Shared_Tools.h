@@ -13,27 +13,27 @@
 //macros
 #define DEBUG_PORT_BAUD			115200
 #define COMMAND_PORT_BAUD		115200
-#define GPS_PORT_BAUD			  9600
+#define GPS_PORT_BAUD			9600
 #define TELEM_PORT_BAUD			9600
 
 #define REPORT_COMMANDS_FREQ	50	//Hz
-#define REPORT_TELEM_FREQ		  10	//Hz
+#define REPORT_TELEM_FREQ		10	//Hz
 #define REPORT_COMMANDS_PERIOD	(byte)((1.0/REPORT_COMMANDS_FREQ) * 1000)	//ms
-#define REPORT_TELEM_PERIOD		  (byte)((1.0/REPORT_TELEM_FREQ) * 1000)		//ms
+#define REPORT_TELEM_PERIOD		(byte)((1.0/REPORT_TELEM_FREQ) * 1000)		//ms
 
 #define LOSS_LINK_TIMOUT		1000 //ms
 
 #define ANALOG_RESOLUTION		16
 
 #define ELEVATOR_INDEX			0
-#define AILERON_INDEX			  1
-#define RUDDER_INDEX			  2
+#define AILERON_INDEX			1
+#define RUDDER_INDEX			2
 #define THROTTLE_INDEX			3
 #define NOSE_GEAR_INDEX			5
 
 #define AILERON_OFFSET			0
 #define ELEVATOR_OFFSET			0
-#define RUDDER_OFFSET			  0
+#define RUDDER_OFFSET			0
 #define THROTTLE_OFFSET			0
 
 #define THROTTLE_MAX			170 //full throttle
