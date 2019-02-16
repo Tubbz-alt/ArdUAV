@@ -55,16 +55,16 @@ class GS_Class
 public:
 	struct telemetry
 	{
-		float altitude;				//cm
-		float rollAngle;			//radians
-		float pitchAngle;			//radians
-		float velocity;				//m/s
-		float latitude;				//dd
-		float longitude;			//dd
-		uint16_t UTC_year;			//y
-		uint16_t UTC_month;			//M
-		uint16_t UTC_day;			//d
-		uint16_t UTC_hour;			//h
+		float altitude;			//cm
+		float rollAngle;		//radians
+		float pitchAngle;		//radians
+		float velocity;			//m/s
+		float latitude;			//dd
+		float longitude;		//dd
+		uint16_t UTC_year;		//y
+		uint16_t UTC_month;		//M
+		uint16_t UTC_day;		//d
+		uint16_t UTC_hour;		//h
 		uint16_t UTC_minute;		//m
 		uint16_t UTC_second;		//s
 		float speedOverGround;		//knots
@@ -142,8 +142,8 @@ private:
 		ROLL_ANALOG_PIN,        //analog_pin
 		ROLL_RATE_PIN,          //rate_pin
 		AILERON_OFFSET,         //_offset
-		AILERON_MAX,			//high_rates_surface_max
-		AILERON_MIN,			//high_rates_surface_min
+		AILERON_MAX,		//high_rates_surface_max
+		AILERON_MIN,		//high_rates_surface_min
 		AILERON_MAX_LOWRATES,   //low_rates_surface_max
 		AILERON_MIN_LOWRATES,   //low_rates_surface_min
 		AILERON_MAX_ADC,        //ADC_max
@@ -156,8 +156,8 @@ private:
 		PITCH_ANALOG_PIN,       //analog_pin
 		PITCH_RATE_PIN,         //rate_pin
 		ELEVATOR_OFFSET,        //_offset
-		ELEVATOR_MAX,			//high_rates_surface_max
-		ELEVATOR_MIN,			//high_rates_surface_min
+		ELEVATOR_MAX,		//high_rates_surface_max
+		ELEVATOR_MIN,		//high_rates_surface_min
 		ELEVATOR_MAX_LOWRATES,  //low_rates_surface_max
 		ELEVATOR_MIN_LOWRATES,  //low_rates_surface_min
 		ELEVATOR_MAX_ADC,       //ADC_max
@@ -170,8 +170,8 @@ private:
 		YAW_ANALOG_PIN,         //analog_pin
 		YAW_RATE_PIN,           //rate_pin
 		RUDDER_OFFSET,          //_offset
-		RUDDER_MAX,				//high_rates_surface_max
-		RUDDER_MIN,				//high_rates_surface_min
+		RUDDER_MAX,		//high_rates_surface_max
+		RUDDER_MIN,		//high_rates_surface_min
 		RUDDER_MAX_LOWRATES,    //low_rates_surface_max
 		RUDDER_MIN_LOWRATES,    //low_rates_surface_min
 		RUDDER_MAX_ADC,         //ADC_max
