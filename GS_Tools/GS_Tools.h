@@ -17,10 +17,10 @@
 //macros
 #define GS
 
-#define YAW_ANALOG_PIN			0
-#define THROTTLE_ANALOG_PIN		1
-#define ROLL_ANALOG_PIN			2
-#define PITCH_ANALOG_PIN		3
+#define YAW_ANALOG_PIN			A0
+#define THROTTLE_ANALOG_PIN		A1
+#define ROLL_ANALOG_PIN			A2
+#define PITCH_ANALOG_PIN		A3
 
 #define PITCH_RATE_PIN			0
 #define ROLL_RATE_PIN			1
