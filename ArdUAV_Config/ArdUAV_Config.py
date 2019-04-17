@@ -160,6 +160,7 @@ class AppWindow(QDialog):
                                                                      'MaxPitchDownAngle': ""},
                                                'OtherSettings': {'PitotTubeAnalogPin': "",
                                                                  'LiDARFixedMount': ""}}}
+        self.getParameters()
 
     def setupSignals(self):
         self.ui.GetCurrentValues.clicked.connect(self.getParameters)
