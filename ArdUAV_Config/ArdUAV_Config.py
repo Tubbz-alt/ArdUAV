@@ -504,6 +504,9 @@ class AppWindow(QDialog):
 
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_CommandPortNumber'])
         self.ui.IFCCommandPort.setCurrentIndex(self.value)
+		
+        self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_GPSPortNumber'])
+        self.ui.IFCGPSPort.setCurrentIndex(self.value)
 
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_TelemetryPortNumber'])
         self.ui.IFCTelemetryPort.setCurrentIndex(self.value)
