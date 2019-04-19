@@ -718,11 +718,11 @@ class AppWindow(QDialog):
                     line = line.replace(line.split()[2], newValue)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_MAX_ADC":
-                    newValue = self.ui.MaxElevatorServoValue.text()
+                    newValue = self.ui.MaxElevatorADCValue.text()
                     line = line.replace(line.split()[2], newValue)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MAX_ADC":
-                    newValue = self.ui.MaxRudderServoValue.text()
+                    newValue = self.ui.MaxRudderADCValue.text()
                     line = line.replace(line.split()[2], newValue)
             newContents.append(line)
 
