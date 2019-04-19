@@ -228,7 +228,7 @@ bool GS_Class::checkRadioLink()
 			noPacketFlag = true;
 		}
 
-		if ((myGS.currentTime_Telem - myGS.timeBench_Telem) >= LOSS_LINK_TIMOUT)
+		if ((myGS.currentTime_Telem - myGS.timeBench_Telem) >= LOSS_LINK_TIMEOUT)
 		{
 			//link is severed - unset flag if not alread unset
 			linkConnected = false;
