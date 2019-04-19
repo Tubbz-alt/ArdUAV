@@ -382,7 +382,7 @@ bool IFC_Class::checkRadioLink()
 			noPacketFlag = true;
 		}
 
-		if ((currentTime_Commands - timeBench_Commands) >= LOSS_LINK_TIMOUT)
+		if ((currentTime_Commands - timeBench_Commands) >= LOSS_LINK_TIMEOUT)
 		{
 			//link is severed - unset flag if not alread unset
 			linkConnected = false;
