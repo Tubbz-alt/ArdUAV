@@ -13,9 +13,9 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
-#define GS_DEBUG_PORT_NUMBER      0	//Serial
+#define GS_DEBUG_PORT_NUMBER      2	//Serial2
 #define GS_COMMAND_PORT_NUMBER    4	//Serial4
-#define GS_TELEM_PORT_NUMBER      5	//Serial5
+#define GS_TELEM_PORT_NUMBER      3	//Serial3
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -23,7 +23,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
-#if GS_DEBUGD_PORT_NUMBER == 0
+#if GS_DEBUG_PORT_NUMBER == 0
 #define GS_DEBUG_PORT Serial
 #elif GS_DEBUG_PORT_NUMBER == 1
 #define GS_DEBUG_PORT Serial1

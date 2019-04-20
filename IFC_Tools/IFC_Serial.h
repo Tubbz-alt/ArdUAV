@@ -11,10 +11,10 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
-#define IFC_DEBUG_PORT_NUMBER     0	//Serial
-#define IFC_COMMAND_PORT_NUMBER   2	//Serial2
-#define IFC_GPS_PORT_NUMBER       3	//Serial3
-#define IFC_TELEM_PORT_NUMBER     4	//Serial4
+#define IFC_DEBUG_PORT_NUMBER     0	//USB
+#define IFC_COMMAND_PORT_NUMBER   4	//Serial4
+#define IFC_GPS_PORT_NUMBER       1	//Serial1
+#define IFC_TELEM_PORT_NUMBER     3	//Serial3
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -88,7 +88,7 @@ extern void serialEvent();
 
 #elif IFC_GPS_PORT_NUMBER == 1
 
-#define IFC_COMMAND_PORT Serial1
+#define IFC_GPS_PORT Serial1
 extern void serialEvent1();
 
 #elif IFC_GPS_PORT_NUMBER == 2

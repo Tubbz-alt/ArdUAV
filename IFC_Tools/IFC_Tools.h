@@ -29,7 +29,7 @@
 
 #define PITOT_PIN			A9	//analog input pin
 
-#define THROTTLE_PIN			12	//digital ESC signal pin
+#define THROTTLE_PIN			17	//digital ESC signal pin
 #define R_AILERON_PIN			39	//servo driver output port number
 #define L_AILERON_PIN			16	//servo driver output port number
 #define ELEVATOR_PIN			24	//servo driver output port number

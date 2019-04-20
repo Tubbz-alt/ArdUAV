@@ -11,13 +11,13 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
-#define DEBUG_PORT_BAUD			115200
+#define DEBUG_PORT_BAUD			9600
 #define COMMAND_PORT_BAUD		115200
 #define GPS_PORT_BAUD			9600
 #define TELEM_PORT_BAUD			9600
 
-#define REPORT_COMMANDS_FREQ	50	//Hz
-#define REPORT_TELEM_FREQ		10	//Hz
+#define REPORT_COMMANDS_FREQ	50.00	//Hz
+#define REPORT_TELEM_FREQ		10.00	//Hz
 #define REPORT_COMMANDS_PERIOD	(byte)((1.0/REPORT_COMMANDS_FREQ) * 1000)	//ms
 #define REPORT_TELEM_PERIOD		(byte)((1.0/REPORT_TELEM_FREQ) * 1000)		//ms
 
@@ -37,9 +37,9 @@
 #define THROTTLE_OFFSET			0
 
 #define THROTTLE_MAX			170 //full throttle
-#define AILERON_MAX				430 //roll left
-#define ELEVATOR_MAX			480 //nose up
-#define RUDDER_MAX				430 //nose left
+#define AILERON_MAX				255 //roll left
+#define ELEVATOR_MAX			255 //nose up
+#define RUDDER_MAX				255 //nose left
 
 #define THROTTLE_MIN			50  //no throttle
 #define AILERON_MIN				230 //roll right
