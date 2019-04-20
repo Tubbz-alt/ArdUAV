@@ -28,14 +28,14 @@
 #include <stdarg.h>
 #include "ArdUAV_LIDARLite.h"
 
-extern TwoWire Wire2;
-
 /*------------------------------------------------------------------------------
   Constructor
 
   Use LIDARLite::begin to initialize.
 ------------------------------------------------------------------------------*/
-LIDARLite::LIDARLite(){}
+LIDARLite::LIDARLite(TwoWire *i2c){
+  _i2c = i2c;
+}
 
 /*------------------------------------------------------------------------------
   Begin
@@ -52,12 +52,12 @@ LIDARLite::LIDARLite(){}
 ------------------------------------------------------------------------------*/
 void LIDARLite::begin(int configuration, bool fasti2c, char lidarliteAddress)
 {
-  Wire2.begin(); // Start I2C
+	_i2c->begin(); // Start I2C
 
   if(fasti2c)
   {
     #if ARDUINO >= 157
-      Wire2.setClock(400000UL); // Set I2C frequency to 400kHz, for Arduino Due
+	  _i2c->setClock(400000UL); // Set I2C frequency to 400kHz, for Arduino Due
     #else
       TWBR = ((F_CPU / 400000UL) - 16) / 2; // Set I2C frequency to 400kHz
     #endif
@@ -204,12 +204,12 @@ int LIDARLite::distance(bool biasCorrection, char lidarliteAddress)
 ------------------------------------------------------------------------------*/
 void LIDARLite::write(char myAddress, char myValue, char lidarliteAddress)
 {
-  Wire2.beginTransmission((int)lidarliteAddress);
-  Wire2.write((int)myAddress); // Set register for write
-  Wire2.write((int)myValue); // Write myValue to register
+	_i2c->beginTransmission((int)lidarliteAddress);
+	_i2c->write((int)myAddress); // Set register for write
+	_i2c->write((int)myValue); // Write myValue to register
 
   // A nack means the device is not responding, report the error over serial
-  int nackCatcher = Wire2.endTransmission();
+  int nackCatcher = _i2c->endTransmission();
   if(nackCatcher != 0)
   {
     Serial.println("> nack");
@@ -246,18 +246,18 @@ void LIDARLite::read(char myAddress, int numOfBytes, byte arrayToSave[2], bool m
   while(busyFlag != 0) // Loop until device is not busy
   {
     // Read status register to check busy flag
-    Wire2.beginTransmission((int)lidarliteAddress);
-    Wire2.write(0x01); // Set the status register to be read
+	  _i2c->beginTransmission((int)lidarliteAddress);
+	  _i2c->write(0x01); // Set the status register to be read
 
     // A nack means the device is not responding, report the error over serial
-    int nackCatcher = Wire2.endTransmission();
+    int nackCatcher = _i2c->endTransmission();
     if(nackCatcher != 0)
     {
       Serial.println("> nack");
     }
 
-    Wire2.requestFrom((int)lidarliteAddress,1); // Read register 0x01
-    busyFlag = bitRead(Wire2.read(),0); // Assign the LSB of the status register to busyFlag
+	_i2c->requestFrom((int)lidarliteAddress,1); // Read register 0x01
+    busyFlag = bitRead(_i2c->read(),0); // Assign the LSB of the status register to busyFlag
 
     busyCounter++; // Increment busyCounter for timeout
 
@@ -271,24 +271,24 @@ void LIDARLite::read(char myAddress, int numOfBytes, byte arrayToSave[2], bool m
   // Device is not busy, begin read
   if(busyFlag == 0)
   {
-    Wire2.beginTransmission((int)lidarliteAddress);
-    Wire2.write((int)myAddress); // Set the register to be read
+	  _i2c->beginTransmission((int)lidarliteAddress);
+	  _i2c->write((int)myAddress); // Set the register to be read
 
     // A nack means the device is not responding, report the error over serial
-    int nackCatcher = Wire2.endTransmission();
+    int nackCatcher = _i2c->endTransmission();
     if(nackCatcher != 0)
     {
       Serial.println("> nack");
     }
 
     // Perform read of 1 or 2 bytes, save in arrayToSave
-    Wire2.requestFrom((int)lidarliteAddress, numOfBytes);
+	_i2c->requestFrom((int)lidarliteAddress, numOfBytes);
     int i = 0;
-    if(numOfBytes <= Wire2.available())
+    if(numOfBytes <= _i2c->available())
     {
       while(i < numOfBytes)
       {
-        arrayToSave[i] = Wire2.read();
+        arrayToSave[i] = _i2c->read();
         i++;
       }
     }

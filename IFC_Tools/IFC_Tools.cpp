@@ -8,8 +8,8 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //sensor/actuator classes
-Adafruit_BNO055 bno = Adafruit_BNO055(55);
-LIDARLite myLidarLite;
+Adafruit_BNO055 bno = Adafruit_BNO055(&Wire, 55, BNO055_ADDRESS_A);
+LIDARLite myLidarLite(&Wire);
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(&Wire2, 0x40);
 Servo throttle;
 /////////////////////////////////////////////////////////////////////////////////////////

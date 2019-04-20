@@ -32,7 +32,7 @@
 class LIDARLite
 {
   public:
-      LIDARLite();
+      LIDARLite(TwoWire *I2C);
       void begin(int = 0, bool = false, char = LIDARLITE_ADDR_DEFAULT);
       void configure(int = 0, char = LIDARLITE_ADDR_DEFAULT);
       void reset(char = LIDARLITE_ADDR_DEFAULT);
@@ -40,6 +40,9 @@ class LIDARLite
       void write(char, char, char = LIDARLITE_ADDR_DEFAULT);
       void read(char, int, byte*, bool, char);
       void correlationRecordToSerial(char = '\n', int = 256, char = LIDARLITE_ADDR_DEFAULT);
+
+  private:
+	  TwoWire *_i2c;
 };
 
 #endif

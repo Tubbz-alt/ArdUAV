@@ -283,7 +283,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor
 #error "On an arduino Zero, BNO055's ADR pin must be high. Fix that, then delete this line."
     Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS_B );
 #else
-    Adafruit_BNO055 ( int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS_A );
+    Adafruit_BNO055 (TwoWire *I2C, int32_t sensorID = -1, uint8_t address = BNO055_ADDRESS_A );
 #endif
     bool  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
@@ -317,6 +317,8 @@ class Adafruit_BNO055 : public Adafruit_Sensor
     byte  read8   ( adafruit_bno055_reg_t );
     bool  readLen ( adafruit_bno055_reg_t, byte* buffer, uint8_t len );
     bool  write8  ( adafruit_bno055_reg_t, byte value );
+
+	TwoWire *_i2c;
 
     uint8_t _address;
     int32_t _sensorID;
