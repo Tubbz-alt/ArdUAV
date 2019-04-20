@@ -26,13 +26,13 @@
 #define ROLL_RATE_PIN			1
 #define YAW_RATE_PIN			2
 
-#define AILERON_MAX_LOWRATES        	325
-#define ELEVATOR_MAX_LOWRATES       	350
-#define RUDDER_MAX_LOWRATES         	292
+#define AILERON_MAX_LOWRATES        	2000
+#define ELEVATOR_MAX_LOWRATES       	2000
+#define RUDDER_MAX_LOWRATES         	2000
 
-#define AILERON_MIN_LOWRATES       	289
-#define ELEVATOR_MIN_LOWRATES       	264
-#define RUDDER_MIN_LOWRATES         	264
+#define AILERON_MIN_LOWRATES       	1000
+#define ELEVATOR_MIN_LOWRATES       	1000
+#define RUDDER_MIN_LOWRATES         	1000
 
 #define THROTTLE_MIN_ADC            	24130
 #define AILERON_MIN_ADC             	25190

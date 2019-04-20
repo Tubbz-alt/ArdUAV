@@ -6,7 +6,6 @@
 #include "AirComms.h"
 #include "neo6mGPS.h"
 #include "ArdUAV_Adafruit_BNO055.h"
-#include "ArdUAV_Adafruit_PWMServoDriver.h"
 #include "ArdUAV_LIDARLite.h"
 
 

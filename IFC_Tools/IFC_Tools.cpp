@@ -10,7 +10,10 @@
 //sensor/actuator classes
 Adafruit_BNO055 bno = Adafruit_BNO055(&Wire, 55, BNO055_ADDRESS_A);
 LIDARLite myLidarLite(&Wire);
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(&Wire2, 0x40);
+Servo rudder;
+Servo elevator;
+Servo aileron_L;
+Servo aileron_R;
 Servo throttle;
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -131,18 +134,18 @@ void IFC_Class::begin()
 
 
 
-	//initialize the servo driver
-	IFC_DEBUG_PORT.println(F("Initializing servo driver and servos..."));
-	//initialize the servo driver and set the frequency of all outputs to 50Hz
-	pwm.begin();
-	pwm.setPWMFreq(SERVO_FREQ);
-
 	//initialize each individual servo to their respective center position
-	pwm.setPWM(RUDDER_PIN, 0, RUDDER_MID);
-	pwm.setPWM(ELEVATOR_PIN, 0, ELEVATOR_MID);
-	pwm.setPWM(L_AILERON_PIN, 0, AILERON_MID);
-	pwm.setPWM(R_AILERON_PIN, 0, AILERON_MID);
-	IFC_DEBUG_PORT.println(F("\tServo driver and servos initialized..."));
+	IFC_DEBUG_PORT.println(F("Initializing Servos..."));
+	rudder.attach(RUDDER_PIN);
+	elevator.attach(ELEVATOR_PIN);
+	aileron_L.attach(L_AILERON_PIN);
+	aileron_R.attach(R_AILERON_PIN);
+
+	rudder.writeMicroseconds(RUDDER_MID);
+	elevator.writeMicroseconds(ELEVATOR_MID);
+	aileron_L.writeMicroseconds(AILERON_MID);
+	aileron_R.writeMicroseconds(AILERON_MID);
+	IFC_DEBUG_PORT.println(F("\tServos initialized..."));
 
 
 
@@ -325,10 +328,10 @@ void IFC_Class::updateServos()
 	throttle.write(constrain(controlInputs.throttle_command, THROTTLE_MIN, THROTTLE_MAX));
 
 	//update servo positions
-	pwm.setPWM(ELEVATOR_PIN, 0, constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
-	pwm.setPWM(RUDDER_PIN, 0, constrain(controlInputs.yaw_command, RUDDER_MIN, RUDDER_MAX));
-	pwm.setPWM(R_AILERON_PIN, 0, constrain(controlInputs.roll_command, AILERON_MIN, AILERON_MAX));
-	pwm.setPWM(L_AILERON_PIN, 0, constrain(controlInputs.roll_command, AILERON_MIN, AILERON_MAX));
+	elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
+	rudder.writeMicroseconds(constrain(controlInputs.yaw_command, RUDDER_MIN, RUDDER_MAX));
+	aileron_L.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN, AILERON_MAX));
+	aileron_R.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN, AILERON_MAX));
 
 	return;
 }
@@ -345,16 +348,16 @@ void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
 	}
 	else if (INDEX == ELEVATOR_INDEX)
 	{
-		pwm.setPWM(ELEVATOR_PIN, 0, constrain(value, ELEVATOR_MIN, ELEVATOR_MAX));
+		elevator.writeMicroseconds(constrain(value, ELEVATOR_MIN, ELEVATOR_MAX));
 	}
 	else if (INDEX == RUDDER_INDEX)
 	{
-		pwm.setPWM(RUDDER_PIN, 0, constrain(value, RUDDER_MIN, RUDDER_MAX));
+		rudder.writeMicroseconds(constrain(value, RUDDER_MIN, RUDDER_MAX));
 	}
 	else if (INDEX == AILERON_INDEX)
 	{
-		pwm.setPWM(R_AILERON_PIN, 0, constrain(value, AILERON_MIN, AILERON_MAX));
-		pwm.setPWM(L_AILERON_PIN, 0, constrain(value, AILERON_MIN, AILERON_MAX));
+		aileron_L.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
+		aileron_R.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
 	}
 	else
 	{

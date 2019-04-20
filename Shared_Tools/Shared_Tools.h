@@ -37,14 +37,14 @@
 #define THROTTLE_OFFSET			0
 
 #define THROTTLE_MAX			170 //full throttle
-#define AILERON_MAX				255 //roll left
-#define ELEVATOR_MAX			255 //nose up
-#define RUDDER_MAX				255 //nose left
+#define AILERON_MAX				2000 //roll left
+#define ELEVATOR_MAX			2000 //nose up
+#define RUDDER_MAX				2000 //nose left
 
 #define THROTTLE_MIN			50  //no throttle
-#define AILERON_MIN				230 //roll right
-#define ELEVATOR_MIN			250 //nose down
-#define RUDDER_MIN				210 //nose right
+#define AILERON_MIN				1000 //roll right
+#define ELEVATOR_MIN			1000 //nose down
+#define RUDDER_MIN				1000 //nose right
 
 #define AILERON_MID				(uint16_t)((AILERON_MAX + AILERON_MIN) / 2)
 #define ELEVATOR_MID			(uint16_t)((ELEVATOR_MAX + ELEVATOR_MIN) / 2)
