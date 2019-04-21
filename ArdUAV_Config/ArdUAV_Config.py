@@ -23,7 +23,7 @@ class AppWindow(QDialog):
         self.comboBoxIndicesBool = {'True': '1',
                                     'False': '0'}
 
-        self.servoPinComboBoxIndices = {'12': 0,
+        self.servoPinComboBoxIndices = {'2': 0,
                                         '39': 1,
                                         '16': 2,
                                         '24': 3,
@@ -40,7 +40,7 @@ class AppWindow(QDialog):
                                         '14': 14,
                                         '36': 15}
 
-        self.comboBoxIndicesServoPin = {'s0': '12',
+        self.comboBoxIndicesServoPin = {'s0': '2',
                                         's1': '39',
                                         's2': '16',
                                         's3': '24',

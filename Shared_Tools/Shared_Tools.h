@@ -11,12 +11,12 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
-#define DEBUG_PORT_BAUD			9600
+#define DEBUG_PORT_BAUD			115200
 #define COMMAND_PORT_BAUD		115200
 #define GPS_PORT_BAUD			9600
 #define TELEM_PORT_BAUD			9600
 
-#define REPORT_COMMANDS_FREQ	50.00	//Hz
+#define REPORT_COMMANDS_FREQ	20.00	//Hz
 #define REPORT_TELEM_FREQ		10.00	//Hz
 #define REPORT_COMMANDS_PERIOD	(byte)((1.0/REPORT_COMMANDS_FREQ) * 1000)	//ms
 #define REPORT_TELEM_PERIOD		(byte)((1.0/REPORT_TELEM_FREQ) * 1000)		//ms

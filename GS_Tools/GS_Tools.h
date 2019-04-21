@@ -20,7 +20,7 @@
 #define YAW_ANALOG_PIN			A2
 #define THROTTLE_ANALOG_PIN		A3
 #define ROLL_ANALOG_PIN			A0
-#define PITCH_ANALOG_PIN		A8
+#define PITCH_ANALOG_PIN		A17
 
 #define PITCH_RATE_PIN			0
 #define ROLL_RATE_PIN			1
