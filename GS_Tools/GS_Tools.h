@@ -26,23 +26,28 @@
 #define ROLL_RATE_PIN			1
 #define YAW_RATE_PIN			2
 
-#define AILERON_MAX_LOWRATES        	2000
-#define ELEVATOR_MAX_LOWRATES       	2000
-#define RUDDER_MAX_LOWRATES         	2000
+#define AILERON_MAX_LOWRATES	2000
+#define ELEVATOR_MAX_LOWRATES	2000
+#define RUDDER_MAX_LOWRATES		2000
 
-#define AILERON_MIN_LOWRATES       	1000
-#define ELEVATOR_MIN_LOWRATES       	1000
-#define RUDDER_MIN_LOWRATES         	1000
+#define AILERON_MIN_LOWRATES	1000
+#define ELEVATOR_MIN_LOWRATES	1000
+#define RUDDER_MIN_LOWRATES		1000
 
-#define THROTTLE_MIN_ADC            	24130
-#define AILERON_MIN_ADC             	25190
-#define ELEVATOR_MIN_ADC            	24030
-#define RUDDER_MIN_ADC              	25100
+#define THROTTLE_MIN_ADC		24130
+#define AILERON_MIN_ADC			25190
+#define ELEVATOR_MIN_ADC		24030
+#define RUDDER_MIN_ADC			25100
 
-#define THROTTLE_MAX_ADC            	41060
-#define AILERON_MAX_ADC             	41920
-#define ELEVATOR_MAX_ADC            	41220
-#define RUDDER_MAX_ADC              	41740
+#define THROTTLE_MAX_ADC		41060
+#define AILERON_MAX_ADC			41920
+#define ELEVATOR_MAX_ADC		41220
+#define RUDDER_MAX_ADC			41740
+
+#define AILERON_REVERSE			false
+#define ELEVATOR_REVERSE		true
+#define RUDDER_REVERSE			true
+#define THROTTLE_REVERSE		false
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -65,10 +70,10 @@ public:
 		uint16_t UTC_month;		//M
 		uint16_t UTC_day;		//d
 		uint16_t UTC_hour;		//h
-		uint16_t UTC_minute;		//m
-		uint16_t UTC_second;		//s
-		float speedOverGround;		//knots
-		float courseOverGround;		//degrees
+		uint16_t UTC_minute;	//m
+		uint16_t UTC_second;	//s
+		float speedOverGround;	//knots
+		float courseOverGround;	//degrees
 	} telemetry;
 
 	struct controlInputs
@@ -134,6 +139,7 @@ private:
 		uint16_t low_rates_surface_min;
 		uint16_t ADC_max;
 		uint16_t ADC_min;
+		bool reverse;
 	};
 
 	struct controlSurfaces ailerons
@@ -142,12 +148,13 @@ private:
 		ROLL_ANALOG_PIN,        //analog_pin
 		ROLL_RATE_PIN,          //rate_pin
 		AILERON_OFFSET,         //_offset
-		AILERON_MAX,		//high_rates_surface_max
-		AILERON_MIN,		//high_rates_surface_min
+		AILERON_MAX,			//high_rates_surface_max
+		AILERON_MIN,			//high_rates_surface_min
 		AILERON_MAX_LOWRATES,   //low_rates_surface_max
 		AILERON_MIN_LOWRATES,   //low_rates_surface_min
 		AILERON_MAX_ADC,        //ADC_max
-		AILERON_MIN_ADC         //ADC_min
+		AILERON_MIN_ADC,        //ADC_min
+		AILERON_REVERSE,        //flag to reverse servo throw direction
 	};
 
 	struct controlSurfaces elevator
@@ -156,12 +163,13 @@ private:
 		PITCH_ANALOG_PIN,       //analog_pin
 		PITCH_RATE_PIN,         //rate_pin
 		ELEVATOR_OFFSET,        //_offset
-		ELEVATOR_MAX,		//high_rates_surface_max
-		ELEVATOR_MIN,		//high_rates_surface_min
+		ELEVATOR_MAX,			//high_rates_surface_max
+		ELEVATOR_MIN,			//high_rates_surface_min
 		ELEVATOR_MAX_LOWRATES,  //low_rates_surface_max
 		ELEVATOR_MIN_LOWRATES,  //low_rates_surface_min
 		ELEVATOR_MAX_ADC,       //ADC_max
-		ELEVATOR_MIN_ADC        //ADC_min
+		ELEVATOR_MIN_ADC,       //ADC_min
+		ELEVATOR_REVERSE,       //flag to reverse servo throw direction
 	};
 
 	struct controlSurfaces rudder
@@ -170,12 +178,13 @@ private:
 		YAW_ANALOG_PIN,         //analog_pin
 		YAW_RATE_PIN,           //rate_pin
 		RUDDER_OFFSET,          //_offset
-		RUDDER_MAX,		//high_rates_surface_max
-		RUDDER_MIN,		//high_rates_surface_min
+		RUDDER_MAX,				//high_rates_surface_max
+		RUDDER_MIN,				//high_rates_surface_min
 		RUDDER_MAX_LOWRATES,    //low_rates_surface_max
 		RUDDER_MIN_LOWRATES,    //low_rates_surface_min
 		RUDDER_MAX_ADC,         //ADC_max
-		RUDDER_MIN_ADC          //ADC_max
+		RUDDER_MIN_ADC,         //ADC_max
+		RUDDER_REVERSE,         //flag to reverse servo throw direction
 	};
 
 	struct controlSurfaces throttle
@@ -189,7 +198,8 @@ private:
 		0,                      //low_rates_surface_max
 		0,                      //low_rates_surface_min
 		THROTTLE_MAX_ADC,       //ADC_max
-		THROTTLE_MIN_ADC        //ADC_max
+		THROTTLE_MIN_ADC,       //ADC_max
+		THROTTLE_REVERSE,       //flag to reverse motor direction
 	};
 	/////////////////////////////////////////////////////////////////////////////////////////
 

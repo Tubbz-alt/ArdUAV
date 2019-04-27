@@ -24,14 +24,14 @@ void GS_Class::begin()
 	//wait for all serial ports to come online
 	//while (!GS_DEBUG_PORT);
 	GS_DEBUG_PORT.println(F("Initializing serial ports..."));
-	GS_DEBUG_PORT.print(F("Initializing command port at Serial")); GS_DEBUG_PORT.print(GS_COMMAND_PORT_NUMBER);  GS_DEBUG_PORT.println(F("..."));
-	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial")); GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER);  GS_DEBUG_PORT.println(F("..."));
+	GS_DEBUG_PORT.print(F("Initializing command port at Serial"));	GS_DEBUG_PORT.print(GS_COMMAND_PORT_NUMBER);	GS_DEBUG_PORT.println(F("..."));
 	while (!GS_COMMAND_PORT)
 	{
 		GS_DEBUG_PORT.println(F("Initializing command port..."));
 		GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 		delay(500);
 	}
+	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial"));		GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER);		GS_DEBUG_PORT.println(F("..."));
 	while (!GS_TELEM_PORT)
 	{
 		GS_DEBUG_PORT.println(F("Initializing telemetry port..."));
@@ -96,20 +96,20 @@ int GS_Class::grabData_Radio()
 	//save new data if available
 	if (result == AIR_NEW_DATA)
 	{
-		telemetry.altitude = myRadio.incomingArray[AIR_ALTITUDE_INDEX] / 100.0;
-		telemetry.rollAngle = myRadio.incomingArray[AIR_ROLL_ANGLE_INDEX] / 100.0;
-		telemetry.pitchAngle = myRadio.incomingArray[AIR_PITCH_ANGLE_INDEX] / 100.0;
-		telemetry.velocity = myRadio.incomingArray[AIR_PITOT_INDEX] / 100.0;
-		telemetry.latitude = myRadio.incomingArray[AIR_LATITUDE_INDEX] / 100.0;
-		telemetry.longitude = myRadio.incomingArray[AIR_LONGITUDE_INDEX] / 100.0;
-		telemetry.UTC_year = myRadio.incomingArray[AIR_UTC_YEAR_INDEX];
-		telemetry.UTC_month = myRadio.incomingArray[AIR_UTC_MONTH_INDEX];
-		telemetry.UTC_day = myRadio.incomingArray[AIR_UTC_DAY_INDEX];
-		telemetry.UTC_hour = myRadio.incomingArray[AIR_UTC_HOUR_INDEX];
-		telemetry.UTC_minute = myRadio.incomingArray[AIR_UTC_MINUTE_INDEX];
-		telemetry.UTC_second = myRadio.incomingArray[AIR_UTC_SECOND_INDEX];
-		telemetry.speedOverGround = myRadio.incomingArray[AIR_SOG_INDEX] / 100.0;
-		telemetry.courseOverGround = myRadio.incomingArray[AIR_COG_INDEX] / 100.0;
+		telemetry.altitude			= myRadio.incomingArray[AIR_ALTITUDE_INDEX]		/ 100.0;
+		telemetry.rollAngle			= myRadio.incomingArray[AIR_ROLL_ANGLE_INDEX]	/ 100.0;
+		telemetry.pitchAngle		= myRadio.incomingArray[AIR_PITCH_ANGLE_INDEX]	/ 100.0;
+		telemetry.velocity			= myRadio.incomingArray[AIR_PITOT_INDEX]		/ 100.0;
+		telemetry.latitude			= myRadio.incomingArray[AIR_LATITUDE_INDEX]		/ 100.0;
+		telemetry.longitude			= myRadio.incomingArray[AIR_LONGITUDE_INDEX]	/ 100.0;
+		telemetry.UTC_year			= myRadio.incomingArray[AIR_UTC_YEAR_INDEX];
+		telemetry.UTC_month			= myRadio.incomingArray[AIR_UTC_MONTH_INDEX];
+		telemetry.UTC_day			= myRadio.incomingArray[AIR_UTC_DAY_INDEX];
+		telemetry.UTC_hour			= myRadio.incomingArray[AIR_UTC_HOUR_INDEX];
+		telemetry.UTC_minute		= myRadio.incomingArray[AIR_UTC_MINUTE_INDEX];
+		telemetry.UTC_second		= myRadio.incomingArray[AIR_UTC_SECOND_INDEX];
+		telemetry.speedOverGround	= myRadio.incomingArray[AIR_SOG_INDEX]			/ 100.0;
+		telemetry.courseOverGround	= myRadio.incomingArray[AIR_COG_INDEX]			/ 100.0;
 	}
 
 	//return boolean to tell main program if there is new data available
@@ -150,10 +150,10 @@ void GS_Class::computeCommands()
 {
 	//read and map joystick data
 	//mapping normalized to max and min joystick values
-	controlInputs.roll_command = updateServoCommand(ailerons);
-	controlInputs.pitch_command = updateServoCommand(elevator);
-	controlInputs.yaw_command = updateServoCommand(rudder);
-	controlInputs.throttle_command = updateServoCommand(throttle);
+	controlInputs.roll_command		= updateServoCommand(ailerons);
+	controlInputs.pitch_command		= updateServoCommand(elevator);
+	controlInputs.yaw_command		= updateServoCommand(rudder);
+	controlInputs.throttle_command	= updateServoCommand(throttle);
 
 	return;
 }
@@ -165,14 +165,14 @@ void GS_Class::computeCommands()
 void GS_Class::sendCommands()
 {
 	//update the radio's outgoing array with the propper information
-	myRadio.outgoingArray[AIR_PITCH_INDEX] = myGS.controlInputs.pitch_command;
-	myRadio.outgoingArray[AIR_ROLL_INDEX] = myGS.controlInputs.roll_command;
-	myRadio.outgoingArray[AIR_YAW_INDEX] = myGS.controlInputs.yaw_command;
-	myRadio.outgoingArray[AIR_THROTTLE_INDEX] = myGS.controlInputs.throttle_command;
+	myRadio.outgoingArray[AIR_PITCH_INDEX]		= myGS.controlInputs.pitch_command;
+	myRadio.outgoingArray[AIR_ROLL_INDEX]		= myGS.controlInputs.roll_command;
+	myRadio.outgoingArray[AIR_YAW_INDEX]		= myGS.controlInputs.yaw_command;
+	myRadio.outgoingArray[AIR_THROTTLE_INDEX]	= myGS.controlInputs.throttle_command;
 	/*myRadio.outgoingArray[AIR_AUTOPILOT_INDEX] = myGS.controlInputs.autopilot_command;
-	myRadio.outgoingArray[AIR_LIMITER_INDEX] = myGS.controlInputs.limiter_command;
+	myRadio.outgoingArray[AIR_LIMITER_INDEX]	= myGS.controlInputs.limiter_command;
 	myRadio.outgoingArray[AIR_LANDING_GEAR_INDEX] = myGS.controlInputs.landingGear_command;
-	myRadio.outgoingArray[AIR_FLAPS_INDEX] = myGS.controlInputs.flaps_command;*/
+	myRadio.outgoingArray[AIR_FLAPS_INDEX]		= myGS.controlInputs.flaps_command;*/
 
 	//optional debugging prints to see what is in the outgoing array
 	/*for (byte i = 0; i < AIR_DATA_LEN; i++)
@@ -274,8 +274,17 @@ int16_t GS_Class::updateServoCommand(controlSurfaces controlSurface)
 	}*/
 	
 
-	//throttle is processed opposite of all other commands
-	if (controlSurface.command_index == AIR_THROTTLE_INDEX)
+	if (controlSurface.reverse)
+	{
+		//convert to a servo command format
+		commandValue = map(analogValue,             //value to be mapped
+			controlSurface.ADC_min,                 //input minimum expected value
+			controlSurface.ADC_max,                 //input maximum expected value
+			controlSurface.high_rates_surface_max,  //output maximum value
+			controlSurface.high_rates_surface_min  //output minimum value
+		) + controlSurface._offset;					//add the offset (bias)
+	}
+	else
 	{
 		//convert to a servo command format
 		commandValue = map(analogValue,             //value to be mapped
@@ -285,32 +294,21 @@ int16_t GS_Class::updateServoCommand(controlSurfaces controlSurface)
 			controlSurface.high_rates_surface_max   //output maximum value
 		) + controlSurface._offset;					//add the offset (bias)
 	}
-	else
-	{
-		//convert to a servo command format
-		commandValue = map(analogValue,             //value to be mapped
-			controlSurface.ADC_min,                 //input minimum expected value
-			controlSurface.ADC_max,                 //input maximum expected value
-			controlSurface.high_rates_surface_max,  //output maximum value
-			controlSurface.high_rates_surface_min   //output minimum value
-		) + controlSurface._offset;					//add the offset (bias)
-	}
 
-	commandValue = constrain(commandValue,          //value to be constrained
-			controlSurface.high_rates_surface_min,	//minimum value
-			controlSurface.high_rates_surface_max	//maximum value
-		);
+	commandValue = constrain(commandValue,      //value to be constrained
+		controlSurface.high_rates_surface_min,	//minimum value
+		controlSurface.high_rates_surface_max);	//maximum value
 
 	//optional debugging prints
-	/*if (controlSurface.command_index == AILERON_INDEX)
-	{
-		GS_DEBUG_PORT.print("Command_Index: "); GS_DEBUG_PORT.println(controlSurface.command_index);
-		GS_DEBUG_PORT.print("Value: "); GS_DEBUG_PORT.println(commandValue);
-		GS_DEBUG_PORT.print("high_rates_surface_min: "); GS_DEBUG_PORT.println(controlSurface.high_rates_surface_min);
-		GS_DEBUG_PORT.print("high_rates_surface_max: "); GS_DEBUG_PORT.println(controlSurface.high_rates_surface_max);
-		GS_DEBUG_PORT.print("_offset: "); GS_DEBUG_PORT.println(controlSurface._offset);
-		GS_DEBUG_PORT.println();
-	}*/
+	//if (controlSurface.command_index == THROTTLE_INDEX)
+	//{
+	//	GS_DEBUG_PORT.print("Command_Index: ");				GS_DEBUG_PORT.println(controlSurface.command_index);
+	//	GS_DEBUG_PORT.print("Value: ");						GS_DEBUG_PORT.println(commandValue);
+	//	GS_DEBUG_PORT.print("high_rates_surface_min: ");	GS_DEBUG_PORT.println(controlSurface.high_rates_surface_min);
+	//	GS_DEBUG_PORT.print("high_rates_surface_max: ");	GS_DEBUG_PORT.println(controlSurface.high_rates_surface_max);
+	//	GS_DEBUG_PORT.print("_offset: ");					GS_DEBUG_PORT.println(controlSurface._offset);
+	//	GS_DEBUG_PORT.println();
+	//}
 
 	return commandValue;
 }
