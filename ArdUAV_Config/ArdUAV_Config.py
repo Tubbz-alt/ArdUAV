@@ -18,7 +18,9 @@ class AppWindow(QDialog):
         self.setupSignals()
 
         self.boolComboBoxIndices = {'1': 0,
-                                    '0': 1}
+                                    '0': 1,
+                                    'true': 0,
+                                    'false': 1}
 
         self.comboBoxIndicesBool = {'True': '1',
                                     'False': '0'}
@@ -125,22 +127,27 @@ class AppWindow(QDialog):
                                                                  'GS_TelemetryPortNumber': ""},
                                               'ThrottleSettings': {'ThrottleAnalogPin': "",
                                                                    'MinThrottleADCValue': "",
-                                                                   'MaxThrottleADCValue': ""},
+                                                                   'MaxThrottleADCValue': "",
+                                                                   'ThrottleReverse': ""},
                                               'ElevatorSettings': {'ElevatorAnalogPin': "",
                                                                    'MinElevatorADCValue': "",
                                                                    'MaxElevatorADCValue': "",
                                                                    'MinElevatorServoValue': "",
-                                                                   'MaxElevatorServoValue': ""},
+                                                                   'MaxElevatorServoValue': "",
+                                                                   'ElevatorReverse': ""},
                                               'AileronSettings': {'AileronAnalogPin': "",
                                                                   'MinAileronADCValue': "",
                                                                   'MaxAileronADCValue': "",
                                                                   'MinAileronServoValue': "",
-                                                                  'MaxAileronServoValue': ""},
+                                                                  'MaxAileronServoValue': "",
+                                                                  'AileronReverse': ""},
                                               'RudderSettings': {'RudderAnalogPin': "",
                                                                  'MinRudderADCValue': "",
                                                                  'MaxRudderADCValue': "",
                                                                  'MinRudderServoValue': "",
-                                                                 'MaxRudderServoValue': ""}},
+                                                                 'ThrottleReverse': "",
+                                                                 'MaxRudderServoValue': "",
+                                                                 'RudderReverse': ""}},
                                   'IFCTools': {'SerialSettings': {'IFC_DebugPortNumber': "",
                                                                   'IFC_CommandPortNumber': "",
                                                                   'IFC_GPSPortNumber': "",
@@ -298,6 +305,18 @@ class AppWindow(QDialog):
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MAX_ADC":
                     self.currentParameters['GSTools']['RudderSettings']['MaxRudderADCValue'] = str(line.split()[2])
+
+                elif line.split()[0] == "#define" and line.split()[1] == "AILERON_REVERSE":
+                    self.currentParameters['GSTools']['AileronSettings']['AileronReverse'] = str(line.split()[2])
+
+                elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_REVERSE":
+                    self.currentParameters['GSTools']['ElevatorSettings']['ElevatorReverse'] = str(line.split()[2])
+
+                elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_REVERSE":
+                    self.currentParameters['GSTools']['RudderSettings']['RudderReverse'] = str(line.split()[2])
+
+                elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_REVERSE":
+                    self.currentParameters['GSTools']['ThrottleSettings']['ThrottleReverse'] = str(line.split()[2])
 
     def readGSSerial(self):
         with open(self.GSSerialFilename, 'r') as inFile:
@@ -497,6 +516,18 @@ class AppWindow(QDialog):
 
         self.value = int(self.currentParameters['GSTools']['RudderSettings']['MaxRudderServoValue'])
         self.ui.MaxRudderServoValue.setValue(self.value)
+
+        self.value = self.currentParameters['GSTools']['ThrottleSettings']['ThrottleReverse']
+        self.ui.ThrottleReverse.setCurrentIndex(self.boolComboBoxIndices[self.value])
+
+        self.value = self.currentParameters['GSTools']['ElevatorSettings']['ElevatorReverse']
+        self.ui.ElevatorReverse.setCurrentIndex(self.boolComboBoxIndices[self.value])
+
+        self.value = self.currentParameters['GSTools']['AileronSettings']['AileronReverse']
+        self.ui.AileronReverse.setCurrentIndex(self.boolComboBoxIndices[self.value])
+
+        self.value = self.currentParameters['GSTools']['RudderSettings']['RudderReverse']
+        self.ui.RudderReverse.setCurrentIndex(self.boolComboBoxIndices[self.value])
 
     def updateGUIIFCTools(self):
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_DebugPortNumber'])
@@ -723,6 +754,22 @@ class AppWindow(QDialog):
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MAX_ADC":
                     newValue = self.ui.MaxRudderADCValue.text()
+                    line = line.replace(line.split()[2], newValue)
+
+                elif line.split()[0] == "#define" and line.split()[1] == "AILERON_REVERSE":
+                    newValue = self.comboBoxIndicesBool[self.ui.AileronReverse.currentText()]
+                    line = line.replace(line.split()[2], newValue)
+
+                elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_REVERSE":
+                    newValue = self.comboBoxIndicesBool[self.ui.ElevatorReverse.currentText()]
+                    line = line.replace(line.split()[2], newValue)
+
+                elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_REVERSE":
+                    newValue = self.comboBoxIndicesBool[self.ui.RudderReverse.currentText()]
+                    line = line.replace(line.split()[2], newValue)
+
+                elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_REVERSE":
+                    newValue = self.comboBoxIndicesBool[self.ui.ThrottleReverse.currentText()]
                     line = line.replace(line.split()[2], newValue)
             newContents.append(line)
 

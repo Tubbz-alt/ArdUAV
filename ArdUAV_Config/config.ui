@@ -493,8 +493,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>657</width>
-                <height>493</height>
+                <width>232</width>
+                <height>96</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_15">
@@ -582,8 +582,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>657</width>
-                <height>493</height>
+                <width>159</width>
+                <height>68</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_7">
@@ -656,8 +656,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>657</width>
-                <height>493</height>
+                <width>167</width>
+                <height>68</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_9">
@@ -724,8 +724,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>657</width>
-                <height>493</height>
+                <width>160</width>
+                <height>68</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_10">
@@ -792,8 +792,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>657</width>
-                <height>493</height>
+                <width>162</width>
+                <height>68</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_14">
@@ -1153,6 +1153,37 @@
                  </item>
                 </layout>
                </item>
+               <item row="3" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_87">
+                 <item>
+                  <widget class="QLabel" name="label_87">
+                   <property name="text">
+                    <string>Throttle Reverse Direction</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="ThrottleReverse">
+                   <property name="currentIndex">
+                    <number>1</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>True</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>False</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </widget>
             </widget>
@@ -1235,6 +1266,27 @@
                  </item>
                 </layout>
                </item>
+               <item row="1" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_47">
+                 <item>
+                  <widget class="QLabel" name="label_47">
+                   <property name="text">
+                    <string>Min Elevator ADC Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinElevatorADCValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
                <item row="2" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_48">
                  <item>
@@ -1262,12 +1314,12 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_47">
+               <item row="3" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_50">
                  <item>
-                  <widget class="QLabel" name="label_47">
+                  <widget class="QLabel" name="label_50">
                    <property name="text">
-                    <string>Min Elevator ADC Value</string>
+                    <string>Min Elevator Servo Value</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1275,7 +1327,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="MinElevatorADCValue">
+                  <widget class="QSpinBox" name="MinElevatorServoValue">
                    <property name="maximum">
                     <number>65535</number>
                    </property>
@@ -1304,12 +1356,12 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_50">
+               <item row="5" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_88">
                  <item>
-                  <widget class="QLabel" name="label_50">
+                  <widget class="QLabel" name="label_88">
                    <property name="text">
-                    <string>Min Elevator Servo Value</string>
+                    <string>Elevator Reverse Direction</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1317,10 +1369,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="MinElevatorServoValue">
-                   <property name="maximum">
-                    <number>65535</number>
+                  <widget class="QComboBox" name="ElevatorReverse">
+                   <property name="currentIndex">
+                    <number>1</number>
                    </property>
+                   <item>
+                    <property name="text">
+                     <string>True</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>False</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                 </layout>
@@ -1346,101 +1408,11 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>197</width>
-                <height>152</height>
+                <width>657</width>
+                <height>493</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_18">
-               <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_54">
-                 <item>
-                  <widget class="QLabel" name="label_54">
-                   <property name="text">
-                    <string>Min Aileron ADC Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinAileronADCValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="3" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_56">
-                 <item>
-                  <widget class="QLabel" name="label_56">
-                   <property name="text">
-                    <string>Min Aileron Servo Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinAileronServoValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="2" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_55">
-                 <item>
-                  <widget class="QLabel" name="label_55">
-                   <property name="text">
-                    <string>Max Aileron ADC Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MaxAileronADCValue">
-                   <property name="minimum">
-                    <number>0</number>
-                   </property>
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                   <property name="value">
-                    <number>0</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="4" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_57">
-                 <item>
-                  <widget class="QLabel" name="label_57">
-                   <property name="text">
-                    <string>Max Aileron Servo Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MaxAileronServoValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
                <item row="0" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_52">
                  <item>
@@ -1497,6 +1469,127 @@
                  </item>
                 </layout>
                </item>
+               <item row="1" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_54">
+                 <item>
+                  <widget class="QLabel" name="label_54">
+                   <property name="text">
+                    <string>Min Aileron ADC Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinAileronADCValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_55">
+                 <item>
+                  <widget class="QLabel" name="label_55">
+                   <property name="text">
+                    <string>Max Aileron ADC Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MaxAileronADCValue">
+                   <property name="minimum">
+                    <number>0</number>
+                   </property>
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                   <property name="value">
+                    <number>0</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="3" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_56">
+                 <item>
+                  <widget class="QLabel" name="label_56">
+                   <property name="text">
+                    <string>Min Aileron Servo Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinAileronServoValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="4" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_57">
+                 <item>
+                  <widget class="QLabel" name="label_57">
+                   <property name="text">
+                    <string>Max Aileron Servo Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MaxAileronServoValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="5" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_89">
+                 <item>
+                  <widget class="QLabel" name="label_89">
+                   <property name="text">
+                    <string>Aileron Reverse Direction</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="AileronReverse">
+                   <property name="currentIndex">
+                    <number>1</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>True</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>False</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </widget>
             </widget>
@@ -1518,8 +1611,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>199</width>
-                <height>152</height>
+                <width>657</width>
+                <height>493</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_22">
@@ -1669,6 +1762,37 @@
                  </item>
                 </layout>
                </item>
+               <item row="5" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_93">
+                 <item>
+                  <widget class="QLabel" name="label_93">
+                   <property name="text">
+                    <string>Rudder Reverse Direction</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="RudderReverse">
+                   <property name="currentIndex">
+                    <number>1</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>True</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>False</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </widget>
             </widget>
@@ -1714,7 +1838,7 @@
                  <item>
                   <widget class="QLabel" name="label_64">
                    <property name="text">
-                    <string>Debug Port Number (0 for USB)</string>
+                    <string>Debug Port</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1762,7 +1886,7 @@
                  <item>
                   <widget class="QLabel" name="label_65">
                    <property name="text">
-                    <string>Command Port Number</string>
+                    <string>Command Port</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1810,7 +1934,7 @@
                  <item>
                   <widget class="QLabel" name="label_67">
                    <property name="text">
-                    <string>GPS Port Number</string>
+                    <string>GPS Port</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1858,7 +1982,7 @@
                  <item>
                   <widget class="QLabel" name="label_66">
                    <property name="text">
-                    <string>Telemetry Port Number</string>
+                    <string>Telemetry Port</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1922,11 +2046,109 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>147</width>
-                <height>152</height>
+                <width>657</width>
+                <height>493</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_31">
+               <item row="0" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_72">
+                 <item>
+                  <widget class="QLabel" name="label_72">
+                   <property name="text">
+                    <string>Throttle Pin</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="ThrottlePin">
+                   <item>
+                    <property name="text">
+                     <string>s0</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s1</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s2</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s3</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s4</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s5</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s6</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s7</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s8</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s9</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s10</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s11</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s12</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s13</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s14</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s15</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
                <item row="1" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_74">
                  <item>
@@ -1941,6 +2163,104 @@
                  </item>
                  <item>
                   <widget class="QComboBox" name="ElevatorPin">
+                   <item>
+                    <property name="text">
+                     <string>s0</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s1</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s2</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s3</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s4</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s5</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s6</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s7</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s8</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s9</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s10</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s11</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s12</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s13</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s14</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>s15</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_92">
+                 <item>
+                  <widget class="QLabel" name="label_92">
+                   <property name="text">
+                    <string>Right Aileron Pin</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="RightAileronPin">
                    <item>
                     <property name="text">
                      <string>s0</string>
@@ -2221,202 +2541,6 @@
                  </item>
                 </layout>
                </item>
-               <item row="2" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_92">
-                 <item>
-                  <widget class="QLabel" name="label_92">
-                   <property name="text">
-                    <string>Right Aileron Pin</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="RightAileronPin">
-                   <item>
-                    <property name="text">
-                     <string>s0</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s1</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s2</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s3</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s4</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s5</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s6</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s7</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s8</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s9</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s10</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s11</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s12</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s13</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s14</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s15</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="0" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_72">
-                 <item>
-                  <widget class="QLabel" name="label_72">
-                   <property name="text">
-                    <string>Throttle Pin</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="ThrottlePin">
-                   <item>
-                    <property name="text">
-                     <string>s0</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s1</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s2</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s3</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s4</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s5</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s6</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s7</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s8</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s9</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s10</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s11</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s12</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s13</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s14</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s15</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
               </layout>
              </widget>
             </widget>
@@ -2438,8 +2562,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>187</width>
-                <height>254</height>
+                <width>657</width>
+                <height>493</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_30">
@@ -2695,8 +2819,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>171</width>
-                <height>68</height>
+                <width>657</width>
+                <height>493</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_29">
