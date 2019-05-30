@@ -840,7 +840,7 @@ class AppWindow(QDialog):
                     line = line.replace(line.split()[2], newValue)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_PIN":
-                    newValue = self.comboBoxIndicesServoPin[self.ui.ThrottleAnalogPin.currentText()]
+                    newValue = self.comboBoxIndicesServoPin[self.ui.ThrottlePin.currentText()]
                     line = line.replace(line.split()[2], newValue)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "R_AILERON_PIN":
