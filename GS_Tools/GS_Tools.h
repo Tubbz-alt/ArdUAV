@@ -44,10 +44,10 @@
 #define ELEVATOR_MAX_ADC		41220
 #define RUDDER_MAX_ADC			41740
 
-#define AILERON_REVERSE			false
-#define ELEVATOR_REVERSE		true
-#define RUDDER_REVERSE			true
-#define THROTTLE_REVERSE		false
+#define AILERON_REVERSE			0
+#define ELEVATOR_REVERSE		1
+#define RUDDER_REVERSE			0
+#define THROTTLE_REVERSE		1
 /////////////////////////////////////////////////////////////////////////////////////////
 
 

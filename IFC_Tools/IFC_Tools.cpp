@@ -28,7 +28,7 @@ void IFC_Class::begin()
 {
 	//initialize variables
 	dataTimestamp_IMU = 0;
-	controlInputs.limiter_enable = true;
+	controlInputs.limiter_enable = false;
 
 
 
@@ -196,8 +196,8 @@ int IFC_Class::grabData_IMU()
 
 	//get course, pitch, roll angles in degrees
 	telemetry.courseAngle = event.orientation.x;
-	telemetry.rollAngle = event.orientation.y;
-	telemetry.pitchAngle = event.orientation.z;
+	telemetry.rollAngle = event.orientation.z;
+	telemetry.pitchAngle = event.orientation.y;
 
 	//convert Euler angles from degrees to radians - ONLY USED FOR LiDAR CORRECTION
 	telemetry.convertedRoll = (telemetry.rollAngle) * (M_PI / 180);
