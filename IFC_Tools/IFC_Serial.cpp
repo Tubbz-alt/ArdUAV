@@ -8,7 +8,7 @@
 
 
 
-void gpsEvent()
+void gpsEvent_IFC()
 {
 	while (IFC_GPS_PORT.available())
 	{
@@ -29,7 +29,7 @@ void gpsEvent()
 
 
 
-void commEvent()
+void commEvent_IFC()
 {
 	while (IFC_COMMAND_PORT.available())
 	{
