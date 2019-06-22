@@ -7,7 +7,7 @@
 
 
 
-void commEvent()
+void commEvent_GS()
 {
 	while (GS_TELEM_PORT.available())
 	{
