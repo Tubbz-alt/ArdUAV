@@ -88,43 +88,43 @@ void commEvent_GS()
 #if GS_TELEM_PORT_NUMBER == 0
 void serialEvent()
 {
-	commEvent();
+	commEvent_GS();
 }
 
 #elif GS_TELEM_PORT_NUMBER == 1
 void serialEvent1()
 {
-	commEvent();
+	commEvent_GS();
 }
 
 #elif GS_TELEM_PORT_NUMBER == 2
 void serialEvent2()
 {
-	commEvent();
+	commEvent_GS();
 }
 
 #elif GS_TELEM_PORT_NUMBER == 3
 void serialEvent3()
 {
-	commEvent();
+	commEvent_GS();
 }
 
 #elif GS_TELEM_PORT_NUMBER == 4
 void serialEvent4()
 {
-	commEvent();
+	commEvent_GS();
 }
 
 #elif GS_TELEM_PORT_NUMBER == 5
 void serialEvent5()
 {
-	commEvent();
+	commEvent_GS();
 }
 
 #elif GS_TELEM_PORT_NUMBER == 6
 void serialEvent6()
 {
-	commEvent();
+	commEvent_GS();
 }
 
 #endif
