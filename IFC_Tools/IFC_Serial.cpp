@@ -110,43 +110,43 @@ void commEvent_IFC()
 #if IFC_GPS_PORT_NUMBER == 0
 void serialEvent()
 {
-	gpsEvent();
+	gpsEvent_IFC();
 }
 
 #elif IFC_GPS_PORT_NUMBER == 1
 void serialEvent1()
 {
-	gpsEvent();
+	gpsEvent_IFC();
 }
 
 #elif IFC_GPS_PORT_NUMBER == 2
 void serialEvent2()
 {
-	gpsEvent();
+	gpsEvent_IFC();
 }
 
 #elif IFC_GPS_PORT_NUMBER == 3
 void serialEvent3()
 {
-	gpsEvent();
+	gpsEvent_IFC();
 }
 
 #elif IFC_GPS_PORT_NUMBER == 4
 void serialEvent4()
 {
-	gpsEvent();
+	gpsEvent_IFC();
 }
 
 #elif IFC_GPS_PORT_NUMBER == 5
 void serialEvent5()
 {
-	gpsEvent();
+	gpsEvent_IFC();
 }
 
 #elif IFC_GPS_PORT_NUMBER == 6
 void serialEvent6()
 {
-	gpsEvent();
+	gpsEvent_IFC();
 }
 
 #endif
@@ -157,43 +157,43 @@ void serialEvent6()
 #if IFC_COMMAND_PORT_NUMBER == 0
 void serialEvent()
 {
-	commEvent();
+	commEvent_IFC();
 }
 
 #elif IFC_COMMAND_PORT_NUMBER == 1
 void serialEvent1()
 {
-	commEvent();
+	commEvent_IFC();
 }
 
 #elif IFC_COMMAND_PORT_NUMBER == 2
 void serialEvent2()
 {
-	commEvent();
+	commEvent_IFC();
 }
 
 #elif IFC_COMMAND_PORT_NUMBER == 3
 void serialEvent3()
 {
-	commEvent();
+	commEvent_IFC();
 }
 
 #elif IFC_COMMAND_PORT_NUMBER == 4
 void serialEvent4()
 {
-	commEvent();
+	commEvent_IFC();
 }
 
 #elif IFC_COMMAND_PORT_NUMBER == 5
 void serialEvent5()
 {
-	commEvent();
+	commEvent_IFC();
 }
 
 #elif IFC_COMMAND_PORT_NUMBER == 6
 void serialEvent6()
 {
-	commEvent();
+	commEvent_IFC();
 }
 
 #endif
