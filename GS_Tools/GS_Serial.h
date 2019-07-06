@@ -1,3 +1,4 @@
+#pragma once
 #include "Arduino.h"
 
 #include "Shared_Tools.h"
@@ -5,17 +6,11 @@
 
 
 
-#ifndef GS_Serial_cpp
-#define GS_Serial_cpp
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
-#define GS_DEBUG_PORT_NUMBER      2	//Serial2
-#define GS_COMMAND_PORT_NUMBER    4	//Serial4
-#define GS_TELEM_PORT_NUMBER      3	//Serial3
+#define GS_DEBUG_PORT_NUMBER      2 //Serial2
+#define GS_COMMAND_PORT_NUMBER    4 //Serial4
+#define GS_TELEM_PORT_NUMBER      3 //Serial3
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -103,4 +98,3 @@ extern void serialEvent6();
 #endif
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////////////////
-#endif
