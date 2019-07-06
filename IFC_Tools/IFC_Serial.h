@@ -1,20 +1,15 @@
+#pragma once
 #include "Arduino.h"
-
-
-
-
-#ifndef IFC_Serial_cpp
-#define IFC_Serial_cpp
 
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
-#define IFC_DEBUG_PORT_NUMBER     0	//USB
-#define IFC_COMMAND_PORT_NUMBER   4	//Serial4
-#define IFC_GPS_PORT_NUMBER       1	//Serial1
-#define IFC_TELEM_PORT_NUMBER     3	//Serial3
+#define IFC_DEBUG_PORT_NUMBER     0 //USB
+#define IFC_COMMAND_PORT_NUMBER   4 //Serial4
+#define IFC_GPS_PORT_NUMBER       1 //Serial1
+#define IFC_TELEM_PORT_NUMBER     3 //Serial3
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -134,4 +129,3 @@ extern void serialEvent6();
 #endif
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////////////////
-#endif // !1

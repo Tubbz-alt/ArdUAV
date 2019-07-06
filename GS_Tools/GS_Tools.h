@@ -1,3 +1,4 @@
+#pragma once
 #include "Arduino.h"
 
 #include "GS_Serial.h"
@@ -7,47 +8,41 @@
 
 
 
-#ifndef GS_Tools_cpp
-#define GS_Tools_cpp
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
 #define GS
 
-#define YAW_ANALOG_PIN			A2
-#define THROTTLE_ANALOG_PIN		A3
-#define ROLL_ANALOG_PIN			A0
-#define PITCH_ANALOG_PIN		A17
+#define YAW_ANALOG_PIN          A2
+#define THROTTLE_ANALOG_PIN     A3
+#define ROLL_ANALOG_PIN         A0
+#define PITCH_ANALOG_PIN        A17
 
-#define PITCH_RATE_PIN			0
-#define ROLL_RATE_PIN			1
-#define YAW_RATE_PIN			2
+#define PITCH_RATE_PIN          0
+#define ROLL_RATE_PIN           1
+#define YAW_RATE_PIN            2
 
-#define AILERON_MAX_LOWRATES	2000
-#define ELEVATOR_MAX_LOWRATES	2000
-#define RUDDER_MAX_LOWRATES		2000
+#define AILERON_MAX_LOWRATES    2000
+#define ELEVATOR_MAX_LOWRATES   2000
+#define RUDDER_MAX_LOWRATES     2000
 
-#define AILERON_MIN_LOWRATES	1000
-#define ELEVATOR_MIN_LOWRATES	1000
-#define RUDDER_MIN_LOWRATES		1000
+#define AILERON_MIN_LOWRATES    1000
+#define ELEVATOR_MIN_LOWRATES   1000
+#define RUDDER_MIN_LOWRATES     1000
 
-#define THROTTLE_MIN_ADC		24130
-#define AILERON_MIN_ADC			25190
-#define ELEVATOR_MIN_ADC		24030
-#define RUDDER_MIN_ADC			25100
+#define THROTTLE_MIN_ADC        24130
+#define AILERON_MIN_ADC         25190
+#define ELEVATOR_MIN_ADC        24030
+#define RUDDER_MIN_ADC          25100
 
-#define THROTTLE_MAX_ADC		41060
-#define AILERON_MAX_ADC			41920
-#define ELEVATOR_MAX_ADC		41220
-#define RUDDER_MAX_ADC			41740
+#define THROTTLE_MAX_ADC        41060
+#define AILERON_MAX_ADC         41920
+#define ELEVATOR_MAX_ADC        41220
+#define RUDDER_MAX_ADC          41740
 
-#define AILERON_REVERSE			0
-#define ELEVATOR_REVERSE		1
-#define RUDDER_REVERSE			0
-#define THROTTLE_REVERSE		1
+#define AILERON_REVERSE         0
+#define ELEVATOR_REVERSE        1
+#define RUDDER_REVERSE          0
+#define THROTTLE_REVERSE        1
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -60,20 +55,20 @@ class GS_Class
 public:
 	struct telemetry
 	{
-		float altitude;			//cm
-		float rollAngle;		//radians
-		float pitchAngle;		//radians
-		float velocity;			//m/s
-		float latitude;			//dd
-		float longitude;		//dd
-		uint16_t UTC_year;		//y
-		uint16_t UTC_month;		//M
-		uint16_t UTC_day;		//d
+		float altitude;         //cm
+		float rollAngle;        //radians
+		float pitchAngle;       //radians
+		float velocity;         //m/s
+		float latitude;         //dd
+		float longitude;        //dd
+		uint16_t UTC_year;      //y
+		uint16_t UTC_month;     //M
+		uint16_t UTC_day;       //d
 		uint16_t UTC_hour;		//h
-		uint16_t UTC_minute;	//m
-		uint16_t UTC_second;	//s
-		float speedOverGround;	//knots
-		float courseOverGround;	//degrees
+		uint16_t UTC_minute;    //m
+		uint16_t UTC_second;    //s
+		float speedOverGround;  //knots
+		float courseOverGround; //degrees
 	} telemetry;
 
 	struct controlInputs
@@ -148,8 +143,8 @@ private:
 		ROLL_ANALOG_PIN,        //analog_pin
 		ROLL_RATE_PIN,          //rate_pin
 		AILERON_OFFSET,         //_offset
-		AILERON_MAX,			//high_rates_surface_max
-		AILERON_MIN,			//high_rates_surface_min
+		AILERON_MAX,            //high_rates_surface_max
+		AILERON_MIN,            //high_rates_surface_min
 		AILERON_MAX_LOWRATES,   //low_rates_surface_max
 		AILERON_MIN_LOWRATES,   //low_rates_surface_min
 		AILERON_MAX_ADC,        //ADC_max
@@ -163,8 +158,8 @@ private:
 		PITCH_ANALOG_PIN,       //analog_pin
 		PITCH_RATE_PIN,         //rate_pin
 		ELEVATOR_OFFSET,        //_offset
-		ELEVATOR_MAX,			//high_rates_surface_max
-		ELEVATOR_MIN,			//high_rates_surface_min
+		ELEVATOR_MAX,           //high_rates_surface_max
+		ELEVATOR_MIN,           //high_rates_surface_min
 		ELEVATOR_MAX_LOWRATES,  //low_rates_surface_max
 		ELEVATOR_MIN_LOWRATES,  //low_rates_surface_min
 		ELEVATOR_MAX_ADC,       //ADC_max
@@ -178,8 +173,8 @@ private:
 		YAW_ANALOG_PIN,         //analog_pin
 		YAW_RATE_PIN,           //rate_pin
 		RUDDER_OFFSET,          //_offset
-		RUDDER_MAX,				//high_rates_surface_max
-		RUDDER_MIN,				//high_rates_surface_min
+		RUDDER_MAX,             //high_rates_surface_max
+		RUDDER_MIN,             //high_rates_surface_min
 		RUDDER_MAX_LOWRATES,    //low_rates_surface_max
 		RUDDER_MIN_LOWRATES,    //low_rates_surface_min
 		RUDDER_MAX_ADC,         //ADC_max
@@ -215,5 +210,3 @@ private:
 
 extern GS_Class myGS;
 /////////////////////////////////////////////////////////////////////////////////////////
-
-#endif

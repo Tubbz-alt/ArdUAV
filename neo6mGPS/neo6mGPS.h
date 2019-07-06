@@ -1,32 +1,27 @@
+#pragma once
 #include "Arduino.h"
 
 
 
 
-#ifndef neo6mGPS_cpp
-#define neo6mGPS_cpp
+#define NMEA_LEN       16
+#define FREQ_LEN       14
+#define BAUD_LEN       28
+#define GPS_DATA_LEN   10
 
+#define UTC_YEAR_POS   0
+#define UTC_MONTH_POS  1
+#define UTC_DAY_POS    2
+#define UTC_HOUR_POS   3
+#define UTC_MINUTE_POS 4
+#define UTC_SECOND_POS 5
+#define LAT_POS        6
+#define LON_POS        7
+#define SPD_POS        8
+#define COG_POS        9
 
-
-
-#define NMEA_LEN	16
-#define FREQ_LEN	14
-#define BAUD_LEN	28
-#define GPS_DATA_LEN	10
-
-#define UTC_YEAR_POS	0
-#define UTC_MONTH_POS	1
-#define UTC_DAY_POS	2
-#define UTC_HOUR_POS	3
-#define UTC_MINUTE_POS	4
-#define UTC_SECOND_POS	5
-#define LAT_POS		6
-#define LON_POS		7
-#define SPD_POS		8
-#define COG_POS		9
-
-#define GPS_NO_DATA	0
-#define GPS_NEW_DATA	1
+#define GPS_NO_DATA    0
+#define GPS_NEW_DATA   1
 
 
 
@@ -405,5 +400,3 @@ private:// <<-------------------------------------------------------------------
 
 //create GPS class http://forum.arduino.cc/index.php?topic=163004.0
 extern neo6mGPS myGPS;
-
-#endif

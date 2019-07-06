@@ -1,3 +1,4 @@
+#pragma once
 #include "Arduino.h"
 #include "Servo.h"
 
@@ -11,43 +12,37 @@
 
 
 
-#ifndef IFC_Tools_cpp
-#define IFC_Tools_cpp
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
 #define IFC
 
-#define LIDAR_FIXED_MOUNT		1	//0 - gimbal mount, 1 - fixed mount
+#define LIDAR_FIXED_MOUNT  1  //0 - gimbal mount, 1 - fixed mount
 
-#define SERVO_FREQ			60	//Hz
-#define LIMITER_PERIOD			REPORT_COMMANDS_PERIOD //ms
+#define SERVO_FREQ         60 //Hz
+#define LIMITER_PERIOD     REPORT_COMMANDS_PERIOD //ms
 
-#define PITOT_PIN			A9	//analog input pin
+#define PITOT_PIN          A9 //analog input pin
 
-#define THROTTLE_PIN			17	//digital ESC signal pin
-#define R_AILERON_PIN			2	//servo driver output port number
-#define L_AILERON_PIN			39	//servo driver output port number
-#define ELEVATOR_PIN			14	//servo driver output port number
-#define RUDDER_PIN			25	//servo driver output port number
+#define THROTTLE_PIN       17 //digital ESC signal pin
+#define R_AILERON_PIN      2  //servo driver output port number
+#define L_AILERON_PIN      39 //servo driver output port number
+#define ELEVATOR_PIN       14 //servo driver output port number
+#define RUDDER_PIN         25 //servo driver output port number
 
-#define PITCH_AXIS			true	//
-#define ROLL_AXIS			false	//
+#define PITCH_AXIS         true  //
+#define ROLL_AXIS          false //
 
-#define UNSAFE_ROLL_R			-35	//unsafe right bank angle threshold (in degrees)
-#define UNSAFE_ROLL_L			35	//unsafe left bank angle threshold (in degrees)
+#define UNSAFE_ROLL_R      -35 //unsafe right bank angle threshold (in degrees)
+#define UNSAFE_ROLL_L      35  //unsafe left bank angle threshold (in degrees)
 
-#define MAX_ROLL_R			-50	//max right bank angle (in degrees) allowed by flight controller
-#define MAX_ROLL_L			50	//max left bank angle (in degrees) allowed by flight controller
+#define MAX_ROLL_R         -50 //max right bank angle (in degrees) allowed by flight controller
+#define MAX_ROLL_L         50  //max left bank angle (in degrees) allowed by flight controller
 
-#define UNSAFE_PITCH_UP			-30	//unsafe up pitch angle threshold (in degrees)
-#define UNSAFE_PITCH_DOWN		10	//unsafe down pitch angle threshold (in degrees)
+#define UNSAFE_PITCH_UP    -30 //unsafe up pitch angle threshold (in degrees)
+#define UNSAFE_PITCH_DOWN  10  //unsafe down pitch angle threshold (in degrees)
 
-#define MAX_PITCH_UP			-45	//max up pitch angle (in degrees) allowed by flight controller
-#define MAX_PITCH_DOWN			25	//max down pitch angle (in degrees) allowed by flight controller
+#define MAX_PITCH_UP       -45 //max up pitch angle (in degrees) allowed by flight controller
+#define MAX_PITCH_DOWN     25  //max down pitch angle (in degrees) allowed by flight controller
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -61,30 +56,30 @@ public:
 	//struct to store telemetry data
 	struct telemetry
 	{
-		float altitude;				//cm
-		float convertedAltitude;	//cm
-		float courseAngle;			//degrees
-		float rollAngle;			//degrees
-		float pitchAngle;			//degrees
-		float convertedRoll;		//radians
-		float convertedPitch;		//radians
-		float velocity;				//m/s
-		float latitude;				//dd
-		float longitude;			//dd
-		uint16_t UTC_year;			//y
-		uint16_t UTC_month;			//M
-		uint16_t UTC_day;			//d
-		uint16_t UTC_hour;			//h
-		uint16_t UTC_minute;		//m
-		uint16_t UTC_second;		//s
-		float speedOverGround;		//knots
-		float courseOverGround;		//degrees
+		float altitude;             //cm
+		float convertedAltitude;    //cm
+		float courseAngle;          //degrees
+		float rollAngle;            //degrees
+		float pitchAngle;           //degrees
+		float convertedRoll;        //radians
+		float convertedPitch;       //radians
+		float velocity;             //m/s
+		float latitude;             //dd
+		float longitude;            //dd
+		uint16_t UTC_year;          //y
+		uint16_t UTC_month;         //M
+		uint16_t UTC_day;           //d
+		uint16_t UTC_hour;          //h
+		uint16_t UTC_minute;        //m
+		uint16_t UTC_second;        //s
+		float speedOverGround;      //knots
+		float courseOverGround;     //degrees
 	} telemetry;
 
 	//struct to store control values (i.e. servo commands etc.)
 	struct controlInputs
 	{
-		bool limiter_enable;		//enables and disables pitch and bank limiter
+		bool limiter_enable; //enables and disables pitch and bank limiter
 		uint16_t pitch_command;
 		uint16_t roll_command;
 		uint16_t yaw_command;
@@ -164,5 +159,3 @@ extern IFC_Class myIFC;
 extern TwoWire Wire1;
 extern TwoWire Wire2;
 /////////////////////////////////////////////////////////////////////////////////////////
-
-#endif
