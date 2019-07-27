@@ -3,7 +3,7 @@
 
 #include "GS_Serial.h"
 #include "Shared_Tools.h"
-#include "AirComms.h"
+#include "SerialTransfer.h"
 
 
 
@@ -43,6 +43,13 @@
 #define ELEVATOR_REVERSE        1
 #define RUDDER_REVERSE          0
 #define THROTTLE_REVERSE        1
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
+#define AIR_ROLL_INDEX         0
+#define AIR_PITCH_INDEX        1
+#define AIR_YAW_INDEX          2
+#define AIR_THROTTLE_INDEX     3
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -53,6 +60,8 @@
 class GS_Class
 {
 public:
+	bool newTelem = false;
+
 	struct telemetry
 	{
 		float altitude;         //cm
@@ -86,22 +95,10 @@ public:
 
 
 
-	//initialize the IFC class
 	void begin();
-
-	//get data from GS
-	int grabData_Radio();
-
-	//send data to datalogging computer via debugging port
 	void sendTelem();
-
-	//determine each command value based off GS sensor data
 	void computeCommands();
-
-	//send commands to plane
 	void sendCommands();
-
-	//determine each command value based off GS sensor data and send commands to plane
 	void computeAndSendCommands();
 
 
@@ -201,12 +198,14 @@ private:
 
 
 
-	//calculate the values for a single control surface servo command
 	int16_t updateServoCommand(controlSurfaces controlSurface);
-
-	//check to see if there is a loss of radio link between GS and IFC
 	bool checkRadioLink();
 };
 
+
+
+
 extern GS_Class myGS;
+extern SerialTransfer GS_commandTransfer;
+extern SerialTransfer GS_telemetryTransfer;
 /////////////////////////////////////////////////////////////////////////////////////////

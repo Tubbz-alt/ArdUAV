@@ -14,16 +14,9 @@ void setup()
 
 void loop()
 {
-  //get telemetry data from the plane
-  if(myGS.grabData_Radio())
-  {
-    //send data to datalogging computer via debugging port
-    myGS.sendTelem();
-  }
-
   //determine each command value based off GS sensor data and send commands to plane
   myGS.computeAndSendCommands();
+
+  //send data to datalogging computer via debugging port
+  myGS.sendTelem();
 }
-
-
-

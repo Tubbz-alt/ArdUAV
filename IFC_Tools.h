@@ -4,7 +4,7 @@
 
 #include "IFC_Serial.h"
 #include "Shared_Tools.h"
-#include "AirComms.h"
+#include "SerialTransfer.h"
 #include "neo6mGPS.h"
 #include "ArdUAV_Adafruit_BNO055.h"
 #include "ArdUAV_LIDARLite.h"
@@ -93,32 +93,15 @@ public:
 
 
 
-	//initialize the IFC class
 	void begin();
-
-	//get GPS data
-	int grabData_GPS();
-
-	//get IMU Data
+	bool grabData_GPS();
 	int grabData_IMU();
-
-	//get LiDAR Altimeter Data
 	int grabData_LiDAR();
-
-	//get data from GS
-	int grabData_Radio();
-
-	//get airpseed data from pitot tube
 	int grabData_Pitot();
-
-	//send telemetry data to GS
 	void sendTelem();
-
-	//update servo positions (use controlInputs commands)
 	void updateServos();
-
-	//update a single servo's position (use controlInputs commands)
 	void updateSingleServo(byte INDEX, uint16_t value);
+	void bankPitchLimiter(bool enable, bool _linkConnected);
 
 
 
@@ -132,29 +115,22 @@ private:
 	unsigned long timeBench_Limiter;
 	unsigned long currentTime_Limiter;
 
-	unsigned long timeBench_Commands;
-	unsigned long currentTime_Commands;
-
 	unsigned long timeBench_Telem;
 	unsigned long currentTime_Telem;
 	/////////////////////////////////////////////////////////////////////////////////////////
 
-	//IMU data timestamp
 	unsigned long dataTimestamp_IMU;
 
 
 
-	//check to see if there is a loss of radio link between GS and IFC
-	bool checkRadioLink();
 
-	//keep the plane from pitching or rolling too much in any direction
-	void bankPitchLimiter(bool enable, bool _linkConnected);
-
-	//update struct based on euler angles
 	void updateControlsLimiter(bool axis);
 };
 
 extern IFC_Class myIFC;
+extern neo6mGPS myGPS;
+extern SerialTransfer IFC_commandTransfer;
+extern SerialTransfer IFC_telemetryTransfer;
 
 extern TwoWire Wire1;
 extern TwoWire Wire2;

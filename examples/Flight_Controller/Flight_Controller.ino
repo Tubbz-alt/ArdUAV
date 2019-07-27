@@ -57,28 +57,9 @@ void loop()
     IFC_DEBUG_PORT.println();*/
   }
 
-  //get data from the ground station
-  if(myIFC.grabData_Radio())
-  {
-    //optional debugging prints
-    /*IFC_DEBUG_PORT.print("Pitch Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.pitch_command);
-    IFC_DEBUG_PORT.print("Roll Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.roll_command);
-    IFC_DEBUG_PORT.print("Yaw Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.yaw_command);
-    IFC_DEBUG_PORT.print("Throttle Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.throttle_command);
-    IFC_DEBUG_PORT.print("Autopilot Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.autopilot_command);
-    IFC_DEBUG_PORT.print("Limiter Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.limiter_command);
-    IFC_DEBUG_PORT.print("Landing Gear Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.landingGear_command);
-    IFC_DEBUG_PORT.print("Flaps Command:\t"); IFC_DEBUG_PORT.println(myIFC.controlInputs.flaps_command);
-    IFC_DEBUG_PORT.println();*/
-
-    //update all servo positions based on the new data
-    myIFC.updateServos();
-  }
+  //update all servo positions based on the new data
+  myIFC.updateServos();
 
   //send the telemetry to the radio
   myIFC.sendTelem();
 }
-
-
-
-

@@ -101,11 +101,11 @@ class AppWindow(QDialog):
 
         self.BASE_LIBRARY_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-        self.sharedToolsFilename = os.path.join(self.BASE_LIBRARY_PATH, "Shared_Tools", "Shared_Tools.h")
-        self.GSToolsFilename = os.path.join(self.BASE_LIBRARY_PATH, "GS_Tools", "GS_Tools.h")
-        self.GSSerialFilename = os.path.join(self.BASE_LIBRARY_PATH, "GS_Tools", "GS_Serial.h")
-        self.IFCToolsFilename = os.path.join(self.BASE_LIBRARY_PATH, "IFC_Tools", "IFC_Tools.h")
-        self.IFCSerialFilename = os.path.join(self.BASE_LIBRARY_PATH, "IFC_Tools", "IFC_Serial.h")
+        self.sharedToolsFilename = os.path.join(self.BASE_LIBRARY_PATH, "Shared_Tools.h")
+        self.GSToolsFilename = os.path.join(self.BASE_LIBRARY_PATH, "GS_Tools.h")
+        self.GSSerialFilename = os.path.join(self.BASE_LIBRARY_PATH, "GS_Serial.h")
+        self.IFCToolsFilename = os.path.join(self.BASE_LIBRARY_PATH, "IFC_Tools.h")
+        self.IFCSerialFilename = os.path.join(self.BASE_LIBRARY_PATH, "IFC_Serial.h")
 
         self.currentParameters = {'SharedTools': {'SerialSettings': {'Debug_Port_Baud': "",
                                                                      'Command_Port_Baud': "",

@@ -76,31 +76,24 @@ extern void serialEvent6();
 
 #if IFC_GPS_PORT_NUMBER == 0
 #define IFC_GPS_PORT Serial
-extern void serialEvent();
 
 #elif IFC_GPS_PORT_NUMBER == 1
 #define IFC_GPS_PORT Serial1
-extern void serialEvent1();
 
 #elif IFC_GPS_PORT_NUMBER == 2
 #define IFC_GPS_PORT Serial2
-extern void serialEvent2();
 
 #elif IFC_GPS_PORT_NUMBER == 3
 #define IFC_GPS_PORT Serial3
-extern void serialEvent3();
 
 #elif IFC_GPS_PORT_NUMBER == 4
 #define IFC_GPS_PORT Serial4
-extern void serialEvent4();
 
 #elif IFC_GPS_PORT_NUMBER == 5
 #define IFC_GPS_PORT Serial5
-extern void serialEvent5();
 
 #elif IFC_GPS_PORT_NUMBER == 6
 #define IFC_GPS_PORT Serial6
-extern void serialEvent6();
 #endif
 
 

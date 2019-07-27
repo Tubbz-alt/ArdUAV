@@ -2,6 +2,8 @@
 #include "IFC_Serial.h"
 
 #include "Shared_Tools.h"
+#include "SerialTransfer.h"
+#include "neo6mGPS.h"
 
 
 
@@ -10,6 +12,9 @@
 //sensor/actuator classes
 Adafruit_BNO055 bno = Adafruit_BNO055(&Wire, 55, BNO055_ADDRESS_A);
 LIDARLite myLidarLite(&Wire);
+neo6mGPS myGPS;
+SerialTransfer IFC_commandTransfer;
+SerialTransfer IFC_telemetryTransfer;
 Servo rudder;
 Servo elevator;
 Servo aileron_L;
@@ -45,8 +50,8 @@ void IFC_Class::begin()
 	//wait for all serial ports to come online
 	IFC_DEBUG_PORT.println(F("Initializing serial ports..."));
 	IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
-	IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial")); IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
-	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial")); IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
+	IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial"));     IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);      IFC_DEBUG_PORT.println(F("..."));
+	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial"));    IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
 	//while (!DEBUG_PORT);
 	while (!IFC_COMMAND_PORT)
 	{
@@ -90,7 +95,8 @@ void IFC_Class::begin()
 
 	//initialize AirComs
 	IFC_DEBUG_PORT.println(F("Initializing AirComms..."));
-	myRadio.begin(true);
+	IFC_commandTransfer.begin(IFC_COMMAND_PORT);
+	IFC_telemetryTransfer.begin(IFC_TELEM_PORT);
 	IFC_DEBUG_PORT.println(F("\tAirComms initialized"));
 
 
@@ -98,7 +104,7 @@ void IFC_Class::begin()
 
 	//initialize GPS
 	IFC_DEBUG_PORT.println(F("Initializing GPS..."));
-	myGPS.begin();
+	myGPS.begin(IFC_GPS_PORT);
 	IFC_DEBUG_PORT.println(F("\tGPS initialized"));
 
 
@@ -155,34 +161,31 @@ void IFC_Class::begin()
 	throttle.attach(THROTTLE_PIN);
 	throttle.write(THROTTLE_MIN);
 	IFC_DEBUG_PORT.println(F("\tESC initialized..."));
-
-	return;
 }
 
 
 
 
-int IFC_Class::grabData_GPS()
+bool IFC_Class::grabData_GPS()
 {
-	//get data from the GPS
-	int result = myGPS.grabData_GPS();
-
 	//if a new packet was processed, update the telemetry struct
-	if (result == GPS_NEW_DATA)
+	if (myGPS.available())
 	{
-		telemetry.latitude = myGPS.GPS_data[LAT_POS];
-		telemetry.longitude = myGPS.GPS_data[LON_POS];
-		telemetry.UTC_year = (uint16_t)myGPS.GPS_data[UTC_YEAR_POS];
-		telemetry.UTC_month = (uint16_t)myGPS.GPS_data[UTC_MONTH_POS];
-		telemetry.UTC_day = (uint16_t)myGPS.GPS_data[UTC_DAY_POS];
-		telemetry.UTC_hour = (uint16_t)myGPS.GPS_data[UTC_HOUR_POS];
-		telemetry.UTC_minute = (uint16_t)myGPS.GPS_data[UTC_MINUTE_POS];
-		telemetry.UTC_second = (uint16_t)myGPS.GPS_data[UTC_SECOND_POS];
-		telemetry.speedOverGround = myGPS.GPS_data[SPD_POS];
-		telemetry.courseOverGround = myGPS.GPS_data[COG_POS];
+		telemetry.latitude         = 0;
+		telemetry.longitude        = 0;
+		telemetry.UTC_year         = 0;
+		telemetry.UTC_month        = 0;
+		telemetry.UTC_day          = 0;
+		telemetry.UTC_hour         = 0;
+		telemetry.UTC_minute       = 0;
+		telemetry.UTC_second       = 0;
+		telemetry.speedOverGround  = 0;
+		telemetry.courseOverGround = 0;
+
+		return true;
 	}
 
-	return result;
+	return false;
 }
 
 
@@ -196,11 +199,11 @@ int IFC_Class::grabData_IMU()
 
 	//get course, pitch, roll angles in degrees
 	telemetry.courseAngle = event.orientation.x;
-	telemetry.rollAngle = event.orientation.z;
-	telemetry.pitchAngle = event.orientation.y;
+	telemetry.rollAngle   = event.orientation.z;
+	telemetry.pitchAngle  = event.orientation.y;
 
 	//convert Euler angles from degrees to radians - ONLY USED FOR LiDAR CORRECTION
-	telemetry.convertedRoll = (telemetry.rollAngle) * (M_PI / 180);
+	telemetry.convertedRoll  = (telemetry.rollAngle)  * (M_PI / 180);
 	telemetry.convertedPitch = (telemetry.pitchAngle) * (M_PI / 180);
 
 	//timestamp the new data
@@ -246,45 +249,6 @@ int IFC_Class::grabData_Pitot()
 
 
 
-int IFC_Class::grabData_Radio()
-{
-	int result;
-
-	//check to see if there is a loss of radio link between GS and IFC
-	checkRadioLink();
-
-	//see if new data is available
-	result = myRadio.grabData_Radio();
-
-	//if a new packet was processed, update the controlInputs struct
-	if (result == AIR_NEW_DATA)
-	{
-		//update controlInputs struct so that the next time the servos can be updated with the latest positions
-		controlInputs.pitch_command = myRadio.incomingArray[AIR_PITCH_INDEX];
-		controlInputs.roll_command = myRadio.incomingArray[AIR_ROLL_INDEX];
-		controlInputs.yaw_command = myRadio.incomingArray[AIR_YAW_INDEX];
-		controlInputs.throttle_command = myRadio.incomingArray[AIR_THROTTLE_INDEX];
-		controlInputs.autopilot_command = myRadio.incomingArray[AIR_AUTOPILOT_INDEX];
-		controlInputs.limiter_command = myRadio.incomingArray[AIR_LIMITER_INDEX];
-		controlInputs.landingGear_command = myRadio.incomingArray[AIR_LANDING_GEAR_INDEX];
-		controlInputs.flaps_command = myRadio.incomingArray[AIR_FLAPS_INDEX];
-
-		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
-		bankPitchLimiter(controlInputs.limiter_enable, true);
-	}
-	else if (!linkConnected)
-	{
-		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
-		//update servos with new values automatically if there is a loss of link
-		bankPitchLimiter(controlInputs.limiter_enable, false);
-	}
-
-	return result;
-}
-
-
-
-
 //send telemetry data to GS
 void IFC_Class::sendTelem()
 {
@@ -293,29 +257,43 @@ void IFC_Class::sendTelem()
 	if ((currentTime_Telem - timeBench_Telem) >= REPORT_TELEM_PERIOD)
 	{
 		//reset timer
-		timeBench_Telem = currentTime_Telem;
+		timeBench_Telem += REPORT_TELEM_PERIOD;
 
 		//update the radio's outgoing array with the propper information
-		myRadio.outgoingArray[AIR_PITOT_INDEX] = (int16_t)(telemetry.velocity * 100);
-		myRadio.outgoingArray[AIR_ALTITUDE_INDEX] = (int16_t)(telemetry.altitude * 100);
-		myRadio.outgoingArray[AIR_PITCH_ANGLE_INDEX] = (int16_t)(telemetry.pitchAngle * 100);
-		myRadio.outgoingArray[AIR_ROLL_ANGLE_INDEX] = (int16_t)(telemetry.rollAngle * 100);
-		myRadio.outgoingArray[AIR_LATITUDE_INDEX] = (int16_t)(telemetry.latitude * 100);
-		myRadio.outgoingArray[AIR_LONGITUDE_INDEX] = (int16_t)(telemetry.longitude * 100);
-		myRadio.outgoingArray[AIR_UTC_YEAR_INDEX] = telemetry.UTC_year;
-		myRadio.outgoingArray[AIR_UTC_MONTH_INDEX] = telemetry.UTC_month;
-		myRadio.outgoingArray[AIR_UTC_DAY_INDEX] = telemetry.UTC_day;
-		myRadio.outgoingArray[AIR_UTC_HOUR_INDEX] = telemetry.UTC_hour;
-		myRadio.outgoingArray[AIR_UTC_MINUTE_INDEX] = telemetry.UTC_minute;
-		myRadio.outgoingArray[AIR_UTC_SECOND_INDEX] = telemetry.UTC_second;
-		myRadio.outgoingArray[AIR_SOG_INDEX] = (int16_t)(telemetry.speedOverGround * 100);
-		myRadio.outgoingArray[AIR_COG_INDEX] = (int16_t)(telemetry.courseOverGround * 100);
+		IFC_telemetryTransfer.txBuff[0]  = (uint8_t)(((int16_t)(telemetry.velocity * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[1]  = (uint8_t)(((int16_t)(telemetry.velocity * 100)) & 0xFF);
+
+		IFC_telemetryTransfer.txBuff[2]  = (uint8_t)(((int16_t)(telemetry.altitude * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[3]  = (uint8_t)(((int16_t)(telemetry.altitude * 100)) & 0xFF);
+
+		IFC_telemetryTransfer.txBuff[4]  = (uint8_t)(((int16_t)(telemetry.pitchAngle * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[5]  = (uint8_t)(((int16_t)(telemetry.pitchAngle * 100)) & 0xFF);
+
+		IFC_telemetryTransfer.txBuff[6]  = (uint8_t)(((int16_t)(telemetry.rollAngle * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[7]  = (uint8_t)(((int16_t)(telemetry.rollAngle * 100)) & 0xFF);
+
+		IFC_telemetryTransfer.txBuff[8]  = (uint8_t)(((int16_t)(telemetry.latitude * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[9]  = (uint8_t)(((int16_t)(telemetry.latitude * 100)) & 0xFF);
+
+		IFC_telemetryTransfer.txBuff[10] = (uint8_t)(((int16_t)(telemetry.longitude * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[11] = (uint8_t)(((int16_t)(telemetry.longitude * 100)) & 0xFF);
+
+		IFC_telemetryTransfer.txBuff[12] = telemetry.UTC_year;
+		IFC_telemetryTransfer.txBuff[13] = telemetry.UTC_month;
+		IFC_telemetryTransfer.txBuff[14] = telemetry.UTC_day;
+		IFC_telemetryTransfer.txBuff[15] = telemetry.UTC_hour;
+		IFC_telemetryTransfer.txBuff[16] = telemetry.UTC_minute;
+		IFC_telemetryTransfer.txBuff[17] = telemetry.UTC_second;
+
+		IFC_telemetryTransfer.txBuff[18] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[19] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) & 0xFF);
+
+		IFC_telemetryTransfer.txBuff[20] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) >> 8);;
+		IFC_telemetryTransfer.txBuff[21] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) & 0xFF);;
 
 		//send the telemetry data to GS
-		myRadio.sendData();
+		IFC_telemetryTransfer.sendData(22);
 	}
-
-	return;
 }
 
 
@@ -329,11 +307,9 @@ void IFC_Class::updateServos()
 
 	//update servo positions
 	elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
-	rudder.writeMicroseconds(constrain(controlInputs.yaw_command, RUDDER_MIN, RUDDER_MAX));
-	aileron_L.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN, AILERON_MAX));
-	aileron_R.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN, AILERON_MAX));
-
-	return;
+	rudder.writeMicroseconds(constrain(controlInputs.yaw_command,     RUDDER_MIN,   RUDDER_MAX));
+	aileron_L.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN,  AILERON_MAX));
+	aileron_R.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN,  AILERON_MAX));
 }
 
 
@@ -363,49 +339,6 @@ void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
 	{
 		IFC_DEBUG_PORT.println(F("Servo Not recognized"));
 	}
-
-	return;
-}
-
-
-
-
-//check to see if there is a loss of radio link between GS and IFC
-bool IFC_Class::checkRadioLink()
-{
-	//see if new data has arrived - if not, test if the timeout condition is met
-	if (!myRadio.arrayComplete_Radio)
-	{
-		//timer to see if there is a loss of link between GS and plane
-		currentTime_Commands = millis();
-
-		if (!noPacketFlag)
-		{
-			timeBench_Commands = currentTime_Commands;
-			noPacketFlag = true;
-		}
-
-		if ((currentTime_Commands - timeBench_Commands) >= LOSS_LINK_TIMEOUT)
-		{
-			//link is severed - unset flag if not alread unset
-			linkConnected = false;
-			IFC_DEBUG_PORT.println("loss link");
-		}
-		else
-		{
-			//not enough time has passed to determine if the link is severed - set flag if not already set
-			//do not reset timer
-			linkConnected = true;
-		}
-	}
-	else
-	{
-		//new data has arrived - link is connected
-		linkConnected = true;
-		noPacketFlag = false;
-	}
-
-	return linkConnected;
 }
 
 
@@ -442,8 +375,6 @@ void IFC_Class::bankPitchLimiter(bool enable, bool _linkConnected)
 			}
 		}
 	}
-
-	return;
 }
 
 
