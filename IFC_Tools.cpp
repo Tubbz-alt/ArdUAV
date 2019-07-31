@@ -2,8 +2,8 @@
 #include "IFC_Serial.h"
 
 #include "Shared_Tools.h"
-#include "SerialTransfer.h"
-#include "neo6mGPS.h"
+#include "ArdUAV_SerialTransfer.h"
+#include "ArdUAV_neo6mGPS.h"
 
 
 
@@ -171,16 +171,16 @@ bool IFC_Class::grabData_GPS()
 	//if a new packet was processed, update the telemetry struct
 	if (myGPS.available())
 	{
-		telemetry.latitude         = 0;
-		telemetry.longitude        = 0;
+		telemetry.latitude         = myGPS.lat_dd;
+		telemetry.longitude        = myGPS.lon_dd;
 		telemetry.UTC_year         = 0;
 		telemetry.UTC_month        = 0;
 		telemetry.UTC_day          = 0;
 		telemetry.UTC_hour         = 0;
 		telemetry.UTC_minute       = 0;
 		telemetry.UTC_second       = 0;
-		telemetry.speedOverGround  = 0;
-		telemetry.courseOverGround = 0;
+		telemetry.speedOverGround  = myGPS.sog_knots;
+		telemetry.courseOverGround = myGPS.cog_true;
 
 		return true;
 	}
@@ -319,26 +319,21 @@ void IFC_Class::updateServos()
 void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
 {
 	if (INDEX == THROTTLE_INDEX)
-	{
 		throttle.write(constrain(value, THROTTLE_MIN, THROTTLE_MAX));
-	}
+	
 	else if (INDEX == ELEVATOR_INDEX)
-	{
 		elevator.writeMicroseconds(constrain(value, ELEVATOR_MIN, ELEVATOR_MAX));
-	}
+	
 	else if (INDEX == RUDDER_INDEX)
-	{
 		rudder.writeMicroseconds(constrain(value, RUDDER_MIN, RUDDER_MAX));
-	}
+	
 	else if (INDEX == AILERON_INDEX)
 	{
 		aileron_L.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
 		aileron_R.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
 	}
 	else
-	{
 		IFC_DEBUG_PORT.println(F("Servo Not recognized"));
-	}
 }
 
 
@@ -388,10 +383,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 
 	//determine if the current IMU data is old - if so, get new IMU data
 	if ((millis() - dataTimestamp_IMU) >= LIMITER_PERIOD)
-	{
-		//grab IMU data
 		grabData_IMU();
-	}
 
 	//determine if pitch or roll should be tweaked (axis==true --> pitch, axis==false --> roll)
 	if (axis == PITCH_AXIS)
@@ -404,10 +396,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 			
 			//determine if minimum servo command is less than current servo command - if so, replace current command with minimum servo command
 			if (minServoCommand < controlInputs.pitch_command)
-			{
-				//update controlInputs struct
 				controlInputs.pitch_command = minServoCommand;
-			}
 		}
 		//determine if the current pitch angle is too high
 		else if (telemetry.pitchAngle >= UNSAFE_PITCH_DOWN)
@@ -417,10 +406,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 		
 			//determine if minimum servo command is more than current servo command - if so, replace current command with minimum servo command
 			if (minServoCommand > controlInputs.pitch_command)
-			{
-				//update controlInputs struct
 				controlInputs.pitch_command = minServoCommand;
-			}
 		}
 	}
 	else if (axis == ROLL_AXIS)
@@ -433,10 +419,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 
 			//determine if minimum servo command is more than current servo command - if so, replace current command with minimum servo command
 			if (minServoCommand > controlInputs.roll_command)
-			{
-				//update controlInputs struct
 				controlInputs.roll_command = minServoCommand;
-			}
 		}
 		//determine if the current roll angle is too high
 		else if (telemetry.rollAngle >= UNSAFE_ROLL_L)
@@ -446,10 +429,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 
 			//determine if minimum servo command is less than current servo command - if so, replace current command with minimum servo command
 			if (minServoCommand < controlInputs.roll_command)
-			{
-				//update controlInputs struct
 				controlInputs.roll_command = minServoCommand;
-			}
 		}
 	}
 }

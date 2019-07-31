@@ -17,7 +17,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
-#if IFC_DEBUGD_PORT_NUMBER == 0
+#if IFC_DEBUG_PORT_NUMBER == 0
 #define IFC_DEBUG_PORT Serial
 
 #elif IFC_DEBUG_PORT_NUMBER == 1
@@ -119,6 +119,23 @@ extern void serialEvent6();
 
 #elif IFC_TELEM_PORT_NUMBER == 6
 #define IFC_TELEM_PORT Serial6
+#endif
+
+
+
+
+#if IFC_GPS_PORT_NUMBER == IFC_DEBUG_PORT_NUMBER
+#error "Can't have GPS and debug on same Serial port"
+#endif
+#if IFC_GPS_PORT_NUMBER == IFC_COMMAND_PORT_NUMBER
+#error "Can't have GPS and command on same Serial port"
+#endif
+#if IFC_GPS_PORT_NUMBER == IFC_TELEM_PORT_NUMBER 
+#error "Can't have GPS and telemetry on same Serial port"
+#endif
+
+#if IFC_DEBUG_PORT_NUMBER == IFC_COMMAND_PORT_NUMBER
+#error "Can't have debug and command on same Serial port"
 #endif
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////////////////

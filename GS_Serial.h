@@ -96,5 +96,12 @@ extern void serialEvent5();
 #define GS_TELEM_PORT Serial6
 extern void serialEvent6();
 #endif
+
+
+
+
+#if GS_DEBUG_PORT_NUMBER == GS_COMMAND_PORT_NUMBER
+#error "Can't have debug and command on same Serial port"
+#endif
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////////////////

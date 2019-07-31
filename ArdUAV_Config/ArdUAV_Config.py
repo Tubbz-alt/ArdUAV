@@ -15,7 +15,7 @@ class AppWindow(QDialog):
         self.ui.setupUi(self)
         self.show()
 
-        self.setupSignals()
+        self.setup_signals()
 
         self.boolComboBoxIndices = {'1': 0,
                                     '0': 1,
@@ -107,6 +107,8 @@ class AppWindow(QDialog):
         self.IFCToolsFilename = os.path.join(self.BASE_LIBRARY_PATH, "IFC_Tools.h")
         self.IFCSerialFilename = os.path.join(self.BASE_LIBRARY_PATH, "IFC_Serial.h")
 
+        self.value = 0
+
         self.currentParameters = {'SharedTools': {'SerialSettings': {'Debug_Port_Baud': "",
                                                                      'Command_Port_Baud': "",
                                                                      'GPS_Port_Baud': "",
@@ -167,35 +169,35 @@ class AppWindow(QDialog):
                                                                      'MaxPitchDownAngle': ""},
                                                'OtherSettings': {'PitotTubeAnalogPin': "",
                                                                  'LiDARFixedMount': ""}}}
-        self.getParameters()
+        self.get_parameters()
 
-    def setupSignals(self):
-        self.ui.GetCurrentValues.clicked.connect(self.getParameters)
-        self.ui.buttonBox.clicked.connect(self.handleButtonClick)
+    def setup_signals(self):
+        self.ui.GetCurrentValues.clicked.connect(self.get_parameters)
+        self.ui.buttonBox.clicked.connect(self.handle_button_click)
 
-    def handleButtonClick(self, button):
+    def handle_button_click(self, button):
         sb = self.ui.buttonBox.standardButton(button)
         if sb == QDialogButtonBox.Apply:
-            self.writeOutParameters()
+            self.write_out_parameters()
 
         elif sb == QDialogButtonBox.Cancel:
             self.close()
 
-    def getParameters(self):
+    def get_parameters(self):
         try:
-            self.readSharedTools()
-            self.readGSTools()
-            self.readGSSerial()
-            self.readIFCTools()
-            self.readIFCSerial()
+            self.read_shared_tools()
+            self.read_gs_tools()
+            self.read_gs_serial()
+            self.read_ifc_tools()
+            self.read_ifc_serial()
 
-            self.updateGUI()
+            self.update_gui()
 
         except:
             import traceback
             traceback.print_exc()
 
-    def readSharedTools(self):
+    def read_shared_tools(self):
         with open(self.sharedToolsFilename, 'r') as inFile:
             contents = inFile.readlines()
 
@@ -246,7 +248,7 @@ class AppWindow(QDialog):
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MIN":
                     self.currentParameters['SharedTools']['RudderSettings']['MinRudderValue'] = str(line.split()[2])
 
-    def readGSTools(self):
+    def read_gs_tools(self):
         with open(self.GSToolsFilename, 'r') as inFile:
             contents = inFile.readlines()
 
@@ -318,7 +320,7 @@ class AppWindow(QDialog):
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_REVERSE":
                     self.currentParameters['GSTools']['ThrottleSettings']['ThrottleReverse'] = str(line.split()[2])
 
-    def readGSSerial(self):
+    def read_gs_serial(self):
         with open(self.GSSerialFilename, 'r') as inFile:
             contents = inFile.readlines()
 
@@ -333,7 +335,7 @@ class AppWindow(QDialog):
                 elif line.split()[0] == "#define" and line.split()[1] == "GS_TELEM_PORT_NUMBER":
                     self.currentParameters['GSTools']['SerialSettings']['GS_TelemetryPortNumber'] = str(line.split()[2])
 
-    def readIFCTools(self):
+    def read_ifc_tools(self):
         with open(self.IFCToolsFilename, 'r') as inFile:
             contents = inFile.readlines()
 
@@ -384,7 +386,7 @@ class AppWindow(QDialog):
                 elif line.split()[0] == "#define" and line.split()[1] == "MAX_PITCH_DOWN":
                     self.currentParameters['IFCTools']['AutopilotSettings']['MaxPitchDownAngle'] = str(line.split()[2])
 
-    def readIFCSerial(self):
+    def read_ifc_serial(self):
         with open(self.IFCSerialFilename, 'r') as inFile:
             contents = inFile.readlines()
 
@@ -402,12 +404,12 @@ class AppWindow(QDialog):
                 elif line.split()[0] == "#define" and line.split()[1] == "IFC_TELEM_PORT_NUMBER":
                     self.currentParameters['IFCTools']['SerialSettings']['IFC_TelemetryPortNumber'] = str(line.split()[2])
 
-    def updateGUI(self):
-        self.updateGUISharedTools()
-        self.updateGUIGSTools()
-        self.updateGUIIFCTools()
+    def update_gui(self):
+        self.update_gui_shared_tools()
+        self.update_gui_gs_tools()
+        self.update_gui_ifc_tools()
 
-    def updateGUISharedTools(self):
+    def update_gui_shared_tools(self):
         self.value = self.currentParameters['SharedTools']['SerialSettings']['Debug_Port_Baud']
         self.ui.Debug_Port_Baud.setCurrentIndex(self.baudComboBoxIndices[self.value])
 
@@ -453,7 +455,7 @@ class AppWindow(QDialog):
         self.value = int(self.currentParameters['SharedTools']['RudderSettings']['MinRudderValue'])
         self.ui.MinRudderValue.setValue(self.value)
 
-    def updateGUIGSTools(self):
+    def update_gui_gs_tools(self):
         self.value = int(self.currentParameters['GSTools']['SerialSettings']['GS_DebugPortNumber'])
         self.ui.GSDebugPort.setCurrentIndex(self.value)
 
@@ -529,13 +531,13 @@ class AppWindow(QDialog):
         self.value = self.currentParameters['GSTools']['RudderSettings']['RudderReverse']
         self.ui.RudderReverse.setCurrentIndex(self.boolComboBoxIndices[self.value])
 
-    def updateGUIIFCTools(self):
+    def update_gui_ifc_tools(self):
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_DebugPortNumber'])
         self.ui.IFCDebugPort.setCurrentIndex(self.value)
 
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_CommandPortNumber'])
         self.ui.IFCCommandPort.setCurrentIndex(self.value)
-		
+
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_GPSPortNumber'])
         self.ui.IFCGPSPort.setCurrentIndex(self.value)
 
@@ -587,13 +589,13 @@ class AppWindow(QDialog):
         self.value = self.currentParameters['IFCTools']['OtherSettings']['LiDARFixedMount']
         self.ui.LiDARFixedMount.setCurrentIndex(self.boolComboBoxIndices[self.value])
 
-    def writeOutParameters(self):
+    def write_out_parameters(self):
         try:
-            self.writeOutSharedTools()
-            self.writeOutGSTools()
-            self.writeOutGSSerial()
-            self.writeOutIFCTools()
-            self.writeOutIFCSerial()
+            self.write_out_shared_tools()
+            self.write_out_gs_tools()
+            self.write_out_gs_serial()
+            self.write_out_ifc_tools()
+            self.write_out_ifc_serial()
 
             print("--------------------------------")
             print("Library Updated")
@@ -601,357 +603,350 @@ class AppWindow(QDialog):
             import traceback
             traceback.print_exc()
 
-    def writeOutSharedTools(self):
+    def write_out_shared_tools(self):
         with open(self.sharedToolsFilename, 'r') as inFile:
             contents = inFile.readlines()
 
-        newContents = []
+        new_contents = []
 
         for line in contents:
             if len(line.split()) >= 3:
                 if line.split()[0] == "#define" and line.split()[1] == "DEBUG_PORT_BAUD":
-                    newValue = self.ui.Debug_Port_Baud.currentText()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.Debug_Port_Baud.currentText()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "COMMAND_PORT_BAUD":
-                    newValue = self.ui.Command_Port_Baud.currentText()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.Command_Port_Baud.currentText()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "GPS_PORT_BAUD":
-                    newValue = self.ui.GPS_Port_Baud.currentText()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.GPS_Port_Baud.currentText()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "TELEM_PORT_BAUD":
-                    newValue = self.ui.Telemetry_Port_Baud.currentText()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.Telemetry_Port_Baud.currentText()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "REPORT_COMMANDS_FREQ":
-                    newValue = self.ui.CommandReportingRate.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.CommandReportingRate.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "REPORT_TELEM_FREQ":
-                    newValue = self.ui.TelemetryReportingRate.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.TelemetryReportingRate.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "LOSS_LINK_TIMEOUT":
-                    newValue = self.ui.LossLinkTimeout.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.LossLinkTimeout.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_MAX":
-                    newValue = self.ui.MaxThrottleValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxThrottleValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "AILERON_MAX":
-                    newValue = self.ui.MaxAileronValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxAileronValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_MAX":
-                    newValue = self.ui.MaxElevatorValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxElevatorValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MAX":
-                    newValue = self.ui.MaxRudderValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxRudderValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_MIN":
-                    newValue = self.ui.MinThrottleValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinThrottleValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "AILERON_MIN":
-                    newValue = self.ui.MinAileronValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinAileronValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_MIN":
-                    newValue = self.ui.MinElevatorValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinElevatorValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MIN":
-                    newValue = self.ui.MinRudderValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinRudderValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
-            newContents.append(line)
+            new_contents.append(line)
 
-        newContents = "".join(newContents)
+        new_contents = "".join(new_contents)
 
         with open(self.sharedToolsFilename, 'w') as outFile:
-            outFile.write(newContents)
+            outFile.write(new_contents)
 
-    def writeOutGSTools(self):
+    def write_out_gs_tools(self):
         with open(self.GSToolsFilename, 'r') as inFile:
             contents = inFile.readlines()
 
-        newContents = []
+        new_contents = []
 
         for line in contents:
             if len(line.split()) >= 3:
                 if line.split()[0] == "#define" and line.split()[1] == "YAW_ANALOG_PIN":
-                    newValue = self.comboBoxIndicesAnalogPin[self.ui.RudderAnalogPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesAnalogPin[self.ui.RudderAnalogPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_ANALOG_PIN":
-                    newValue = self.comboBoxIndicesAnalogPin[self.ui.ThrottleAnalogPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesAnalogPin[self.ui.ThrottleAnalogPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ROLL_ANALOG_PIN":
-                    newValue = self.comboBoxIndicesAnalogPin[self.ui.AileronAnalogPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesAnalogPin[self.ui.AileronAnalogPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "PITCH_ANALOG_PIN":
-                    newValue = self.comboBoxIndicesAnalogPin[self.ui.ElevatorAnalogPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesAnalogPin[self.ui.ElevatorAnalogPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "AILERON_MAX_LOWRATES":
-                    newValue = self.ui.MaxAileronServoValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxAileronServoValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_MAX_LOWRATES":
-                    newValue = self.ui.MaxElevatorServoValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxElevatorServoValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MAX_LOWRATES":
-                    newValue = self.ui.MaxRudderServoValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxRudderServoValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "AILERON_MIN_LOWRATES":
-                    newValue = self.ui.MinAileronServoValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinAileronServoValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_MIN_LOWRATES":
-                    newValue = self.ui.MinElevatorServoValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinElevatorServoValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MIN_LOWRATES":
-                    newValue = self.ui.MinRudderServoValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinRudderServoValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_MIN_ADC":
-                    newValue = self.ui.MinThrottleADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinThrottleADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "AILERON_MIN_ADC":
-                    newValue = self.ui.MinAileronADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinAileronADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_MIN_ADC":
-                    newValue = self.ui.MinElevatorADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinElevatorADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MIN_ADC":
-                    newValue = self.ui.MinRudderADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MinRudderADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_MAX_ADC":
-                    newValue = self.ui.MaxThrottleADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxThrottleADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "AILERON_MAX_ADC":
-                    newValue = self.ui.MaxAileronADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxAileronADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_MAX_ADC":
-                    newValue = self.ui.MaxElevatorADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxElevatorADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_MAX_ADC":
-                    newValue = self.ui.MaxRudderADCValue.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxRudderADCValue.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "AILERON_REVERSE":
-                    newValue = self.comboBoxIndicesBool[self.ui.AileronReverse.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesBool[self.ui.AileronReverse.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_REVERSE":
-                    newValue = self.comboBoxIndicesBool[self.ui.ElevatorReverse.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesBool[self.ui.ElevatorReverse.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_REVERSE":
-                    newValue = self.comboBoxIndicesBool[self.ui.RudderReverse.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesBool[self.ui.RudderReverse.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_REVERSE":
-                    newValue = self.comboBoxIndicesBool[self.ui.ThrottleReverse.currentText()]
-                    line = line.replace(line.split()[2], newValue)
-            newContents.append(line)
+                    new_value = self.comboBoxIndicesBool[self.ui.ThrottleReverse.currentText()]
+                    line = line.replace(line.split()[2], new_value)
+            new_contents.append(line)
 
-        newContents = "".join(newContents)
+        new_contents = "".join(new_contents)
 
         with open(self.GSToolsFilename, 'w') as outFile:
-            outFile.write(newContents)
+            outFile.write(new_contents)
 
-    def writeOutGSSerial(self):
+    def write_out_gs_serial(self):
         with open(self.GSSerialFilename, 'r') as inFile:
             contents = inFile.readlines()
 
-        newContents = []
+        new_contents = []
 
         for line in contents:
             if len(line.split()) >= 3:
                 if line.split()[0] == "#define" and line.split()[1] == "GS_DEBUG_PORT_NUMBER":
-                    newValue = self.portComboBoxIndicesPortNum[self.ui.GSDebugPort.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.portComboBoxIndicesPortNum[self.ui.GSDebugPort.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
-                    # attempt to change comment if possible
                     try:
                         line = line.replace(line.split()[3], "//" + self.ui.GSDebugPort.currentText())
                     except:
                         pass
 
                 elif line.split()[0] == "#define" and line.split()[1] == "GS_COMMAND_PORT_NUMBER":
-                    newValue = self.portComboBoxIndicesPortNum[self.ui.GSCommandPort.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.portComboBoxIndicesPortNum[self.ui.GSCommandPort.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
-                    # attempt to change comment if possible
                     try:
                         line = line.replace(line.split()[3], "//" + self.ui.GSCommandPort.currentText())
                     except:
                         pass
 
                 elif line.split()[0] == "#define" and line.split()[1] == "GS_TELEM_PORT_NUMBER":
-                    newValue = self.portComboBoxIndicesPortNum[self.ui.GSTelemetryPort.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.portComboBoxIndicesPortNum[self.ui.GSTelemetryPort.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
-                    # attempt to change comment if possible
                     try:
                         line = line.replace(line.split()[3], "//" + self.ui.GSTelemetryPort.currentText())
                     except:
                         pass
 
-            newContents.append(line)
+            new_contents.append(line)
 
-        newContents = "".join(newContents)
+        new_contents = "".join(new_contents)
 
         with open(self.GSSerialFilename, 'w') as outFile:
-            outFile.write(newContents)
+            outFile.write(new_contents)
 
-    def writeOutIFCTools(self):
+    def write_out_ifc_tools(self):
         with open(self.IFCToolsFilename, 'r') as inFile:
             contents = inFile.readlines()
 
-        newContents = []
+        new_contents = []
 
         for line in contents:
             if len(line.split()) >= 3:
                 if line.split()[0] == "#define" and line.split()[1] == "LIDAR_FIXED_MOUNT":
-                    newValue = self.comboBoxIndicesBool[self.ui.LiDARFixedMount.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesBool[self.ui.LiDARFixedMount.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "PITOT_PIN":
-                    newValue = self.comboBoxIndicesAnalogPin[self.ui.PitotTubeAnalogPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesAnalogPin[self.ui.PitotTubeAnalogPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "THROTTLE_PIN":
-                    newValue = self.comboBoxIndicesServoPin[self.ui.ThrottlePin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesServoPin[self.ui.ThrottlePin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "R_AILERON_PIN":
-                    newValue = self.comboBoxIndicesServoPin[self.ui.RightAileronPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesServoPin[self.ui.RightAileronPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "L_AILERON_PIN":
-                    newValue = self.comboBoxIndicesServoPin[self.ui.LeftAileronPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesServoPin[self.ui.LeftAileronPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "ELEVATOR_PIN":
-                    newValue = self.comboBoxIndicesServoPin[self.ui.ElevatorPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesServoPin[self.ui.ElevatorPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "RUDDER_PIN":
-                    newValue = self.comboBoxIndicesServoPin[self.ui.RudderPin.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.comboBoxIndicesServoPin[self.ui.RudderPin.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "UNSAFE_ROLL_R":
-                    newValue = self.ui.UnsafeRollRightAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.UnsafeRollRightAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "UNSAFE_ROLL_L":
-                    newValue = self.ui.UnsafeRollLeftAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.UnsafeRollLeftAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "MAX_ROLL_R":
-                    newValue = self.ui.MaxRollRightAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxRollRightAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "MAX_ROLL_L":
-                    newValue = self.ui.MaxRollLeftAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxRollLeftAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "UNSAFE_PITCH_UP":
-                    newValue = self.ui.UnsafePitchUpAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.UnsafePitchUpAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "UNSAFE_PITCH_DOWN":
-                    newValue = self.ui.UnsafePitchDownAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.UnsafePitchDownAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "MAX_PITCH_UP":
-                    newValue = self.ui.MaxPitchUpAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxPitchUpAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
                 elif line.split()[0] == "#define" and line.split()[1] == "MAX_PITCH_DOWN":
-                    newValue = self.ui.MaxPitchDownAngle.text()
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.ui.MaxPitchDownAngle.text()
+                    line = line.replace(line.split()[2], new_value)
 
-            newContents.append(line)
+            new_contents.append(line)
 
-        newContents = "".join(newContents)
+        new_contents = "".join(new_contents)
 
         with open(self.IFCToolsFilename, 'w') as outFile:
-            outFile.write(newContents)
+            outFile.write(new_contents)
 
-    def writeOutIFCSerial(self):
+    def write_out_ifc_serial(self):
         with open(self.IFCSerialFilename, 'r') as inFile:
             contents = inFile.readlines()
 
-        newContents = []
+        new_contents = []
 
         for line in contents:
             if len(line.split()) >= 3:
                 if line.split()[0] == "#define" and line.split()[1] == "IFC_DEBUG_PORT_NUMBER":
-                    newValue = self.portComboBoxIndicesPortNum[self.ui.IFCDebugPort.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.portComboBoxIndicesPortNum[self.ui.IFCDebugPort.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
-                    # attempt to change comment if possible
                     try:
                         line = line.replace(line.split()[3], "//" + self.ui.IFCDebugPort.currentText())
                     except:
                         pass
 
                 elif line.split()[0] == "#define" and line.split()[1] == "IFC_COMMAND_PORT_NUMBER":
-                    newValue = self.portComboBoxIndicesPortNum[self.ui.IFCCommandPort.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.portComboBoxIndicesPortNum[self.ui.IFCCommandPort.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
-                    # attempt to change comment if possible
                     try:
                         line = line.replace(line.split()[3], "//" + self.ui.IFCCommandPort.currentText())
                     except:
                         pass
 
                 elif line.split()[0] == "#define" and line.split()[1] == "IFC_GPS_PORT_NUMBER":
-                    newValue = self.portComboBoxIndicesPortNum[self.ui.IFCGPSPort.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.portComboBoxIndicesPortNum[self.ui.IFCGPSPort.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
-                    # attempt to change comment if possible
                     try:
                         line = line.replace(line.split()[3], "//" + self.ui.IFCGPSPort.currentText())
                     except:
                         pass
 
                 elif line.split()[0] == "#define" and line.split()[1] == "IFC_TELEM_PORT_NUMBER":
-                    newValue = self.portComboBoxIndicesPortNum[self.ui.IFCTelemetryPort.currentText()]
-                    line = line.replace(line.split()[2], newValue)
+                    new_value = self.portComboBoxIndicesPortNum[self.ui.IFCTelemetryPort.currentText()]
+                    line = line.replace(line.split()[2], new_value)
 
-                    # attempt to change comment if possible
                     try:
                         line = line.replace(line.split()[3], "//" + self.ui.IFCTelemetryPort.currentText())
                     except:
                         pass
 
-            newContents.append(line)
+            new_contents.append(line)
 
-        newContents = "".join(newContents)
+        new_contents = "".join(new_contents)
 
         with open(self.IFCSerialFilename, 'w') as outFile:
-            outFile.write(newContents)
+            outFile.write(new_contents)
 
     def close(self):
         exit()
