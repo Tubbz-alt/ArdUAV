@@ -1,6 +1,8 @@
 #pragma once
 #include "Arduino.h"
 
+#include "Shared_Tools.h"
+
 
 
 
@@ -130,12 +132,25 @@ extern void serialEvent6();
 #if IFC_GPS_PORT_NUMBER == IFC_COMMAND_PORT_NUMBER
 #error "Can't have GPS and command on same Serial port"
 #endif
-#if IFC_GPS_PORT_NUMBER == IFC_TELEM_PORT_NUMBER 
+#if IFC_GPS_PORT_NUMBER == IFC_TELEM_PORT_NUMBER
 #error "Can't have GPS and telemetry on same Serial port"
 #endif
 
+
+
+
 #if IFC_DEBUG_PORT_NUMBER == IFC_COMMAND_PORT_NUMBER
 #error "Can't have debug and command on same Serial port"
+#endif
+
+
+
+
+#if IFC_DEBUG_PORT_NUMBER == IFC_TELEM_PORT_NUMBER && DEBUG_PORT_BAUD != TELEM_PORT_BAUD
+#error "Debug and telem on same Serial port, but debug baud != telem baud"
+#endif
+#if IFC_TELEM_PORT_NUMBER == IFC_COMMAND_PORT_NUMBER && TELEM_PORT_BAUD != COMMAND_PORT_BAUD
+#error "Telem and command on same Serial port, but telem baud != command baud"
 #endif
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////////////////
