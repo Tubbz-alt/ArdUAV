@@ -67,11 +67,11 @@ public:
 		float latitude;             //dd
 		float longitude;            //dd
 		uint16_t UTC_year;          //y
-		uint16_t UTC_month;         //M
-		uint16_t UTC_day;           //d
-		uint16_t UTC_hour;          //h
-		uint16_t UTC_minute;        //m
-		uint16_t UTC_second;        //s
+		uint8_t UTC_month;          //M
+		uint8_t UTC_day;            //d
+		uint8_t UTC_hour;           //h
+		uint8_t UTC_minute;         //m
+		float UTC_second;           //s
 		float speedOverGround;      //knots
 		float courseOverGround;     //degrees
 	} telemetry;
