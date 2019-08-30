@@ -123,14 +123,16 @@ const char GPVTG_header[HEADER_LEN] = { '$', 'G', 'P', 'V', 'T', 'G' };
 
 class neo6mGPS
 {
-public:// <<---------------------------------------------------------------------------//public
+public: // <<----------------------------------------------------------//public
 	char data[NUM_FIELDS][FIELD_LEN];
-	uint32_t utc    = 0;
-	uint8_t utc_hr  = 0;
-	uint8_t utc_min = 0;
-	uint8_t utc_sec = 0;
-	float lat       = 0;
-	float lon       = 0;
+	int utc_year    = 0;
+	byte utc_month  = 0;
+	byte utc_day    = 0;
+	byte utc_hour   = 0;
+	byte utc_min    = 0;
+	float utc_sec   = 0;
+	float lat_dm    = 0;
+	float lon_dm    = 0;
 	float lat_dd    = 0;
 	float lon_dd    = 0;
 	float sog_knots = 0;
@@ -138,9 +140,6 @@ public:// <<--------------------------------------------------------------------
 	char navStatus  = 'V';
 	char latDir     = ' ';
 	char lonDir     = ' ';
-	uint8_t utc_day = 0;
-	uint8_t utc_mon = 0;
-	uint8_t utc_yr  = 0;
 
 
 
@@ -161,7 +160,7 @@ public:// <<--------------------------------------------------------------------
 
 
 
-private:// <<---------------------------------------------------------------------------//private
+private: // <<---------------------------------------------------------//private
 	HardwareSerial* _port;
 	usb_serial_class* usb_port;
 	bool usingUSB = false;
@@ -175,6 +174,9 @@ private:// <<-------------------------------------------------------------------
 
 	void enableSelectedNmea();
 	bool parseData(char recChar);
+	void calc_utc_time(float data);
+	void calc_utc_date(int data);
+	float dm_dd(float loc, char dir);
 	void updateValues();
 	bool findSentence(const char header[]);
 	void insertChecksum(char packet[], const byte len);
