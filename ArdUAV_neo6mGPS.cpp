@@ -1,4 +1,4 @@
-#include "ArdUAV_neo6mGPS.h"
+#include "neo6mGPS.h"
 
 
 
@@ -221,6 +221,44 @@ bool neo6mGPS::parseData(char recChar)
 
 
 
+// hhmmss.sss
+void neo6mGPS::calc_utc_time(float time)
+{
+	utc_hour = (int)(time / 10000);
+	utc_min = (int)((time - (utc_hour * 10000)) / 100);
+	utc_sec = time - (utc_hour * 10000) - (utc_min * 100);
+}
+
+
+
+
+// ddmmyy
+void neo6mGPS::calc_utc_date(int date)
+{
+	utc_day = date / 10000;
+	utc_month = (date - (utc_day * 10000)) / 100;
+	utc_year = 2000 + date - (utc_day * 10000) - (utc_month * 100);
+}
+
+
+
+
+// (d)ddmm.mmmm, D
+float neo6mGPS::dm_dd(float loc, char dir)
+{
+	float result = (int)(loc / 100);
+
+	result += (loc - (result * 100)) / 60.0;
+
+	if (dir == 'S' || dir == 'W')
+		result = -result;
+
+	return result;
+}
+
+
+
+
 void neo6mGPS::updateValues()
 {
 	if (findSentence(GPGGA_header))
@@ -241,38 +279,19 @@ void neo6mGPS::updateValues()
 	}
 	else if (findSentence(GPRMC_header))
 	{
-		char tempBuff[2];
-
-		utc       = atoi(data[1]);
-		utc_hr    = utc / 10000;
-		utc_min   = (utc / 100) - (utc_hr * 100);
-		utc_sec   = utc - (utc_min * 100) - (utc_hr * 10000);
+		calc_utc_time(atof(data[1]));
 
 		navStatus = data[2][0];
-
-		lat       = atof(data[3]);
+		lat_dm    = atof(data[3]);
 		latDir    = data[4][0];
-
-		lon       = atof(data[5]);
+		lat_dd    = dm_dd(lat_dm, latDir);
+		lon_dm    = atof(data[5]);
 		lonDir    = data[6][0];
-
+		lon_dd    = dm_dd(lon_dm, lonDir);
 		sog_knots = atof(data[7]);
 		cog_true  = atof(data[8]);
 
-		tempBuff[0] = data[9][0];
-		tempBuff[1] = data[9][1];
-
-		utc_day   = atoi(tempBuff);
-
-		tempBuff[0] = data[9][2];
-		tempBuff[1] = data[9][3];
-
-		utc_mon   = atoi(tempBuff);
-
-		tempBuff[0] = data[9][4];
-		tempBuff[1] = data[9][5];
-
-		utc_yr    = atoi(tempBuff);
+		calc_utc_date(atoi(data[9]));
 	}
 	else if (findSentence(GPVTG_header))
 	{
