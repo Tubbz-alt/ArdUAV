@@ -173,12 +173,12 @@ bool IFC_Class::grabData_GPS()
 	{
 		telemetry.latitude         = myGPS.lat_dd;
 		telemetry.longitude        = myGPS.lon_dd;
-		telemetry.UTC_year         = 0;
-		telemetry.UTC_month        = 0;
-		telemetry.UTC_day          = 0;
-		telemetry.UTC_hour         = 0;
-		telemetry.UTC_minute       = 0;
-		telemetry.UTC_second       = 0;
+		telemetry.UTC_year         = myGPS.utc_year;
+		telemetry.UTC_month        = myGPS.utc_month;
+		telemetry.UTC_day          = myGPS.utc_day;
+		telemetry.UTC_hour         = myGPS.utc_hour;
+		telemetry.UTC_minute       = myGPS.utc_min;
+		telemetry.UTC_second       = myGPS.utc_sec;
 		telemetry.speedOverGround  = myGPS.sog_knots;
 		telemetry.courseOverGround = myGPS.cog_true;
 
