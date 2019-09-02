@@ -55,6 +55,14 @@
 #define YAW_COMMAND_LSB        5
 #define THROTTLE_COMMAND_MSB   6
 #define THROTTLE_COMMAND_LSB   7
+#define AUTOPILOT_COMMAND_MSB  8
+#define AUTOPILOT_COMMAND_LSB  9
+#define LIMITER_COMMAND_MSB    10
+#define LIMITER_COMMAND_LSB    11
+#define GEAR_COMMAND_MSB       12
+#define GEAR_COMMAND_LSB       13
+#define FLAPS_COMMAND_MSB      14
+#define FLAPS_COMMAND_LSB      15
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
