@@ -86,7 +86,7 @@ public:
 		uint16_t throttle_command;
 		uint16_t autopilot_command;
 		uint16_t limiter_command;
-		uint16_t landingGear_command;
+		uint16_t gear_command;
 		uint16_t flaps_command;
 	} controlInputs;
 

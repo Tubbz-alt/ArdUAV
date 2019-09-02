@@ -22,7 +22,7 @@ void commEvent_IFC()
 		myIFC.controlInputs.throttle_command    = (IFC_commandTransfer.rxBuff[6] << 8)  | IFC_commandTransfer.rxBuff[7];
 		myIFC.controlInputs.autopilot_command   = (IFC_commandTransfer.rxBuff[8] << 8)  | IFC_commandTransfer.rxBuff[9];
 		myIFC.controlInputs.limiter_command     = (IFC_commandTransfer.rxBuff[10] << 8) | IFC_commandTransfer.rxBuff[11];
-		myIFC.controlInputs.landingGear_command = (IFC_commandTransfer.rxBuff[12] << 8) | IFC_commandTransfer.rxBuff[13];
+		myIFC.controlInputs.gear_command        = (IFC_commandTransfer.rxBuff[12] << 8) | IFC_commandTransfer.rxBuff[13];
 		myIFC.controlInputs.flaps_command       = (IFC_commandTransfer.rxBuff[14] << 8) | IFC_commandTransfer.rxBuff[15];
 
 		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
