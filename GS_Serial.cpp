@@ -24,13 +24,13 @@ void commEvent_GS()
 		myGS.telemetry.latitude         = ((GS_telemetryTransfer.rxBuff[8]  << 8) | GS_telemetryTransfer.rxBuff[9])  / 100.0;
 		myGS.telemetry.longitude        = ((GS_telemetryTransfer.rxBuff[10] << 8) | GS_telemetryTransfer.rxBuff[11]) / 100.0;
 		myGS.telemetry.UTC_year         =  (GS_telemetryTransfer.rxBuff[12] << 8) | GS_telemetryTransfer.rxBuff[13];
-		myGS.telemetry.UTC_month        =  (GS_telemetryTransfer.rxBuff[14] << 8) | GS_telemetryTransfer.rxBuff[15];
-		myGS.telemetry.UTC_day          =  (GS_telemetryTransfer.rxBuff[16] << 8) | GS_telemetryTransfer.rxBuff[17];
-		myGS.telemetry.UTC_hour         =  (GS_telemetryTransfer.rxBuff[18] << 8) | GS_telemetryTransfer.rxBuff[19];
-		myGS.telemetry.UTC_minute       =  (GS_telemetryTransfer.rxBuff[20] << 8) | GS_telemetryTransfer.rxBuff[21];
-		myGS.telemetry.UTC_second       =  (GS_telemetryTransfer.rxBuff[22] << 8) | GS_telemetryTransfer.rxBuff[13];
-		myGS.telemetry.speedOverGround  = ((GS_telemetryTransfer.rxBuff[24] << 8) | GS_telemetryTransfer.rxBuff[25]) / 100.0;
-		myGS.telemetry.courseOverGround = ((GS_telemetryTransfer.rxBuff[26] << 8) | GS_telemetryTransfer.rxBuff[27]) / 100.0;
+		myGS.telemetry.UTC_month        =   GS_telemetryTransfer.rxBuff[14];
+		myGS.telemetry.UTC_day          =   GS_telemetryTransfer.rxBuff[15];
+		myGS.telemetry.UTC_hour         =   GS_telemetryTransfer.rxBuff[16];
+		myGS.telemetry.UTC_minute       =   GS_telemetryTransfer.rxBuff[17];
+		myGS.telemetry.UTC_second       = ((GS_telemetryTransfer.rxBuff[18] << 8) | GS_telemetryTransfer.rxBuff[19]) / 100.0;
+		myGS.telemetry.speedOverGround  = ((GS_telemetryTransfer.rxBuff[20] << 8) | GS_telemetryTransfer.rxBuff[21]) / 100.0;
+		myGS.telemetry.courseOverGround = ((GS_telemetryTransfer.rxBuff[22] << 8) | GS_telemetryTransfer.rxBuff[23]) / 100.0;
 	}
 	else if ((result != NO_DATA) && (result != CONTINUE))
 	{

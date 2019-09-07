@@ -278,21 +278,23 @@ void IFC_Class::sendTelem()
 		IFC_telemetryTransfer.txBuff[10] = (uint8_t)(((int16_t)(telemetry.longitude * 100)) >> 8);
 		IFC_telemetryTransfer.txBuff[11] = (uint8_t)(((int16_t)(telemetry.longitude * 100)) & 0xFF);
 
-		IFC_telemetryTransfer.txBuff[12] = telemetry.UTC_year;
-		IFC_telemetryTransfer.txBuff[13] = telemetry.UTC_month;
-		IFC_telemetryTransfer.txBuff[14] = telemetry.UTC_day;
-		IFC_telemetryTransfer.txBuff[15] = telemetry.UTC_hour;
-		IFC_telemetryTransfer.txBuff[16] = telemetry.UTC_minute;
-		IFC_telemetryTransfer.txBuff[17] = telemetry.UTC_second;
+		IFC_telemetryTransfer.txBuff[12] = (uint8_t)(telemetry.UTC_year >> 8);
+		IFC_telemetryTransfer.txBuff[13] = (uint8_t)(telemetry.UTC_year & 0xFF);
+		IFC_telemetryTransfer.txBuff[14] = telemetry.UTC_month;
+		IFC_telemetryTransfer.txBuff[15] = telemetry.UTC_day;
+		IFC_telemetryTransfer.txBuff[16] = telemetry.UTC_hour;
+		IFC_telemetryTransfer.txBuff[17] = telemetry.UTC_minute;
+		IFC_telemetryTransfer.txBuff[18] = (uint8_t)(((int16_t)(telemetry.UTC_second * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[19] = (uint8_t)(((int16_t)(telemetry.UTC_second * 100)) & 0xFF);
 
-		IFC_telemetryTransfer.txBuff[18] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) >> 8);
-		IFC_telemetryTransfer.txBuff[19] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) & 0xFF);
+		IFC_telemetryTransfer.txBuff[20] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[21] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) & 0xFF);
 
-		IFC_telemetryTransfer.txBuff[20] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) >> 8);;
-		IFC_telemetryTransfer.txBuff[21] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) & 0xFF);;
+		IFC_telemetryTransfer.txBuff[22] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) >> 8);;
+		IFC_telemetryTransfer.txBuff[23] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) & 0xFF);;
 
 		//send the telemetry data to GS
-		IFC_telemetryTransfer.sendData(22);
+		IFC_telemetryTransfer.sendData(24);
 	}
 }
 
