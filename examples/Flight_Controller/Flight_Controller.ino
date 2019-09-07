@@ -29,8 +29,8 @@ void loop()
 {
   nose_wheel.write(myIFC.controlInputs.yaw_command);
   fpv_pan.write(IFC_commandTransfer.rxBuff[16]);
-  fpv_tilt.write(IFC_commandTransfer.rxBuff[17]);
-  bay_door.write(IFC_commandTransfer.rxBuff[18]);
+  fpv_tilt.write(constrain(IFC_commandTransfer.rxBuff[17], 80, 180));
+  bay_door.write(constrain(IFC_commandTransfer.rxBuff[18], 40, 140));
   
   //get GPS data
   if(myIFC.grabData_GPS())
