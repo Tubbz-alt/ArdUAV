@@ -193,18 +193,15 @@ bool IFC_Class::grabData_GPS()
 
 int IFC_Class::grabData_IMU()
 {
-	//get a new sensor event
-	sensors_event_t event;
-	bno.getEvent(&event);
-
-	//get course, pitch, roll angles in degrees
-	telemetry.courseAngle = event.orientation.x;
-	telemetry.rollAngle   = event.orientation.z;
-	telemetry.pitchAngle  = event.orientation.y;
+	//get IMU data and convert to degrees
+	auto vect = bno.getQuat().toEuler();
+	telemetry.courseAngle = vect.x() * (180 / M_PI);
+	telemetry.rollAngle   = vect.z() * (180 / M_PI);
+	telemetry.pitchAngle  = vect.y() * (180 / M_PI);
 
 	//convert Euler angles from degrees to radians - ONLY USED FOR LiDAR CORRECTION
-	telemetry.convertedRoll  = (telemetry.rollAngle)  * (M_PI / 180);
-	telemetry.convertedPitch = (telemetry.pitchAngle) * (M_PI / 180);
+	telemetry.convertedRoll  = vect.y();
+	telemetry.convertedPitch = vect.z();
 
 	//timestamp the new data
 	dataTimestamp_IMU = millis();
