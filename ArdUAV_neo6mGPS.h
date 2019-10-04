@@ -140,6 +140,15 @@ public: // <<----------------------------------------------------------//public
 	char navStatus  = 'V';
 	char latDir     = ' ';
 	char lonDir     = ' ';
+	int fs          = 0;
+	float nosv      = 0;
+	float hdop      = 0;
+	float msl       = 0;
+	char umsl       = ' ';
+	float altref    = 0;
+	char usep       = ' ';
+	float diffage   = 0;
+	int diffstation = 0;
 
 
 
