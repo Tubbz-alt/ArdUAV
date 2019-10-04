@@ -263,11 +263,36 @@ void neo6mGPS::updateValues()
 {
 	if (findSentence(GPGGA_header))
 	{
-		// TODO
+		calc_utc_time(atof(data[1]));
+
+		lat_dm  = atof(data[2]);
+		latDir  = data[3][0];
+		lat_dd  = dm_dd(lat_dm, latDir);
+		lon_dm  = atof(data[4]);
+		lonDir  = data[5][0];
+		lon_dd  = dm_dd(lon_dm, lonDir);
+		fs      = atoi(data[6]);
+		nosv    = atof(data[7]);
+		hdop    = atof(data[8]);
+		msl     = atof(data[9]);
+		umsl    = data[10][0];
+		altref  = atof(data[11]);
+		usep    = data[12][0];
+		diffage = atof(data[13]);
+		diffstation = atoi(data[14]);
 	}
 	else if (findSentence(GPGLL_header))
 	{
-		// TODO
+		lat_dm     = atof(data[1]);
+		latDir    = data[2][0];
+		lat_dd    = dm_dd(lat_dm, latDir);
+		lon_dm    = atof(data[3]);
+		lonDir    = data[4][0];
+		lon_dd    = dm_dd(lon_dm, lonDir);
+
+		calc_utc_time(atof(data[5]));
+
+		navStatus = data[6][0];
 	}
 	else if (findSentence(GPGLV_header))
 	{
