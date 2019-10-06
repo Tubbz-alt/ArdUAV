@@ -3,23 +3,10 @@
 
 
 
-Servo nose_wheel;
-Servo fpv_pan;
-Servo fpv_tilt;
-Servo bay_door;
-
-
-
-
 void setup()
 {
   //initialize the core flight controller software class
   myIFC.begin();
-
-  nose_wheel.attach(24);
-  fpv_pan.attach(26);
-  fpv_tilt.attach(27);
-  bay_door.attach(28);
 }
 
 
@@ -27,23 +14,18 @@ void setup()
 
 void loop()
 {
-  nose_wheel.write(myIFC.controlInputs.yaw_command);
-  fpv_pan.write(IFC_commandTransfer.rxBuff[16]);
-  fpv_tilt.write(constrain(IFC_commandTransfer.rxBuff[17], 80, 180));
-  bay_door.write(constrain(IFC_commandTransfer.rxBuff[18], 40, 140));
-  
   //get GPS data
   if(myIFC.grabData_GPS())
   {
     //optional debugging prints
-    /*IFC_DEBUG_PORT.print("Latitude:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.latitude, 5);
-    IFC_DEBUG_PORT.print("Longitude:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.longitude, 5);
-    IFC_DEBUG_PORT.print("UTC_year:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_year);
-    IFC_DEBUG_PORT.print("UTC_month:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_month);
-    IFC_DEBUG_PORT.print("UTC_day:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_day);
-    IFC_DEBUG_PORT.print("UTC_hour:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_hour);
-    IFC_DEBUG_PORT.print("UTC_minute:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_minute);
-    IFC_DEBUG_PORT.print("UTC_second:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_second);
+    /*IFC_DEBUG_PORT.print("Latitude:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.latitude, 5);
+    IFC_DEBUG_PORT.print("Longitude:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.longitude, 5);
+    IFC_DEBUG_PORT.print("UTC_year:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_year);
+    IFC_DEBUG_PORT.print("UTC_month:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_month);
+    IFC_DEBUG_PORT.print("UTC_day:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_day);
+    IFC_DEBUG_PORT.print("UTC_hour:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_hour);
+    IFC_DEBUG_PORT.print("UTC_minute:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_minute);
+    IFC_DEBUG_PORT.print("UTC_second:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.UTC_second);
     IFC_DEBUG_PORT.print("Speed Over Ground:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.speedOverGround, 3);
     IFC_DEBUG_PORT.print("Course Over Ground:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.courseOverGround, 3);
     IFC_DEBUG_PORT.println();*/
@@ -53,9 +35,9 @@ void loop()
   if(myIFC.grabData_IMU())
   {
     //optional debugging prints
-    /*IFC_DEBUG_PORT.print("Pitch Angle:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.pitchAngle, 5);
-    IFC_DEBUG_PORT.print("Roll Angle:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.rollAngle, 5);
-    //IFC_DEBUG_PORT.print("Course Angle:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.courseAngle, 5);
+    /*IFC_DEBUG_PORT.print("Pitch Angle:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.pitchAngle, 5);
+    IFC_DEBUG_PORT.print("Roll Angle:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.rollAngle, 5);
+    //IFC_DEBUG_PORT.print("Course Angle:\t\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.courseAngle, 5);
     IFC_DEBUG_PORT.println();*/
   }
 
