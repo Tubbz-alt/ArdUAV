@@ -287,8 +287,8 @@ void IFC_Class::sendTelem()
 		IFC_telemetryTransfer.txBuff[20] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) >> 8);
 		IFC_telemetryTransfer.txBuff[21] = (uint8_t)(((int16_t)(telemetry.speedOverGround * 100)) & 0xFF);
 
-		IFC_telemetryTransfer.txBuff[22] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) >> 8);;
-		IFC_telemetryTransfer.txBuff[23] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) & 0xFF);;
+		IFC_telemetryTransfer.txBuff[22] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) >> 8);
+		IFC_telemetryTransfer.txBuff[23] = (uint8_t)(((int16_t)(telemetry.courseOverGround * 100)) & 0xFF);
 
 		//send the telemetry data to GS
 		IFC_telemetryTransfer.sendData(24);
