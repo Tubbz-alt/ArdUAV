@@ -40,13 +40,14 @@ public: // <<---------------------------------------//public
 	uint8_t rxBuff[MAX_PACKET_SIZE];
 
 	uint8_t bytesRead = 0;
+	int8_t status     = 0;
 
 
 
 
 	void begin(Stream &_port);
 	bool sendData(uint8_t messageLen);
-	int8_t available();
+	uint8_t available();
 
 
 
@@ -64,9 +65,9 @@ private: // <<---------------------------------------//private
 
 	Stream* port;
 
-	uint8_t bytesToRec = 0;
-	uint8_t payIndex = 0;
-	uint8_t overheadByte = 0;
+	uint8_t bytesToRec      = 0;
+	uint8_t payIndex        = 0;
+	uint8_t overheadByte    = 0;
 	uint8_t recOverheadByte = 0;
 
 
@@ -74,9 +75,9 @@ private: // <<---------------------------------------//private
 
 
 	uint8_t findChecksum(uint8_t arr[], uint8_t len);
-	void calcOverhead(uint8_t arr[], uint8_t len);
-	int16_t findLast(uint8_t arr[], uint8_t len);
-	void stuffPacket(uint8_t arr[], uint8_t len);
-	void unpackPacket(uint8_t arr[], uint8_t len);
+	void calcOverhead(uint8_t arr[],    uint8_t len);
+	int16_t findLast(uint8_t arr[],     uint8_t len);
+	void stuffPacket(uint8_t arr[],     uint8_t len);
+	void unpackPacket(uint8_t arr[],    uint8_t len);
 	void writePayload();
 };
