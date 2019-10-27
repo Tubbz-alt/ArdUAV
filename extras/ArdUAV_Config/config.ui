@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>ArdUAV Config Window</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../ArdUAV-logo.png</normaloff>../ArdUAV-logo.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="Tabs">

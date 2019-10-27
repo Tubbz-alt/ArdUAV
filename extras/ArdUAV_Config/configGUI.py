@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'config.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -14,6 +14,9 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(805, 619)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("../ArdUAV-logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Dialog.setWindowIcon(icon)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.Tabs = QtWidgets.QTabWidget(Dialog)
