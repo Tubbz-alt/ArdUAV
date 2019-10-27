@@ -389,22 +389,14 @@ class AppWindow(QDialog):
                 print("--------------------------------")
                 print("ERROR - Could not save {}".format(final_name))
                 return
-        else:
-            config_name = os.path.join("configs", "ArdUAV_config_v{}.json")
-            version = 1
 
-            while os.path.exists(config_name.format(version)):
-                version += 1
-
-            final_name = config_name.format(version)
-
-        contents = pprint.pformat(self.currentParameters).replace("'", '"')
-        
-        with open(final_name, "w") as config:
-            config.write(contents)
-
-        print("--------------------------------")
-        print("Config saved as {}".format(final_name))
+            contents = pprint.pformat(self.currentParameters).replace("'", '"')
+            
+            with open(final_name, "w") as config:
+                config.write(contents)
+    
+            print("--------------------------------")
+            print("Config saved as {}".format(final_name))
 
     def get_parameters(self):
         try:
