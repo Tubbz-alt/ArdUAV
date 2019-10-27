@@ -6,7 +6,7 @@ import os
 import sys
 import pprint
 import json
-from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFileDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFileDialog, QInputDialog, QLineEdit
 from configGUI import Ui_Dialog
 
 
@@ -369,17 +369,37 @@ class AppWindow(QDialog):
         self.currentParameters['IFCTools']['OtherSettings']['PitotTubeAnalogPin']       = sNum_to_aNum[self.ui.PitotTubeAnalogPin.currentText()]
         self.currentParameters['IFCTools']['OtherSettings']['LiDARFixedMount']          = boolStr_to_digStr[self.ui.LiDARFixedMount.currentText()]
 
+    def get_custom_config_name(self):
+        text, okPressed = QInputDialog.getText(self, "Config Name","Enter config name or press cancel for default name:", QLineEdit.Normal, "")
+        
+        if okPressed and text != '':
+            return text
+        return False
+
     def write_out_config(self):
-        contents = pprint.pformat(self.currentParameters)
+        config_name = self.get_custom_config_name()
+        
+        if config_name:
+            if not config_name.endswith('.json'):
+                config_name += '.json'
+            
+            final_name = os.path.join("configs", config_name)
+            
+            if os.path.exists(final_name):
+                print("--------------------------------")
+                print("ERROR - Could not save {}".format(final_name))
+                return
+        else:
+            config_name = os.path.join("configs", "ArdUAV_config_v{}.json")
+            version = 1
 
-        config_name = os.path.join("configs", "ArdUAV_config_v{}.json")
-        version = 1
+            while os.path.exists(config_name.format(version)):
+                version += 1
 
-        while os.path.exists(config_name.format(version)):
-            version += 1
+            final_name = config_name.format(version)
 
-        final_name = config_name.format(version)
-
+        contents = pprint.pformat(self.currentParameters).replace("'", '"')
+        
         with open(final_name, "w") as config:
             config.write(contents)
 
