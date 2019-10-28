@@ -370,7 +370,7 @@ class AppWindow(QDialog):
         self.currentParameters['IFCTools']['OtherSettings']['LiDARFixedMount']          = boolStr_to_digStr[self.ui.LiDARFixedMount.currentText()]
 
     def get_custom_config_name(self):
-        text, okPressed = QInputDialog.getText(self, "Config Name","Enter config name or press cancel for default name:", QLineEdit.Normal, "")
+        text, okPressed = QInputDialog.getText(self, "Config Name","Enter config name:", QLineEdit.Normal, "")
         
         if okPressed and text != '':
             return text
