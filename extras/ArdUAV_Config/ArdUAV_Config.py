@@ -120,11 +120,11 @@ baudNum_to_baudIndex = {'300':     0,
 baudIndex_to_baudNum = reverse_dict(baudNum_to_baudIndex)
 
 portName_to_portNum = {'USB':     '0',
-                        'Serial1': '1',
-                        'Serial2': '2',
-                        'Serial3': '3',
-                        'Serial4': '4',
-                        'Serial5': '5'}
+                       'Serial1': '1',
+                       'Serial2': '2',
+                       'Serial3': '3',
+                       'Serial4': '4',
+                       'Serial5': '5'}
 portName_to_portIndex = reverse_dict(portName_to_portNum)
 
 
@@ -935,19 +935,19 @@ class AppWindow(QDialog):
                 
                 if define == "#define":
                     if setting_name == "YAW_ANALOG_PIN":
-                        new_value = self.comboBoxIndicesAnalogPin[self.ui.RudderAnalogPin.currentText()]
+                        new_value = sNum_to_aNum[self.ui.RudderAnalogPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "THROTTLE_ANALOG_PIN":
-                        new_value = self.comboBoxIndicesAnalogPin[self.ui.ThrottleAnalogPin.currentText()]
+                        new_value = sNum_to_aNum[self.ui.ThrottleAnalogPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "ROLL_ANALOG_PIN":
-                        new_value = self.comboBoxIndicesAnalogPin[self.ui.AileronAnalogPin.currentText()]
+                        new_value = sNum_to_aNum[self.ui.AileronAnalogPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "PITCH_ANALOG_PIN":
-                        new_value = self.comboBoxIndicesAnalogPin[self.ui.ElevatorAnalogPin.currentText()]
+                        new_value = sNum_to_aNum[self.ui.ElevatorAnalogPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "AILERON_MAX_LOWRATES":
@@ -1007,19 +1007,19 @@ class AppWindow(QDialog):
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "AILERON_REVERSE":
-                        new_value = self.comboBoxIndicesBool[self.ui.AileronReverse.currentText()]
+                        new_value = boolStr_to_digStr[self.ui.AileronReverse.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "ELEVATOR_REVERSE":
-                        new_value = self.comboBoxIndicesBool[self.ui.ElevatorReverse.currentText()]
+                        new_value = boolStr_to_digStr[self.ui.ElevatorReverse.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "RUDDER_REVERSE":
-                        new_value = self.comboBoxIndicesBool[self.ui.RudderReverse.currentText()]
+                        new_value = boolStr_to_digStr[self.ui.RudderReverse.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "THROTTLE_REVERSE":
-                        new_value = self.comboBoxIndicesBool[self.ui.ThrottleReverse.currentText()]
+                        new_value = boolStr_to_digStr[self.ui.ThrottleReverse.currentText()]
                         line = line.replace(setting_val, new_value)
             
             new_contents.append(line)
@@ -1048,7 +1048,7 @@ class AppWindow(QDialog):
                 
                 if define == "#define":
                     if setting_name == "GS_DEBUG_PORT_NUMBER":
-                        new_value = self.portComboBoxIndicesPortNum[self.ui.GSDebugPort.currentText()]
+                        new_value = portName_to_portNum[self.ui.GSDebugPort.currentText()]
                         line = line.replace(setting_val, new_value)
     
                         try:
@@ -1057,7 +1057,7 @@ class AppWindow(QDialog):
                             pass
     
                     elif setting_name == "GS_COMMAND_PORT_NUMBER":
-                        new_value = self.portComboBoxIndicesPortNum[self.ui.GSCommandPort.currentText()]
+                        new_value = portName_to_portNum[self.ui.GSCommandPort.currentText()]
                         line = line.replace(setting_val, new_value)
     
                         try:
@@ -1066,7 +1066,7 @@ class AppWindow(QDialog):
                             pass
     
                     elif setting_name == "GS_TELEM_PORT_NUMBER":
-                        new_value = self.portComboBoxIndicesPortNum[self.ui.GSTelemetryPort.currentText()]
+                        new_value = portName_to_portNum[self.ui.GSTelemetryPort.currentText()]
                         line = line.replace(setting_val, new_value)
     
                         try:
@@ -1095,31 +1095,31 @@ class AppWindow(QDialog):
                 
                 if define == "#define":
                     if setting_name == "LIDAR_FIXED_MOUNT":
-                        new_value = self.comboBoxIndicesBool[self.ui.LiDARFixedMount.currentText()]
+                        new_value = boolStr_to_digStr[self.ui.LiDARFixedMount.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "PITOT_PIN":
-                        new_value = self.comboBoxIndicesAnalogPin[self.ui.PitotTubeAnalogPin.currentText()]
+                        new_value = sNum_to_aNum[self.ui.PitotTubeAnalogPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "THROTTLE_PIN":
-                        new_value = self.comboBoxIndicesServoPin[self.ui.ThrottlePin.currentText()]
+                        new_value = sNum_to_dNum[self.ui.ThrottlePin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "R_AILERON_PIN":
-                        new_value = self.comboBoxIndicesServoPin[self.ui.RightAileronPin.currentText()]
+                        new_value = sNum_to_dNum[self.ui.RightAileronPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "L_AILERON_PIN":
-                        new_value = self.comboBoxIndicesServoPin[self.ui.LeftAileronPin.currentText()]
+                        new_value = sNum_to_dNum[self.ui.LeftAileronPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "ELEVATOR_PIN":
-                        new_value = self.comboBoxIndicesServoPin[self.ui.ElevatorPin.currentText()]
+                        new_value = sNum_to_dNum[self.ui.ElevatorPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "RUDDER_PIN":
-                        new_value = self.comboBoxIndicesServoPin[self.ui.RudderPin.currentText()]
+                        new_value = sNum_to_dNum[self.ui.RudderPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "UNSAFE_ROLL_R":
@@ -1180,7 +1180,7 @@ class AppWindow(QDialog):
                 
                 if define == "#define":
                     if setting_name == "IFC_DEBUG_PORT_NUMBER":
-                        new_value = self.portComboBoxIndicesPortNum[self.ui.IFCDebugPort.currentText()]
+                        new_value = portName_to_portNum[self.ui.IFCDebugPort.currentText()]
                         line = line.replace(setting_val, new_value)
     
                         try:
@@ -1189,7 +1189,7 @@ class AppWindow(QDialog):
                             pass
     
                     elif setting_name == "IFC_COMMAND_PORT_NUMBER":
-                        new_value = self.portComboBoxIndicesPortNum[self.ui.IFCCommandPort.currentText()]
+                        new_value = portName_to_portNum[self.ui.IFCCommandPort.currentText()]
                         line = line.replace(setting_val, new_value)
     
                         try:
@@ -1198,7 +1198,7 @@ class AppWindow(QDialog):
                             pass
     
                     elif setting_name == "IFC_GPS_PORT_NUMBER":
-                        new_value = self.portComboBoxIndicesPortNum[self.ui.IFCGPSPort.currentText()]
+                        new_value = portName_to_portNum[self.ui.IFCGPSPort.currentText()]
                         line = line.replace(setting_val, new_value)
     
                         try:
@@ -1207,7 +1207,7 @@ class AppWindow(QDialog):
                             pass
     
                     elif setting_name == "IFC_TELEM_PORT_NUMBER":
-                        new_value = self.portComboBoxIndicesPortNum[self.ui.IFCTelemetryPort.currentText()]
+                        new_value = portName_to_portNum[self.ui.IFCTelemetryPort.currentText()]
                         line = line.replace(setting_val, new_value)
     
                         try:
