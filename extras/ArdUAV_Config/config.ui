@@ -1032,8 +1032,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>203</width>
-                <height>124</height>
+                <width>737</width>
+                <height>422</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_21">
@@ -1093,12 +1093,12 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_44">
+               <item row="4" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_87">
                  <item>
-                  <widget class="QLabel" name="label_44">
+                  <widget class="QLabel" name="label_87">
                    <property name="text">
-                    <string>Min Throttle ADC Value</string>
+                    <string>Throttle Reverse Direction</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1106,10 +1106,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="MinThrottleADCValue">
-                   <property name="maximum">
-                    <number>65535</number>
+                  <widget class="QComboBox" name="ThrottleReverse">
+                   <property name="currentIndex">
+                    <number>1</number>
                    </property>
+                   <item>
+                    <property name="text">
+                     <string>True</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>False</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                 </layout>
@@ -1142,11 +1152,11 @@
                 </layout>
                </item>
                <item row="3" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_87">
+                <layout class="QHBoxLayout" name="horizontalLayout_44">
                  <item>
-                  <widget class="QLabel" name="label_87">
+                  <widget class="QLabel" name="label_44">
                    <property name="text">
-                    <string>Throttle Reverse Direction</string>
+                    <string>Min Throttle ADC Value</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1154,20 +1164,10 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="ThrottleReverse">
-                   <property name="currentIndex">
-                    <number>1</number>
+                  <widget class="QSpinBox" name="MinThrottleADCValue">
+                   <property name="maximum">
+                    <number>65535</number>
                    </property>
-                   <item>
-                    <property name="text">
-                     <string>True</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>False</string>
-                    </property>
-                   </item>
                   </widget>
                  </item>
                 </layout>
@@ -1193,8 +1193,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>205</width>
-                <height>180</height>
+                <width>737</width>
+                <height>422</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_17">
@@ -1254,27 +1254,6 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_47">
-                 <item>
-                  <widget class="QLabel" name="label_47">
-                   <property name="text">
-                    <string>Min Elevator ADC Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinElevatorADCValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
                <item row="2" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_48">
                  <item>
@@ -1302,28 +1281,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_50">
-                 <item>
-                  <widget class="QLabel" name="label_50">
-                   <property name="text">
-                    <string>Min Elevator Servo Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinElevatorServoValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="4" column="0">
+               <item row="5" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_51">
                  <item>
                   <widget class="QLabel" name="label_51">
@@ -1344,7 +1302,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="5" column="0">
+               <item row="7" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_88">
                  <item>
                   <widget class="QLabel" name="label_88">
@@ -1375,6 +1333,48 @@
                  </item>
                 </layout>
                </item>
+               <item row="3" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_47">
+                 <item>
+                  <widget class="QLabel" name="label_47">
+                   <property name="text">
+                    <string>Min Elevator ADC Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinElevatorADCValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="6" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_50">
+                 <item>
+                  <widget class="QLabel" name="label_50">
+                   <property name="text">
+                    <string>Min Elevator Servo Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinElevatorServoValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </widget>
             </widget>
@@ -1396,8 +1396,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>198</width>
-                <height>180</height>
+                <width>737</width>
+                <height>422</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_18">
@@ -1457,27 +1457,6 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_54">
-                 <item>
-                  <widget class="QLabel" name="label_54">
-                   <property name="text">
-                    <string>Min Aileron ADC Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinAileronADCValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
                <item row="2" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_55">
                  <item>
@@ -1505,28 +1484,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_56">
-                 <item>
-                  <widget class="QLabel" name="label_56">
-                   <property name="text">
-                    <string>Min Aileron Servo Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinAileronServoValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="4" column="0">
+               <item row="5" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_57">
                  <item>
                   <widget class="QLabel" name="label_57">
@@ -1547,7 +1505,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="5" column="0">
+               <item row="7" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_89">
                  <item>
                   <widget class="QLabel" name="label_89">
@@ -1578,6 +1536,48 @@
                  </item>
                 </layout>
                </item>
+               <item row="3" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_54">
+                 <item>
+                  <widget class="QLabel" name="label_54">
+                   <property name="text">
+                    <string>Min Aileron ADC Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinAileronADCValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="6" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_56">
+                 <item>
+                  <widget class="QLabel" name="label_56">
+                   <property name="text">
+                    <string>Min Aileron Servo Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinAileronServoValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </widget>
             </widget>
@@ -1599,8 +1599,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>200</width>
-                <height>180</height>
+                <width>737</width>
+                <height>422</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_22">
@@ -1660,27 +1660,6 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_60">
-                 <item>
-                  <widget class="QLabel" name="label_60">
-                   <property name="text">
-                    <string>Min Rudder ADC Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinRudderADCValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
                <item row="2" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_61">
                  <item>
@@ -1708,28 +1687,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_62">
-                 <item>
-                  <widget class="QLabel" name="label_62">
-                   <property name="text">
-                    <string>Min Rudder Servo Value</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="MinRudderServoValue">
-                   <property name="maximum">
-                    <number>65535</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="4" column="0">
+               <item row="5" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_63">
                  <item>
                   <widget class="QLabel" name="label_63">
@@ -1750,7 +1708,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="5" column="0">
+               <item row="7" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_93">
                  <item>
                   <widget class="QLabel" name="label_93">
@@ -1777,6 +1735,48 @@
                      <string>False</string>
                     </property>
                    </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="3" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_60">
+                 <item>
+                  <widget class="QLabel" name="label_60">
+                   <property name="text">
+                    <string>Min Rudder ADC Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinRudderADCValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="6" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_62">
+                 <item>
+                  <widget class="QLabel" name="label_62">
+                   <property name="text">
+                    <string>Min Rudder Servo Value</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="MinRudderServoValue">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -2034,8 +2034,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>147</width>
-                <height>152</height>
+                <width>737</width>
+                <height>422</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_31">
@@ -2550,8 +2550,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>187</width>
-                <height>254</height>
+                <width>737</width>
+                <height>422</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_30">
@@ -2807,8 +2807,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>171</width>
-                <height>68</height>
+                <width>737</width>
+                <height>422</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_29">

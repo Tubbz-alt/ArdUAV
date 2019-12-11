@@ -6,7 +6,7 @@ import os
 import sys
 import pprint
 import json
-from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFileDialog, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFileDialog, QInputDialog, QLineEdit, QPushButton, QWidget
 from configGUI import Ui_Dialog
 
 
@@ -67,7 +67,7 @@ index_to_sNum = reverse_dict(sNum_to_index)
 
 sNum_to_dNum = {'s0':  '2',
                 's1':  '39',
-                's2':  '16',
+                's2':  '6',
                 's3':  '24',
                 's4':  '25',
                 's5':  '26',
@@ -285,7 +285,7 @@ class AppWindow(QDialog):
             self.write_out_parameters()
 
         elif sb == QDialogButtonBox.Cancel:
-            self.close()
+            exit()
 
     def ingest_config(self):
         openfile = QFileDialog.getOpenFileName(self, directory="configs", filter="*.json")[0]
@@ -370,33 +370,23 @@ class AppWindow(QDialog):
         self.currentParameters['IFCTools']['OtherSettings']['LiDARFixedMount']          = boolStr_to_digStr[self.ui.LiDARFixedMount.currentText()]
 
     def get_custom_config_name(self):
-        text, okPressed = QInputDialog.getText(self, "Config Name","Enter config name:", QLineEdit.Normal, "")
+        text, okPressed = QInputDialog.getText(self, "Config Name", "Enter config name (leave blank to cancel):", QLineEdit.Normal, "")
         
         if okPressed and text != '':
             return text
         return False
 
     def write_out_config(self):
-        config_name = self.get_custom_config_name()
+        openfile = QFileDialog.getOpenFileName(self, directory="configs", filter="*.json")[0]
         
-        if config_name:
-            if not config_name.endswith('.json'):
-                config_name += '.json'
-            
-            final_name = os.path.join("configs", config_name)
-            
-            if os.path.exists(final_name):
-                print("--------------------------------")
-                print("ERROR - Could not save {}".format(final_name))
-                return
-
+        if openfile:
             contents = pprint.pformat(self.currentParameters).replace("'", '"')
             
-            with open(final_name, "w") as config:
+            with open(openfile, "w") as config:
                 config.write(contents)
     
             print("--------------------------------")
-            print("Config saved as {}".format(final_name))
+            print("Config exported to {}".format(openfile))
 
     def get_parameters(self):
         try:
@@ -446,22 +436,22 @@ class AppWindow(QDialog):
                         self.ui.MaxThrottleValue.setValue(int(setting_val))
     
                     elif setting_name == "AILERON_MAX":
-                        self.ui.MinThrottleValue.setValue(int(setting_val))
+                        self.ui.MaxAileronValue.setValue(int(setting_val))
     
                     elif setting_name == "ELEVATOR_MAX":
                         self.ui.MaxElevatorValue.setValue(int(setting_val))
     
                     elif setting_name == "RUDDER_MAX":
-                        self.ui.MinElevatorValue.setValue(int(setting_val))
+                        self.ui.MaxRudderValue.setValue(int(setting_val))
     
                     elif setting_name == "THROTTLE_MIN":
-                        self.ui.MaxAileronValue.setValue(int(setting_val))
+                        self.ui.MinThrottleValue.setValue(int(setting_val))
     
                     elif setting_name == "AILERON_MIN":
                         self.ui.MinAileronValue.setValue(int(setting_val))
     
                     elif setting_name == "ELEVATOR_MIN":
-                        self.ui.MaxRudderValue.setValue(int(setting_val))
+                        self.ui.MinElevatorValue.setValue(int(setting_val))
     
                     elif setting_name == "RUDDER_MIN":
                         self.ui.MinRudderValue.setValue(int(setting_val))
