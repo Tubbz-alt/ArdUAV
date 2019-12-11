@@ -127,7 +127,6 @@ void GS_Class::computeCommands()
 	//read and map joystick data
 	//mapping normalized to max and min joystick values
 	controlInputs.roll_command     = updateServoCommand(ailerons);
-	Serial.println(controlInputs.roll_command);
 	controlInputs.pitch_command    = updateServoCommand(elevator);
 	controlInputs.yaw_command      = updateServoCommand(rudder);
 	controlInputs.throttle_command = updateServoCommand(throttle);
