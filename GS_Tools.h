@@ -30,14 +30,14 @@
 #define RUDDER_MIN_LOWRATES     1000
 
 #define THROTTLE_MIN_ADC        24130
-#define AILERON_MIN_ADC         25190
-#define ELEVATOR_MIN_ADC        24030
-#define RUDDER_MIN_ADC          23300
+#define AILERON_MIN_ADC         25000
+#define ELEVATOR_MIN_ADC        23700
+#define RUDDER_MIN_ADC          24900
 
 #define THROTTLE_MAX_ADC        41060
-#define AILERON_MAX_ADC         41920
+#define AILERON_MAX_ADC         41900
 #define ELEVATOR_MAX_ADC        41220
-#define RUDDER_MAX_ADC          41740
+#define RUDDER_MAX_ADC          41700
 
 #define AILERON_REVERSE         1
 #define ELEVATOR_REVERSE        1

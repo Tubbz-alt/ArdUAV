@@ -127,6 +127,7 @@ void GS_Class::computeCommands()
 	//read and map joystick data
 	//mapping normalized to max and min joystick values
 	controlInputs.roll_command     = updateServoCommand(ailerons);
+	Serial.println(controlInputs.roll_command);
 	controlInputs.pitch_command    = updateServoCommand(elevator);
 	controlInputs.yaw_command      = updateServoCommand(rudder);
 	controlInputs.throttle_command = updateServoCommand(throttle);
@@ -157,7 +158,7 @@ void GS_Class::sendCommands()
 	GS_commandTransfer.txBuff[FLAPS_COMMAND_LSB]     = (myGS.controlInputs.flaps_command ) & 0xFF;
 
 	//send the telemetry data to GS - First 16 bytes are reserved, leaving 6 for user defined bytes
-	GS_commandTransfer.sendData(22);
+	GS_commandTransfer.sendData(16);
 }
 
 
