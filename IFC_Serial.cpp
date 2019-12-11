@@ -22,7 +22,7 @@ void commEvent_IFC()
 		myIFC.controlInputs.limiter_command     = (IFC_commandTransfer.rxBuff[10] << 8) | IFC_commandTransfer.rxBuff[11];
 		myIFC.controlInputs.gear_command        = (IFC_commandTransfer.rxBuff[12] << 8) | IFC_commandTransfer.rxBuff[13];
 		myIFC.controlInputs.flaps_command       = (IFC_commandTransfer.rxBuff[14] << 8) | IFC_commandTransfer.rxBuff[15];
-		Serial.println(myIFC.controlInputs.pitch_command);
+		
 		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers
 		//myIFC.bankPitchLimiter(myIFC.controlInputs.limiter_enable, true);
 	}
@@ -30,7 +30,7 @@ void commEvent_IFC()
 	{
 		packetDetected = false;
 
-		IFC_DEBUG_PORT.print("ERROR: ");
+		IFC_DEBUG_PORT.print("Command Link Serial Transfer ERROR: ");
 		IFC_DEBUG_PORT.println(IFC_commandTransfer.status);
 
 		//tweak the contents of controlInputs to keep the plane from unsafe maneuvers

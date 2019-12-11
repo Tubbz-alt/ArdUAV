@@ -9,9 +9,7 @@
 
 void commEvent_GS()
 {
-	int8_t result = GS_telemetryTransfer.available();
-
-	if (result == NEW_DATA)
+	if (GS_telemetryTransfer.available())
 	{
 		packetDetected = true;
 		myGS.newTelem = true;
@@ -32,12 +30,12 @@ void commEvent_GS()
 		myGS.telemetry.speedOverGround  = ((GS_telemetryTransfer.rxBuff[20] << 8) | GS_telemetryTransfer.rxBuff[21]) / 100.0;
 		myGS.telemetry.courseOverGround = ((GS_telemetryTransfer.rxBuff[22] << 8) | GS_telemetryTransfer.rxBuff[23]) / 100.0;
 	}
-	else if ((result != NO_DATA) && (result != CONTINUE))
+	else if (GS_telemetryTransfer.status < 0)
 	{
 		packetDetected = false;
 
-		GS_DEBUG_PORT.print("ERROR: ");
-		GS_DEBUG_PORT.println(result);
+		GS_DEBUG_PORT.print("Telemetry Link Serial Transfer ERROR: ");
+		GS_DEBUG_PORT.println(GS_telemetryTransfer.status);
 	}
 	else
 		packetDetected = false;

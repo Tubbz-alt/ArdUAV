@@ -226,7 +226,11 @@ int IFC_Class::grabData_LiDAR()
 		LiDAR_Counter = LiDAR_Counter + 1;
 	}
 
-	telemetry.convertedAltitude = telemetry.altitude * cos(telemetry.convertedRoll) * cos(telemetry.convertedPitch);
+	//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
+	if (LIDAR_FIXED_MOUNT)
+		telemetry.convertedAltitude = telemetry.altitude * cos(telemetry.convertedRoll) * cos(telemetry.convertedPitch);
+	else
+		telemetry.convertedAltitude = telemetry.altitude;
 
 	return 1;
 }
