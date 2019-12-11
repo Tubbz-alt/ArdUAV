@@ -6,7 +6,7 @@ import os
 import sys
 import pprint
 import json
-from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFileDialog, QInputDialog, QLineEdit, QPushButton, QWidget
+from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFileDialog, QInputDialog, QLineEdit
 from configGUI import Ui_Dialog
 
 
