@@ -60,16 +60,6 @@ public: // <<---------------------------------------//public
 		return 0;
 	}
 
-	uint8_t calculate(uint8_t arr[])
-	{
-		uint8_t crc = 0;
-
-		for (uint16_t i = 0; i < (sizeof(arr) - 1); i++)
-			crc = csTable[crc ^ arr[i]];
-
-		return crc;
-	}
-
 	uint8_t calculate(uint8_t arr[], uint8_t len)
 	{
 		uint8_t crc = 0;
