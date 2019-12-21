@@ -57,14 +57,14 @@ public: // <<---------------------------------------//public
 	{
 		if (val < tableLen_)
 			return csTable[val];
-		return 0
+		return 0;
 	}
 
 	uint8_t calculate(uint8_t arr[])
 	{
 		uint8_t crc = 0;
 
-		for (uint16_t i = 0; i < ((sizeof(arr) / sizeof(arr[0])) - 1); i++)
+		for (uint16_t i = 0; i < (sizeof(arr) - 1); i++)
 			crc = csTable[crc ^ arr[i]];
 
 		return crc;
