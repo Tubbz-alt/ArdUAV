@@ -262,7 +262,7 @@ void IFC_Class::sendTelem()
 
 		//send the telemetry data to GS
 		IFC_telemetryTransfer.txObj(telemetry, sizeof(telemetry));
-		IFC_telemetryTransfer.sendData(sizeof(telemetry));
+		IFC_telemetryTransfer.sendData(sizeof(telemetry) + TELEMETRY_BUFFER);
 	}
 }
 
