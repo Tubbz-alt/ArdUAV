@@ -80,11 +80,7 @@ void GS_Class::begin()
 
 	//initialize "pass-through" timers
 	GS_DEBUG_PORT.println(F("Initializing timers..."));
-	timeBench_Commands = millis();
-	currentTime_Commands = timeBench_Commands;
-
-	timeBench_Telem = millis();
-	currentTime_Telem = timeBench_Telem;
+	commandTimer.begin(REPORT_COMMANDS_PERIOD);
 	GS_DEBUG_PORT.println(F("\tTimers initialized..."));
 }
 
@@ -150,12 +146,8 @@ void GS_Class::sendCommands()
 void GS_Class::computeAndSendCommands()
 {
 	//use timer to send commands to the plane at a fixed rate
-	currentTime_Commands = millis();
-	if ((currentTime_Commands - timeBench_Commands) >= REPORT_COMMANDS_PERIOD)
+	if (commandTimer.fire())
 	{
-		//reset timer
-		timeBench_Commands += REPORT_COMMANDS_PERIOD;
-
 		computeCommands();
 		sendCommands();
 	}

@@ -1,6 +1,7 @@
 #pragma once
 #include "Arduino.h"
 #include "Servo.h"
+#include "FireTimer.h"
 
 #include "IFC_Serial.h"
 #include "Shared_Tools.h"
@@ -109,17 +110,10 @@ public:
 private:
 	//byte used to determine if LiDAR reading needs to include bias correction
 	byte LiDAR_Counter;
-
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//variables to implement "pass-through" timers
-	unsigned long timeBench_Limiter;
-	unsigned long currentTime_Limiter;
-
-	unsigned long timeBench_Telem;
-	unsigned long currentTime_Telem;
-	/////////////////////////////////////////////////////////////////////////////////////////
-
 	unsigned long dataTimestamp_IMU;
+	FireTimer limiterTimer;
+	FireTimer telemTimer;
+	FireTimer imuTimer;
 
 
 

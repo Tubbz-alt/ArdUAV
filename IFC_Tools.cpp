@@ -32,7 +32,6 @@ IFC_Class myIFC;
 void IFC_Class::begin()
 {
 	//initialize variables
-	dataTimestamp_IMU = 0;
 	controlInputs.limiter_enable = false;
 
 
@@ -94,10 +93,10 @@ void IFC_Class::begin()
 
 
 	//initialize AirComs
-	IFC_DEBUG_PORT.println(F("Initializing AirComms..."));
+	IFC_DEBUG_PORT.println(F("Initializing transfer classes..."));
 	IFC_commandTransfer.begin(IFC_COMMAND_PORT);
 	IFC_telemetryTransfer.begin(IFC_TELEM_PORT);
-	IFC_DEBUG_PORT.println(F("\tAirComms initialized"));
+	IFC_DEBUG_PORT.println(F("\tTransfer classes initialized"));
 
 
 
@@ -141,7 +140,7 @@ void IFC_Class::begin()
 
 
 	//initialize each individual servo to their respective center position
-	IFC_DEBUG_PORT.println(F("Initializing Servos..."));
+	IFC_DEBUG_PORT.println(F("Initializing servos..."));
 	rudder.attach(RUDDER_PIN);
 	elevator.attach(ELEVATOR_PIN);
 	aileron_L.attach(L_AILERON_PIN);
@@ -161,6 +160,16 @@ void IFC_Class::begin()
 	throttle.attach(THROTTLE_PIN);
 	throttle.write(THROTTLE_MIN);
 	IFC_DEBUG_PORT.println(F("\tESC initialized..."));
+
+
+
+
+	//initialize the timers
+	IFC_DEBUG_PORT.println(F("Initializing timers..."));
+	limiterTimer.begin(LIMITER_PERIOD);
+	telemTimer.begin(REPORT_TELEM_PERIOD);
+	imuTimer.begin(LIMITER_PERIOD);
+	IFC_DEBUG_PORT.println(F("\tTimers initialized..."));
 }
 
 
@@ -203,8 +212,8 @@ int IFC_Class::grabData_IMU()
 	telemetry.convertedRoll  = vect.y();
 	telemetry.convertedPitch = vect.z();
 
-	//timestamp the new data
-	dataTimestamp_IMU = millis();
+	//timestamp the new data - regardless of where this function was called
+	imuTimer.start();
 
 	return 1;
 }
@@ -254,12 +263,8 @@ int IFC_Class::grabData_Pitot()
 void IFC_Class::sendTelem()
 {
 	//use timer to send commands to the plane at a fixed rate
-	currentTime_Telem = millis();
-	if ((currentTime_Telem - timeBench_Telem) >= REPORT_TELEM_PERIOD)
+	if (telemTimer.fire())
 	{
-		//reset timer
-		timeBench_Telem += REPORT_TELEM_PERIOD;
-
 		//send the telemetry data to GS
 		IFC_telemetryTransfer.txObj(telemetry, sizeof(telemetry));
 		IFC_telemetryTransfer.sendData(sizeof(telemetry) + TELEMETRY_BUFFER);
@@ -325,12 +330,8 @@ void IFC_Class::bankPitchLimiter(bool enable, bool _linkConnected)
 		else
 		{
 			//use timer to send commands to the servos at a fixed rate
-			currentTime_Limiter = millis();
-			if ((currentTime_Limiter - timeBench_Limiter) >= REPORT_COMMANDS_PERIOD)
+			if (limiterTimer.fire())
 			{
-				//reset timer
-				timeBench_Limiter = currentTime_Limiter;
-
 				//update struct based on euler angles
 				updateControlsLimiter(PITCH_AXIS);	//pitch
 				updateControlsLimiter(ROLL_AXIS);	//roll
@@ -352,7 +353,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 	uint16_t minServoCommand;
 
 	//determine if the current IMU data is old - if so, get new IMU data
-	if ((millis() - dataTimestamp_IMU) >= LIMITER_PERIOD)
+	if (imuTimer.fire())
 		grabData_IMU();
 
 	//determine if pitch or roll should be tweaked (axis==true --> pitch, axis==false --> roll)

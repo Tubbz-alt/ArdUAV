@@ -1,5 +1,6 @@
 #pragma once
 #include "Arduino.h"
+#include "FireTimer.h"
 
 #include "GS_Serial.h"
 #include "Shared_Tools.h"
@@ -105,15 +106,8 @@ public:
 
 
 private:
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//variables to implement "pass-through" timers
-	unsigned long timeBench_Commands;
-	unsigned long currentTime_Commands;
-
-	unsigned long timeBench_Telem;
-	unsigned long currentTime_Telem;
-	/////////////////////////////////////////////////////////////////////////////////////////
-
+	FireTimer commandTimer;
+	
 
 
 
