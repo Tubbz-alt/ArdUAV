@@ -137,7 +137,7 @@ class AppWindow(QDialog):
 
         self.setup_signals()
 
-        self.BASE_LIBRARY_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+        self.BASE_LIBRARY_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), 'src')
 
         if not os.path.exists("configs"):
             os.makedirs("configs")
