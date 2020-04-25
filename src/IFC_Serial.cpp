@@ -43,6 +43,29 @@ void commEvent_IFC()
 
 
 
+void lidarEvent_IFC()
+{
+	if (IFC_lidarTransfer.available())
+	{
+		//update controlInputs struct so that the next time the servos can be updated with the latest positions
+		IFC_lidarTransfer.rxObj(myIFC.telemetry.altitude, sizeof(myIFC.telemetry.altitude));
+
+		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
+		if (LIDAR_FIXED_MOUNT)
+			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude * cos(myIFC.telemetry.convertedRoll) * cos(myIFC.telemetry.convertedPitch);
+		else
+			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude;
+	}
+	else if (IFC_lidarTransfer.status < 0)
+	{
+		IFC_DEBUG_PORT.print("LiDAR Link Serial Transfer ERROR: ");
+		IFC_DEBUG_PORT.println(IFC_lidarTransfer.status);
+	}
+}
+
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////////
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
 #if IFC_COMMAND_PORT_NUMBER == 0
@@ -85,6 +108,53 @@ void serialEvent5()
 void serialEvent6()
 {
 	commEvent_IFC();
+}
+
+#endif
+
+
+
+
+#if IFC_LIDAR_PORT_NUMBER == 0
+void serialEvent()
+{
+	lidarEvent_IFC();
+}
+
+#elif IFC_LIDAR_PORT_NUMBER == 1
+void serialEvent1()
+{
+	lidarEvent_IFC();
+}
+
+#elif IFC_LIDAR_PORT_NUMBER == 2
+void serialEvent2()
+{
+	lidarEvent_IFC();
+}
+
+#elif IFC_LIDAR_PORT_NUMBER == 3
+void serialEvent3()
+{
+	lidarEvent_IFC();
+}
+
+#elif IFC_LIDAR_PORT_NUMBER == 4
+void serialEvent4()
+{
+	lidarEvent_IFC();
+}
+
+#elif IFC_LIDAR_PORT_NUMBER == 5
+void serialEvent5()
+{
+	lidarEvent_IFC();
+}
+
+#elif IFC_LIDAR_PORT_NUMBER == 6
+void serialEvent6()
+{
+	lidarEvent_IFC();
 }
 
 #endif

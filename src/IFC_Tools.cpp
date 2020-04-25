@@ -11,10 +11,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //sensor/actuator classes
 Adafruit_BNO055 bno = Adafruit_BNO055(&Wire, 55, BNO055_ADDRESS_A);
-LIDARLite myLidarLite(&Wire);
 neo6mGPS myGPS;
 SerialTransfer IFC_commandTransfer;
 SerialTransfer IFC_telemetryTransfer;
+SerialTransfer IFC_lidarTransfer;
 Servo rudder;
 Servo elevator;
 Servo aileron_L;
@@ -129,16 +129,6 @@ void IFC_Class::begin()
 
 
 
-	//initialize the LiDAR for long distance readings
-	IFC_DEBUG_PORT.println(F("Initializing LiDAR altimeter..."));
-	myLidarLite.begin(0, true);
-	myLidarLite.configure(0);
-	LiDAR_Counter = 0;
-	IFC_DEBUG_PORT.println(F("\tLiDAR altimeter initialized..."));
-
-
-
-
 	//initialize each individual servo to their respective center position
 	IFC_DEBUG_PORT.println(F("Initializing servos..."));
 	rudder.attach(RUDDER_PIN);
@@ -214,32 +204,6 @@ int IFC_Class::grabData_IMU()
 
 	//timestamp the new data - regardless of where this function was called
 	imuTimer.start();
-
-	return 1;
-}
-
-
-
-
-int IFC_Class::grabData_LiDAR()
-{
-	//get altitude readings - including periodic bias correction
-	if (LiDAR_Counter >= 100)
-	{
-		telemetry.altitude = myLidarLite.distance();
-		LiDAR_Counter = 0;
-	}
-	else
-	{
-		telemetry.altitude = myLidarLite.distance(false);
-		LiDAR_Counter = LiDAR_Counter + 1;
-	}
-
-	//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
-	if (LIDAR_FIXED_MOUNT)
-		telemetry.convertedAltitude = telemetry.altitude * cos(telemetry.convertedRoll) * cos(telemetry.convertedPitch);
-	else
-		telemetry.convertedAltitude = telemetry.altitude;
 
 	return 1;
 }

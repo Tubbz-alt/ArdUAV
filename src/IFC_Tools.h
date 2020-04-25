@@ -8,7 +8,6 @@
 #include "SerialTransfer.h"
 #include "neo6mGPS.h"
 #include "ArdUAV_Adafruit_BNO055.h"
-#include "ArdUAV_LIDARLite.h"
 
 
 
@@ -17,18 +16,18 @@
 //macros
 #define IFC
 
-#define LIDAR_FIXED_MOUNT  1  //0 - gimbal mount, 1 - fixed mount
+#define LIDAR_FIXED_MOUNT  0  //0 - gimbal mount, 0 - fixed mount
 
 #define SERVO_FREQ         60 //Hz
 #define LIMITER_PERIOD     REPORT_COMMANDS_PERIOD //ms
 
-#define PITOT_PIN          A9 //analog input pin
+#define PITOT_PIN          A17 //analog input pin
 
 #define THROTTLE_PIN       2 //digital ESC signal pin
-#define R_AILERON_PIN      6  //servo driver output port number
-#define L_AILERON_PIN      24 //servo driver output port number
-#define ELEVATOR_PIN       39 //servo driver output port number
-#define RUDDER_PIN         25 //servo driver output port number
+#define R_AILERON_PIN      39  //servo driver output port number
+#define L_AILERON_PIN      39 //servo driver output port number
+#define ELEVATOR_PIN       24 //servo driver output port number
+#define RUDDER_PIN         6 //servo driver output port number
 
 #define PITCH_AXIS         true  //
 #define ROLL_AXIS          false //
@@ -97,7 +96,6 @@ public:
 	void begin();
 	bool grabData_GPS();
 	int grabData_IMU();
-	int grabData_LiDAR();
 	int grabData_Pitot();
 	void sendTelem();
 	void updateServos();
@@ -125,6 +123,7 @@ extern IFC_Class myIFC;
 extern neo6mGPS myGPS;
 extern SerialTransfer IFC_commandTransfer;
 extern SerialTransfer IFC_telemetryTransfer;
+extern SerialTransfer IFC_lidarTransfer;
 
 extern TwoWire Wire1;
 extern TwoWire Wire2;

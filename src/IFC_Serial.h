@@ -9,9 +9,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //macros
 #define IFC_DEBUG_PORT_NUMBER     0 //USB
-#define IFC_COMMAND_PORT_NUMBER   4 //Serial4
+#define IFC_COMMAND_PORT_NUMBER   3 //Serial3
 #define IFC_GPS_PORT_NUMBER       1 //Serial1
-#define IFC_TELEM_PORT_NUMBER     3 //Serial3
+#define IFC_TELEM_PORT_NUMBER     4 //Serial4
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -70,6 +70,38 @@ extern void serialEvent5();
 
 #elif IFC_COMMAND_PORT_NUMBER == 6
 #define IFC_COMMAND_PORT Serial6
+extern void serialEvent6();
+#endif
+
+
+
+
+#if IFC_LIDAR_PORT_NUMBER == 0
+#define IFC_LIDAR_PORT Serial
+extern void serialEvent();
+
+#elif IFC_LIDAR_PORT_NUMBER == 1
+#define IFC_LIDAR_PORT Serial1
+extern void serialEvent1();
+
+#elif IFC_LIDAR_PORT_NUMBER == 2
+#define IFC_LIDAR_PORT Serial2
+extern void serialEvent2();
+
+#elif IFC_LIDAR_PORT_NUMBER == 3
+#define IFC_LIDAR_PORT Serial3
+extern void serialEvent3();
+
+#elif IFC_LIDAR_PORT_NUMBER == 4
+#define IFC_LIDAR_PORT Serial4
+extern void serialEvent4();
+
+#elif IFC_LIDAR_PORT_NUMBER == 5
+#define IFC_LIDAR_PORT Serial5
+extern void serialEvent5();
+
+#elif IFC_LIDAR_PORT_NUMBER == 6
+#define IFC_LIDAR_PORT Serial6
 extern void serialEvent6();
 #endif
 

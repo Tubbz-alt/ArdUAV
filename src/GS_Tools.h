@@ -13,10 +13,10 @@
 //macros
 #define GS
 
-#define YAW_ANALOG_PIN          A2
-#define THROTTLE_ANALOG_PIN     A3
-#define ROLL_ANALOG_PIN         A0
-#define PITCH_ANALOG_PIN        A17
+#define YAW_ANALOG_PIN          A17
+#define THROTTLE_ANALOG_PIN     A0
+#define ROLL_ANALOG_PIN         A2
+#define PITCH_ANALOG_PIN        A3
 
 #define PITCH_RATE_PIN          0
 #define ROLL_RATE_PIN           1
@@ -30,15 +30,15 @@
 #define ELEVATOR_MIN_LOWRATES   1000
 #define RUDDER_MIN_LOWRATES     1000
 
-#define THROTTLE_MIN_ADC        24130
+#define THROTTLE_MIN_ADC        23900
 #define AILERON_MIN_ADC         25000
-#define ELEVATOR_MIN_ADC        23700
-#define RUDDER_MIN_ADC          24900
+#define ELEVATOR_MIN_ADC        23600
+#define RUDDER_MIN_ADC          24800
 
-#define THROTTLE_MAX_ADC        41060
-#define AILERON_MAX_ADC         41900
-#define ELEVATOR_MAX_ADC        41220
-#define RUDDER_MAX_ADC          41700
+#define THROTTLE_MAX_ADC        40850
+#define AILERON_MAX_ADC         41800
+#define ELEVATOR_MAX_ADC        40900
+#define RUDDER_MAX_ADC          41600
 
 #define AILERON_REVERSE         1
 #define ELEVATOR_REVERSE        1
@@ -83,6 +83,7 @@ public:
 
 	struct controlInputs
 	{
+		bool limiter_enable; //enables and disables pitch and bank limiter
 		uint16_t pitch_command;
 		uint16_t roll_command;
 		uint16_t yaw_command;
