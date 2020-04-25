@@ -74,7 +74,7 @@ public:
 		uint16_t UTC_year;      //y
 		uint8_t UTC_month;      //M
 		uint8_t UTC_day;        //d
-		uint8_t UTC_hour;	//h
+		uint8_t UTC_hour;       //h
 		uint8_t UTC_minute;     //m
 		float UTC_second;       //s
 		float speedOverGround;  //knots
