@@ -52,8 +52,8 @@
                 <height>422</height>
                </rect>
               </property>
-              <layout class="QGridLayout" name="gridLayout_13">
-               <item row="0" column="0">
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout">
                  <item>
                   <widget class="QLabel" name="label">
@@ -154,7 +154,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                  <item>
                   <widget class="QLabel" name="label_2">
@@ -255,7 +255,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="2" column="0">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <item>
                   <widget class="QLabel" name="label_3">
@@ -359,7 +359,111 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <item>
+                  <widget class="QLabel" name="label_4">
+                   <property name="text">
+                    <string>LiDAR Port Baud</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="LiDAR_Port_Baud">
+                   <property name="currentText">
+                    <string>115200</string>
+                   </property>
+                   <property name="currentIndex">
+                    <number>8</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>300</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>1200</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>2400</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>4800</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>9600</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>19200</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>38400</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>57600</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>115200</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>230400</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>250000</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>460800</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>500000</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>921600</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>1000000</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>2000000</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
                   <widget class="QLabel" name="label_6">
@@ -1032,8 +1136,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>737</width>
-                <height>422</height>
+                <width>203</width>
+                <height>124</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_21">
@@ -1193,8 +1297,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>737</width>
-                <height>422</height>
+                <width>205</width>
+                <height>180</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_17">
@@ -1599,8 +1703,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>737</width>
-                <height>422</height>
+                <width>200</width>
+                <height>180</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_22">
@@ -1820,8 +1924,8 @@
                 <height>422</height>
                </rect>
               </property>
-              <layout class="QGridLayout" name="gridLayout_27">
-               <item row="0" column="0">
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_64">
                  <item>
                   <widget class="QLabel" name="label_64">
@@ -1869,7 +1973,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_65">
                  <item>
                   <widget class="QLabel" name="label_65">
@@ -1917,7 +2021,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="2" column="0">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_67">
                  <item>
                   <widget class="QLabel" name="label_67">
@@ -1965,7 +2069,55 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_68">
+                 <item>
+                  <widget class="QLabel" name="label_68">
+                   <property name="text">
+                    <string>LiDAR Port</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="IFCLiDARPort">
+                   <item>
+                    <property name="text">
+                     <string>USB</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Serial1</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Serial2</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Serial3</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Serial4</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Serial5</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_66">
                  <item>
                   <widget class="QLabel" name="label_66">
@@ -2039,104 +2191,6 @@
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_31">
-               <item row="0" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_72">
-                 <item>
-                  <widget class="QLabel" name="label_72">
-                   <property name="text">
-                    <string>Throttle Pin</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="ThrottlePin">
-                   <item>
-                    <property name="text">
-                     <string>s0</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s1</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s2</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s3</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s4</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s5</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s6</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s7</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s8</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s9</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s10</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s11</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s12</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s13</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s14</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>s15</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
                <item row="1" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_74">
                  <item>
@@ -2240,7 +2294,7 @@
                  <item>
                   <widget class="QLabel" name="label_92">
                    <property name="text">
-                    <string>Right Aileron Pin</string>
+                    <string>Aileron Pin</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2248,7 +2302,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="RightAileronPin">
+                  <widget class="QComboBox" name="AileronPin">
                    <item>
                     <property name="text">
                      <string>s0</string>
@@ -2333,7 +2387,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="4" column="0">
+               <item row="3" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_91">
                  <item>
                   <widget class="QLabel" name="label_91">
@@ -2431,12 +2485,12 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_90">
+               <item row="0" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_72">
                  <item>
-                  <widget class="QLabel" name="label_90">
+                  <widget class="QLabel" name="label_72">
                    <property name="text">
-                    <string>Left Aileron Pin</string>
+                    <string>Throttle Pin</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2444,7 +2498,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="LeftAileronPin">
+                  <widget class="QComboBox" name="ThrottlePin">
                    <item>
                     <property name="text">
                      <string>s0</string>
@@ -2550,8 +2604,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>737</width>
-                <height>422</height>
+                <width>187</width>
+                <height>254</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_30">
@@ -2807,8 +2861,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>737</width>
-                <height>422</height>
+                <width>171</width>
+                <height>68</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_29">

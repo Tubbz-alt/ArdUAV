@@ -151,6 +151,7 @@ class AppWindow(QDialog):
         self.currentParameters = {'SharedTools': {'SerialSettings': {'Debug_Port_Baud': "",
                                                                      'Command_Port_Baud': "",
                                                                      'GPS_Port_Baud': "",
+                                                                     'LiDAR_Port_Baud': "",
                                                                      'Telemetry_Port_Baud': ""},
                                                   'Reporting_TimeoutSettings': {'CommandReportingRate': "",
                                                                                 'TelemetryReportingRate': "",
@@ -191,11 +192,11 @@ class AppWindow(QDialog):
                                   'IFCTools': {'SerialSettings': {'IFC_DebugPortNumber': "",
                                                                   'IFC_CommandPortNumber': "",
                                                                   'IFC_GPSPortNumber': "",
+                                                                  'IFC_LiDARPortNumber': "",
                                                                   'IFC_TelemetryPortNumber': ""},
                                                'ControlSurfaceSettings': {'ThrottlePin': "",
                                                                           'ElevatorPin': "",
-                                                                          'RightAileronPin': "",
-                                                                          'LeftAileronPin': "",
+                                                                          'AileronPin': "",
                                                                           'RudderPin': ""},
                                                'AutopilotSettings': {'UnsafeRollRightAngle': "",
                                                                      'UnsafeRollLeftAngle': "",
@@ -219,6 +220,7 @@ class AppWindow(QDialog):
         self.ui.Debug_Port_Baud.currentIndexChanged.connect(self.update_param_dict)
         self.ui.Command_Port_Baud.currentIndexChanged.connect(self.update_param_dict)
         self.ui.GPS_Port_Baud.currentIndexChanged.connect(self.update_param_dict)
+        self.ui.LiDAR_Port_Baud.currentIndexChanged.connect(self.update_param_dict)
         self.ui.Telemetry_Port_Baud.currentIndexChanged.connect(self.update_param_dict)
         self.ui.CommandReportingRate.valueChanged.connect(self.update_param_dict)
         self.ui.TelemetryReportingRate.valueChanged.connect(self.update_param_dict)
@@ -262,11 +264,11 @@ class AppWindow(QDialog):
         self.ui.IFCDebugPort.currentIndexChanged.connect(self.update_param_dict)
         self.ui.IFCCommandPort.currentIndexChanged.connect(self.update_param_dict)
         self.ui.IFCGPSPort.currentIndexChanged.connect(self.update_param_dict)
+        self.ui.IFCLiDARPort.currentIndexChanged.connect(self.update_param_dict)
         self.ui.IFCTelemetryPort.currentIndexChanged.connect(self.update_param_dict)
         self.ui.ThrottlePin.currentIndexChanged.connect(self.update_param_dict)
         self.ui.ElevatorPin.currentIndexChanged.connect(self.update_param_dict)
-        self.ui.RightAileronPin.currentIndexChanged.connect(self.update_param_dict)
-        self.ui.LeftAileronPin.currentIndexChanged.connect(self.update_param_dict)
+        self.ui.AileronPin.currentIndexChanged.connect(self.update_param_dict)
         self.ui.RudderPin.currentIndexChanged.connect(self.update_param_dict)
         self.ui.UnsafeRollRightAngle.valueChanged.connect(self.update_param_dict)
         self.ui.UnsafeRollLeftAngle.valueChanged.connect(self.update_param_dict)
@@ -308,6 +310,7 @@ class AppWindow(QDialog):
         self.currentParameters['SharedTools']['SerialSettings']['Debug_Port_Baud']     = self.ui.Debug_Port_Baud.currentText()
         self.currentParameters['SharedTools']['SerialSettings']['Command_Port_Baud']   = self.ui.Command_Port_Baud.currentText()
         self.currentParameters['SharedTools']['SerialSettings']['GPS_Port_Baud']       = self.ui.GPS_Port_Baud.currentText()
+        self.currentParameters['SharedTools']['SerialSettings']['LiDAR_Port_Baud']     = self.ui.LiDAR_Port_Baud.currentText()
         self.currentParameters['SharedTools']['SerialSettings']['Telemetry_Port_Baud'] = self.ui.Telemetry_Port_Baud.currentText()
         self.currentParameters['SharedTools']['Reporting_TimeoutSettings']['CommandReportingRate']   = self.ui.CommandReportingRate.text()
         self.currentParameters['SharedTools']['Reporting_TimeoutSettings']['TelemetryReportingRate'] = self.ui.TelemetryReportingRate.text()
@@ -352,11 +355,11 @@ class AppWindow(QDialog):
         self.currentParameters['IFCTools']['SerialSettings']['IFC_DebugPortNumber']     = portName_to_portNum[self.ui.IFCDebugPort.currentText()]
         self.currentParameters['IFCTools']['SerialSettings']['IFC_CommandPortNumber']   = portName_to_portNum[self.ui.IFCCommandPort.currentText()]
         self.currentParameters['IFCTools']['SerialSettings']['IFC_GPSPortNumber']       = portName_to_portNum[self.ui.IFCGPSPort.currentText()]
+        self.currentParameters['IFCTools']['SerialSettings']['IFC_LiDARPortNumber']     = portName_to_portNum[self.ui.IFCLiDARPort.currentText()]
         self.currentParameters['IFCTools']['SerialSettings']['IFC_TelemetryPortNumber'] = portName_to_portNum[self.ui.IFCTelemetryPort.currentText()]
         self.currentParameters['IFCTools']['ControlSurfaceSettings']['ThrottlePin']     = sNum_to_dNum[self.ui.ThrottlePin.currentText()]
         self.currentParameters['IFCTools']['ControlSurfaceSettings']['ElevatorPin']     = sNum_to_dNum[self.ui.ElevatorPin.currentText()]
-        self.currentParameters['IFCTools']['ControlSurfaceSettings']['RightAileronPin'] = sNum_to_dNum[self.ui.RightAileronPin.currentText()]
-        self.currentParameters['IFCTools']['ControlSurfaceSettings']['LeftAileronPin']  = sNum_to_dNum[self.ui.LeftAileronPin.currentText()]
+        self.currentParameters['IFCTools']['ControlSurfaceSettings']['AileronPin']      = sNum_to_dNum[self.ui.AileronPin.currentText()]
         self.currentParameters['IFCTools']['ControlSurfaceSettings']['RudderPin']       = sNum_to_dNum[self.ui.RudderPin.currentText()]
         self.currentParameters['IFCTools']['AutopilotSettings']['UnsafeRollRightAngle'] = self.ui.UnsafeRollRightAngle.text()
         self.currentParameters['IFCTools']['AutopilotSettings']['UnsafeRollLeftAngle']  = self.ui.UnsafeRollLeftAngle.text()
@@ -419,6 +422,9 @@ class AppWindow(QDialog):
     
                     elif setting_name == "GPS_PORT_BAUD":
                         self.ui.GPS_Port_Baud.setCurrentIndex(baudNum_to_baudIndex[setting_val])
+                    
+                    elif setting_name == "LIDAR_PORT_BAUD":
+                        self.ui.LiDAR_Port_Baud.setCurrentIndex(baudNum_to_baudIndex[setting_val])
     
                     elif setting_name == "TELEM_PORT_BAUD":
                         self.ui.Telemetry_Port_Baud.setCurrentIndex(baudNum_to_baudIndex[setting_val])
@@ -573,11 +579,8 @@ class AppWindow(QDialog):
                     elif setting_name == "THROTTLE_PIN":
                         self.ui.ThrottlePin.setCurrentIndex(dNum_to_index[setting_val])
     
-                    elif setting_name == "R_AILERON_PIN":
-                        self.ui.RightAileronPin.setCurrentIndex(dNum_to_index[setting_val])
-    
-                    elif setting_name == "L_AILERON_PIN":
-                        self.ui.LeftAileronPin.setCurrentIndex(dNum_to_index[setting_val])
+                    elif setting_name == "AILERON_PIN":
+                        self.ui.AileronPin.setCurrentIndex(dNum_to_index[setting_val])
     
                     elif setting_name == "ELEVATOR_PIN":
                         self.ui.ElevatorPin.setCurrentIndex(dNum_to_index[setting_val])
@@ -628,6 +631,9 @@ class AppWindow(QDialog):
     
                     elif setting_name == "IFC_GPS_PORT_NUMBER":
                         self.ui.IFCGPSPort.setCurrentIndex(int(setting_val))
+                    
+                    elif setting_name == "IFC_LIDAR_PORT_NUMBER":
+                        self.ui.IFCLiDARPort.setCurrentIndex(int(setting_val))
     
                     elif setting_name == "IFC_TELEM_PORT_NUMBER":
                         self.ui.IFCTelemetryPort.setCurrentIndex(int(setting_val))
@@ -646,6 +652,9 @@ class AppWindow(QDialog):
 
         self.value = self.currentParameters['SharedTools']['SerialSettings']['GPS_Port_Baud']
         self.ui.GPS_Port_Baud.setCurrentIndex(baudNum_to_baudIndex[self.value])
+        
+        self.value = self.currentParameters['SharedTools']['SerialSettings']['LiDAR_Port_Baud']
+        self.ui.LiDAR_Port_Baud.setCurrentIndex(baudNum_to_baudIndex[self.value])
 
         self.value = self.currentParameters['SharedTools']['SerialSettings']['Telemetry_Port_Baud']
         self.ui.Telemetry_Port_Baud.setCurrentIndex(baudNum_to_baudIndex[self.value])
@@ -768,6 +777,9 @@ class AppWindow(QDialog):
 
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_GPSPortNumber'])
         self.ui.IFCGPSPort.setCurrentIndex(self.value)
+        
+        self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_LiDARPortNumber'])
+        self.ui.IFCLiDARPort.setCurrentIndex(self.value)
 
         self.value = int(self.currentParameters['IFCTools']['SerialSettings']['IFC_TelemetryPortNumber'])
         self.ui.IFCTelemetryPort.setCurrentIndex(self.value)
@@ -778,11 +790,8 @@ class AppWindow(QDialog):
         self.value = self.currentParameters['IFCTools']['ControlSurfaceSettings']['ElevatorPin']
         self.ui.ElevatorPin.setCurrentIndex(dNum_to_index[self.value])
 
-        self.value = self.currentParameters['IFCTools']['ControlSurfaceSettings']['RightAileronPin']
-        self.ui.RightAileronPin.setCurrentIndex(dNum_to_index[self.value])
-
-        self.value = self.currentParameters['IFCTools']['ControlSurfaceSettings']['LeftAileronPin']
-        self.ui.LeftAileronPin.setCurrentIndex(dNum_to_index[self.value])
+        self.value = self.currentParameters['IFCTools']['ControlSurfaceSettings']['AileronPin']
+        self.ui.AileronPin.setCurrentIndex(dNum_to_index[self.value])
 
         self.value = self.currentParameters['IFCTools']['ControlSurfaceSettings']['RudderPin']
         self.ui.RudderPin.setCurrentIndex(dNum_to_index[self.value])
@@ -854,6 +863,10 @@ class AppWindow(QDialog):
     
                     elif setting_name == "GPS_PORT_BAUD":
                         new_value = self.ui.GPS_Port_Baud.currentText()
+                        line = line.replace(setting_val, new_value)
+                    
+                    elif setting_name == "LIDAR_PORT_BAUD":
+                        new_value = self.ui.LiDAR_Port_Baud.currentText()
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "TELEM_PORT_BAUD":
@@ -1096,12 +1109,8 @@ class AppWindow(QDialog):
                         new_value = sNum_to_dNum[self.ui.ThrottlePin.currentText()]
                         line = line.replace(setting_val, new_value)
     
-                    elif setting_name == "R_AILERON_PIN":
-                        new_value = sNum_to_dNum[self.ui.RightAileronPin.currentText()]
-                        line = line.replace(setting_val, new_value)
-    
-                    elif setting_name == "L_AILERON_PIN":
-                        new_value = sNum_to_dNum[self.ui.LeftAileronPin.currentText()]
+                    elif setting_name == "AILERON_PIN":
+                        new_value = sNum_to_dNum[self.ui.AileronPin.currentText()]
                         line = line.replace(setting_val, new_value)
     
                     elif setting_name == "ELEVATOR_PIN":
@@ -1193,6 +1202,15 @@ class AppWindow(QDialog):
     
                         try:
                             line = line.replace(comment, "//" + self.ui.IFCGPSPort.currentText())
+                        except:
+                            pass
+                    
+                    elif setting_name == "IFC_LIDAR_PORT_NUMBER":
+                        new_value = portName_to_portNum[self.ui.IFCLiDARPort.currentText()]
+                        line = line.replace(setting_val, new_value)
+    
+                        try:
+                            line = line.replace(comment, "//" + self.ui.IFCLiDARPort.currentText())
                         except:
                             pass
     
