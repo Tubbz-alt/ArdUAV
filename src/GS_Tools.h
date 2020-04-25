@@ -42,8 +42,8 @@
 
 #define AILERON_REVERSE         1
 #define ELEVATOR_REVERSE        1
-#define RUDDER_REVERSE          0
-#define THROTTLE_REVERSE        1
+#define RUDDER_REVERSE          1
+#define THROTTLE_REVERSE        0
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //DO NOT EDIT THIS BLOCK-----------------------------------------------------------------
@@ -74,7 +74,7 @@ public:
 		uint16_t UTC_year;      //y
 		uint8_t UTC_month;      //M
 		uint8_t UTC_day;        //d
-		uint8_t UTC_hour;       //h
+		uint8_t UTC_hour;	//h
 		uint8_t UTC_minute;     //m
 		float UTC_second;       //s
 		float speedOverGround;  //knots

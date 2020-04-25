@@ -17,8 +17,7 @@ SerialTransfer IFC_telemetryTransfer;
 SerialTransfer IFC_lidarTransfer;
 Servo rudder;
 Servo elevator;
-Servo aileron_L;
-Servo aileron_R;
+Servo aileron;
 Servo throttle;
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,6 +63,12 @@ void IFC_Class::begin()
 		IFC_GPS_PORT.begin(GPS_PORT_BAUD);
 		delay(500);
 	}
+	while (!IFC_LIDAR_PORT)
+	{
+		IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial")); IFC_DEBUG_PORT.print(IFC_LIDAR_PORT);  IFC_DEBUG_PORT.println(F("..."));
+		IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
+		delay(500);
+	}
 	while (!IFC_TELEM_PORT)
 	{
 		IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial")); IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
@@ -96,6 +101,7 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.println(F("Initializing transfer classes..."));
 	IFC_commandTransfer.begin(IFC_COMMAND_PORT);
 	IFC_telemetryTransfer.begin(IFC_TELEM_PORT);
+	IFC_lidarTransfer.begin(IFC_LIDAR_PORT);
 	IFC_DEBUG_PORT.println(F("\tTransfer classes initialized"));
 
 
@@ -133,13 +139,11 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.println(F("Initializing servos..."));
 	rudder.attach(RUDDER_PIN);
 	elevator.attach(ELEVATOR_PIN);
-	aileron_L.attach(L_AILERON_PIN);
-	aileron_R.attach(R_AILERON_PIN);
+	aileron.attach(AILERON_PIN);
 
 	rudder.writeMicroseconds(RUDDER_MID);
 	elevator.writeMicroseconds(ELEVATOR_MID);
-	aileron_L.writeMicroseconds(AILERON_MID);
-	aileron_R.writeMicroseconds(AILERON_MID);
+	aileron.writeMicroseconds(AILERON_MID);
 	IFC_DEBUG_PORT.println(F("\tServos initialized..."));
 
 
@@ -247,8 +251,7 @@ void IFC_Class::updateServos()
 	//update servo positions
 	elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
 	rudder.writeMicroseconds(constrain(controlInputs.yaw_command,     RUDDER_MIN,   RUDDER_MAX));
-	aileron_L.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN,  AILERON_MAX));
-	aileron_R.writeMicroseconds(constrain(controlInputs.roll_command, AILERON_MIN,  AILERON_MAX));
+	aileron.writeMicroseconds(constrain(controlInputs.roll_command,   AILERON_MIN,  AILERON_MAX));
 }
 
 
@@ -268,8 +271,7 @@ void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
 	
 	else if (INDEX == AILERON_INDEX)
 	{
-		aileron_L.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
-		aileron_R.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
+		aileron.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
 	}
 	else
 		IFC_DEBUG_PORT.println(F("Servo Not recognized"));
