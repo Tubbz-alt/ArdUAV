@@ -31,7 +31,8 @@ IFC_Class myIFC;
 void IFC_Class::begin()
 {
 	//initialize variables
-	controlInputs.limiter_enable = false;
+	controlInputs.limiter_enable        = false;
+	controlInputs.manual_control_enable = true;
 
 
 
@@ -243,15 +244,18 @@ void IFC_Class::sendTelem()
 
 
 //update servo positions (use controlInputs commands)
-void IFC_Class::updateServos()
+void IFC_Class::updateServos(bool overrideManEn)
 {
-	//update ESC speed
-	throttle.write(constrain(controlInputs.throttle_command, THROTTLE_MIN, THROTTLE_MAX));
+	if (controlInputs.manual_control_enable || overrideManEn)
+	{
+		//update ESC speed
+		throttle.write(constrain(controlInputs.throttle_command, THROTTLE_MIN, THROTTLE_MAX));
 
-	//update servo positions
-	elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
-	rudder.writeMicroseconds(constrain(controlInputs.yaw_command,     RUDDER_MIN,   RUDDER_MAX));
-	aileron.writeMicroseconds(constrain(controlInputs.roll_command,   AILERON_MIN,  AILERON_MAX));
+		//update servo positions
+		elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
+		rudder.writeMicroseconds(constrain(controlInputs.yaw_command,     RUDDER_MIN,   RUDDER_MAX));
+		aileron.writeMicroseconds(constrain(controlInputs.roll_command,   AILERON_MIN,  AILERON_MAX));
+	}
 }
 
 

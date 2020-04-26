@@ -22,6 +22,13 @@ GS_Class myGS;
 
 void GS_Class::begin()
 {
+	//initialize variables
+	controlInputs.limiter_enable        = false;
+	controlInputs.manual_control_enable = true;
+
+
+
+
 	//initialize serial streams	
 	GS_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
 	GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);

@@ -66,7 +66,7 @@ public:
 	int grabData_IMU();
 	int grabData_Pitot();
 	void sendTelem();
-	void updateServos();
+	void updateServos(bool overrideManEn=false);
 	void updateSingleServo(byte INDEX, uint16_t value);
 	void bankPitchLimiter(bool enable, bool _linkConnected);
 
