@@ -10,7 +10,7 @@
 #define COMMAND_PORT_BAUD      115200
 #define GPS_PORT_BAUD          9600
 #define LIDAR_PORT_BAUD        115200
-#define TELEM_PORT_BAUD        9600
+#define TELEM_PORT_BAUD        2000000
 
 #define COMMAND_BUFFER         10
 #define TELEMETRY_BUFFER       10

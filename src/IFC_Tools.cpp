@@ -235,8 +235,16 @@ void IFC_Class::sendTelem()
 	if (telemTimer.fire())
 	{
 		//send the telemetry data to GS
+		uint16_t sendLen;
+
 		IFC_telemetryTransfer.txObj(telemetry, sizeof(telemetry));
-		IFC_telemetryTransfer.sendData(sizeof(telemetry) + TELEMETRY_BUFFER);
+		sendLen = sizeof(telemetry);
+
+		IFC_telemetryTransfer.txObj(controlInputs, sizeof(controlInputs), sendLen);
+		sendLen += sizeof(controlInputs);
+		sendLen += TELEMETRY_BUFFER;
+
+		IFC_telemetryTransfer.sendData(sendLen);
 	}
 }
 
