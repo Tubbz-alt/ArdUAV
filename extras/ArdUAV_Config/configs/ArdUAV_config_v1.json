@@ -41,7 +41,7 @@
                                  "IFC_DebugPortNumber": "0",
                                  "IFC_GPSPortNumber": "1",
                                  "IFC_LiDARPortNumber": "2",
-                                 "IFC_TelemetryPortNumber": "4"}},
+                                 "IFC_TelemetryPortNumber": "5"}},
  "SharedTools": {"AileronSettings": {"MaxAileronValue": "2000",
                                      "MinAileronValue": "1000"},
                  "ElevatorSettings": {"MaxElevatorValue": "2000",
@@ -55,6 +55,6 @@
                                     "Debug_Port_Baud": "115200",
                                     "GPS_Port_Baud": "9600",
                                     "LiDAR_Port_Baud": "115200",
-                                    "Telemetry_Port_Baud": "9600"},
+                                    "Telemetry_Port_Baud": "2000000"},
                  "ThrottleSettings": {"MaxThrottleValue": "170",
                                       "MinThrottleValue": "50"}}}
