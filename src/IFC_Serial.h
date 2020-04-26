@@ -165,6 +165,9 @@ extern void serialEvent6();
 #if IFC_GPS_PORT_NUMBER == IFC_COMMAND_PORT_NUMBER
 #error "Can't have GPS and command on same Serial port"
 #endif
+#if IFC_GPS_PORT_NUMBER == IFC_LIDAR_PORT_NUMBER
+#error "Can't have GPS and LiDAR on same Serial port"
+#endif
 #if IFC_GPS_PORT_NUMBER == IFC_TELEM_PORT_NUMBER
 #error "Can't have GPS and telemetry on same Serial port"
 #endif
