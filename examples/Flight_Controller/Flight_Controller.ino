@@ -41,14 +41,6 @@ void loop()
     IFC_DEBUG_PORT.println();*/
   }
 
-  //get LiDAR altimeter data
-  if(myIFC.grabData_LiDAR())
-  {
-    //optional debugging prints
-    /*IFC_DEBUG_PORT.print("Converted Altitude:\t"); IFC_DEBUG_PORT.println(myIFC.telemetry.convertedAltitude);
-    IFC_DEBUG_PORT.println();*/
-  }
-
   //get airspeed data from the pitot tube
   if(myIFC.grabData_Pitot())
   {
