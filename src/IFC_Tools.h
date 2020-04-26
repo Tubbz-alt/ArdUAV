@@ -53,41 +53,10 @@ class IFC_Class
 {
 public:
 	//struct to store telemetry data
-	struct telemetry
-	{
-		float altitude;             //cm
-		float convertedAltitude;    //cm
-		float courseAngle;          //degrees
-		float rollAngle;            //degrees
-		float pitchAngle;           //degrees
-		float convertedRoll;        //radians
-		float convertedPitch;       //radians
-		float velocity;             //m/s
-		float latitude;             //dd
-		float longitude;            //dd
-		uint16_t UTC_year;          //y
-		uint8_t UTC_month;          //M
-		uint8_t UTC_day;            //d
-		uint8_t UTC_hour;           //h
-		uint8_t UTC_minute;         //m
-		float UTC_second;           //s
-		float speedOverGround;      //knots
-		float courseOverGround;     //degrees
-	} telemetry;
+	telemetry_struct telemetry;
 
 	//struct to store control values (i.e. servo commands etc.)
-	struct controlInputs
-	{
-		bool limiter_enable; //enables and disables pitch and bank limiter
-		uint16_t pitch_command;
-		uint16_t roll_command;
-		uint16_t yaw_command;
-		uint16_t throttle_command;
-		uint16_t autopilot_command;
-		uint16_t limiter_command;
-		uint16_t gear_command;
-		uint16_t flaps_command;
-	} controlInputs;
+	controlInputs_struct controlInputs;
 
 
 
