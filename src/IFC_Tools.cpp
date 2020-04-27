@@ -200,12 +200,12 @@ int IFC_Class::grabData_IMU()
 	//get IMU data and convert to degrees
 	auto vect = bno.getQuat().toEuler();
 	telemetry.courseAngle = vect.x() * (180 / M_PI);
-	telemetry.rollAngle   = vect.z() * (180 / M_PI);
-	telemetry.pitchAngle  = vect.y() * (180 / M_PI);
+	telemetry.pitchAngle  = vect.z() * (180 / M_PI);
+	telemetry.rollAngle   = vect.y() * (180 / M_PI);
 
 	//convert Euler angles from degrees to radians - ONLY USED FOR LiDAR CORRECTION
-	telemetry.convertedRoll  = vect.y();
 	telemetry.convertedPitch = vect.z();
+	telemetry.convertedRoll  = vect.y();
 
 	//timestamp the new data - regardless of where this function was called
 	imuTimer.start();
