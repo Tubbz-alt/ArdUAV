@@ -49,7 +49,7 @@ void lidarEvent_IFC()
 	{
 		//update controlInputs struct so that the next time the servos can be updated with the latest positions
 		IFC_lidarTransfer.rxObj(myIFC.telemetry.altitude, sizeof(myIFC.telemetry.altitude));
-
+		
 		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
 		if (LIDAR_FIXED_MOUNT)
 			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude * cos(myIFC.telemetry.convertedRoll) * cos(myIFC.telemetry.convertedPitch);

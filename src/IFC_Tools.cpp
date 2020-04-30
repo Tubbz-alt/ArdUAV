@@ -41,6 +41,7 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
 	IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 	IFC_GPS_PORT.begin(GPS_PORT_BAUD);
+	IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
 	IFC_TELEM_PORT.begin(TELEM_PORT_BAUD);
 
 
@@ -50,6 +51,7 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.println(F("Initializing serial ports..."));
 	IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
 	IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial"));     IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);      IFC_DEBUG_PORT.println(F("..."));
+	IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial"));   IFC_DEBUG_PORT.print(IFC_LIDAR_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
 	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial"));    IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
 	//while (!DEBUG_PORT);
 	while (!IFC_COMMAND_PORT)
@@ -165,6 +167,12 @@ void IFC_Class::begin()
 	telemTimer.begin(REPORT_TELEM_PERIOD);
 	imuTimer.begin(LIMITER_PERIOD);
 	IFC_DEBUG_PORT.println(F("\tTimers initialized..."));
+
+
+
+
+	IFC_DEBUG_PORT.println(F("Initialization complete"));
+	IFC_DEBUG_PORT.println(F("--------------------------------------------------"));
 }
 
 
@@ -239,7 +247,7 @@ void IFC_Class::sendTelem()
 
 		IFC_telemetryTransfer.txObj(telemetry, sizeof(telemetry));
 		sendLen = sizeof(telemetry);
-
+		
 		IFC_telemetryTransfer.txObj(controlInputs, sizeof(controlInputs), sendLen);
 		sendLen += sizeof(controlInputs);
 		sendLen += TELEMETRY_BUFFER;
