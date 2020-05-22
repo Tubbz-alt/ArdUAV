@@ -89,6 +89,12 @@ void GS_Class::begin()
 	GS_DEBUG_PORT.println(F("Initializing timers..."));
 	commandTimer.begin(REPORT_COMMANDS_PERIOD);
 	GS_DEBUG_PORT.println(F("\tTimers initialized..."));
+	
+	
+	
+	
+	GS_DEBUG_PORT.println(F("Initialization complete"));
+	GS_DEBUG_PORT.println(F("--------------------------------------------------"));
 }
 
 
