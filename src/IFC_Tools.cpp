@@ -163,6 +163,7 @@ void IFC_Class::begin()
 
 	//initialize the timers
 	IFC_DEBUG_PORT.println(F("Initializing timers..."));
+	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
 	limiterTimer.begin(LIMITER_PERIOD);
 	telemTimer.begin(REPORT_TELEM_PERIOD);
 	imuTimer.begin(LIMITER_PERIOD);
@@ -173,6 +174,79 @@ void IFC_Class::begin()
 
 	IFC_DEBUG_PORT.println(F("Initialization complete"));
 	IFC_DEBUG_PORT.println(F("--------------------------------------------------"));
+}
+
+
+
+
+bool IFC_Class::handleSerialEvents()
+{
+	lidarEvent_IFC();
+	return commEvent_IFC();
+}
+
+
+
+
+bool IFC_Class::commEvent_IFC()
+{
+	if (IFC_commandTransfer.available())
+	{
+		//update controlInputs struct so that the next time the servos can be updated with the latest positions
+		IFC_commandTransfer.rxObj(controlInputs, sizeof(controlInputs));
+
+		lossLinkTimer.start();
+		linkConnected = true;
+	}
+	else if (IFC_commandTransfer.status < 0)
+	{
+		IFC_DEBUG_PORT.print("Command Link Serial Transfer ERROR: ");
+		IFC_DEBUG_PORT.println(IFC_commandTransfer.status);
+	}
+
+	if (lossLinkTimer.fire(false))
+	{
+		linkFailover();
+		linkConnected = false;
+	}
+
+	return linkConnected;
+}
+
+
+
+
+void IFC_Class::linkFailover()
+{
+	controlInputs.pitch_command    = 1500;
+	controlInputs.roll_command     = 1500;
+	controlInputs.yaw_command      = 1500;
+	controlInputs.throttle_command = 1500;
+
+	updateServos();
+}
+
+
+
+
+void IFC_Class::lidarEvent_IFC()
+{
+	if (IFC_lidarTransfer.available())
+	{
+		//update controlInputs struct so that the next time the servos can be updated with the latest positions
+		IFC_lidarTransfer.rxObj(myIFC.telemetry.altitude, sizeof(myIFC.telemetry.altitude));
+
+		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
+		if (LIDAR_FIXED_MOUNT)
+			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude * cos(myIFC.telemetry.convertedRoll) * cos(myIFC.telemetry.convertedPitch);
+		else
+			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude;
+	}
+	else if (IFC_lidarTransfer.status < 0)
+	{
+		IFC_DEBUG_PORT.print("LiDAR Link Serial Transfer ERROR: ");
+		IFC_DEBUG_PORT.println(IFC_lidarTransfer.status);
+	}
 }
 
 
@@ -301,30 +375,26 @@ void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
 
 
 //keep the plane from pitching or rolling too much in any direction
-void IFC_Class::bankPitchLimiter(bool enable, bool _linkConnected)
+void IFC_Class::bankPitchLimiter()
 {
-	//determine if user wants to engage the bank and pitch limiter
-	if (enable)
+	//determine if the radio link is healthy and connected
+	if (linkConnected)
 	{
-		//determine if the radio link is healthy and connected
-		if (_linkConnected)
+		//update struct based on euler angles
+		updateControlsLimiter(PITCH_AXIS);	//pitch
+		updateControlsLimiter(ROLL_AXIS);	//roll
+	}
+	else
+	{
+		//use timer to send commands to the servos at a fixed rate
+		if (limiterTimer.fire())
 		{
 			//update struct based on euler angles
 			updateControlsLimiter(PITCH_AXIS);	//pitch
 			updateControlsLimiter(ROLL_AXIS);	//roll
-		}
-		else
-		{
-			//use timer to send commands to the servos at a fixed rate
-			if (limiterTimer.fire())
-			{
-				//update struct based on euler angles
-				updateControlsLimiter(PITCH_AXIS);	//pitch
-				updateControlsLimiter(ROLL_AXIS);	//roll
 
-				//update servo positions (use controlInputs commands)
-				updateServos();
-			}
+			//update servo positions (use controlInputs commands)
+			updateServos();
 		}
 	}
 }
