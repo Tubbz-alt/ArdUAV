@@ -14,7 +14,7 @@ void commEvent_GS()
 		myGS.newTelem = true;
 
 		//update telemetry struct with latest telemetry data
-		GS_telemetryTransfer.rxObj(myGS.telemetry, sizeof(myGS.telemetry));
+		GS_telemetryTransfer.rxObj(myGS.telemetry);
 	}
 	else if (GS_telemetryTransfer.status < 0)
 	{
