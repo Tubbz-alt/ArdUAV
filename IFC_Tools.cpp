@@ -193,7 +193,7 @@ bool IFC_Class::commEvent_IFC()
 	if (IFC_commandTransfer.available())
 	{
 		//update controlInputs struct so that the next time the servos can be updated with the latest positions
-		IFC_commandTransfer.rxObj(controlInputs, sizeof(controlInputs));
+		IFC_commandTransfer.rxObj(controlInputs);
 
 		lossLinkTimer.start();
 		linkConnected = true;
@@ -234,7 +234,7 @@ void IFC_Class::lidarEvent_IFC()
 	if (IFC_lidarTransfer.available())
 	{
 		//update controlInputs struct so that the next time the servos can be updated with the latest positions
-		IFC_lidarTransfer.rxObj(myIFC.telemetry.altitude, sizeof(myIFC.telemetry.altitude));
+		IFC_lidarTransfer.rxObj(myIFC.telemetry.altitude);
 
 		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
 		if (LIDAR_FIXED_MOUNT)
@@ -319,11 +319,8 @@ void IFC_Class::sendTelem()
 		//send the telemetry data to GS
 		uint16_t sendLen;
 
-		IFC_telemetryTransfer.txObj(telemetry, sizeof(telemetry));
-		sendLen = sizeof(telemetry);
-		
-		IFC_telemetryTransfer.txObj(controlInputs, sizeof(controlInputs), sendLen);
-		sendLen += sizeof(controlInputs);
+		sendLen = IFC_telemetryTransfer.txObj(telemetry);
+		sendLen = IFC_telemetryTransfer.txObj(controlInputs, sendLen);
 		sendLen += TELEMETRY_BUFFER;
 
 		IFC_telemetryTransfer.sendData(sendLen);
