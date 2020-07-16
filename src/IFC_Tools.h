@@ -83,8 +83,6 @@ private:
 
 
 
-	void commEvent_IFC();
-	void lidarEvent_IFC();
 	bool commEvent_IFC();
 	void lidarEvent_IFC();
 	void linkFailover();

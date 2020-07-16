@@ -148,7 +148,7 @@ void GS_Class::computeCommands()
 void GS_Class::sendCommands()
 {
 	//update the radio's outgoing array with the propper information
-	GS_commandTransfer.txObj(controlInputs, sizeof(controlInputs));
+	GS_commandTransfer.txObj(controlInputs);
 	GS_commandTransfer.sendData(sizeof(controlInputs) + COMMAND_BUFFER); //allow extra bytes to send (bytes are user defined)
 }
 
