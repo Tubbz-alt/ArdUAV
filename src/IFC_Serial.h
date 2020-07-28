@@ -1,19 +1,6 @@
 #pragma once
 #include "Arduino.h"
-
 #include "Shared_Tools.h"
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//macros
-#define IFC_DEBUG_PORT_NUMBER     0 //USB
-#define IFC_COMMAND_PORT_NUMBER   3 //Serial3
-#define IFC_GPS_PORT_NUMBER       1 //Serial1
-#define IFC_LIDAR_PORT_NUMBER     2 //Serial2
-#define IFC_TELEM_PORT_NUMBER     5 //Serial5
-/////////////////////////////////////////////////////////////////////////////////////////
 
 
 

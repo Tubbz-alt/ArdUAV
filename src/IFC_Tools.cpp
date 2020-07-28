@@ -1,32 +1,11 @@
 #include "IFC_Tools.h"
 #include "IFC_Serial.h"
-
 #include "Shared_Tools.h"
 #include "SerialTransfer.h"
 #include "neo6mGPS.h"
 
 
 
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//sensor/actuator classes
-Adafruit_BNO055 bno = Adafruit_BNO055(&Wire, 55, BNO055_ADDRESS_A);
-neo6mGPS myGPS;
-SerialTransfer IFC_commandTransfer;
-SerialTransfer IFC_telemetryTransfer;
-SerialTransfer IFC_lidarTransfer;
-Servo rudder;
-Servo elevator;
-Servo aileron;
-Servo throttle;
-/////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//IFC Class
-IFC_Class myIFC;
 
 void IFC_Class::begin()
 {
@@ -53,7 +32,6 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial"));     IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);      IFC_DEBUG_PORT.println(F("..."));
 	IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial"));   IFC_DEBUG_PORT.print(IFC_LIDAR_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
 	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial"));    IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
-	//while (!DEBUG_PORT);
 	while (!IFC_COMMAND_PORT)
 	{
 		IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
@@ -102,9 +80,9 @@ void IFC_Class::begin()
 
 	//initialize AirComs
 	IFC_DEBUG_PORT.println(F("Initializing transfer classes..."));
-	IFC_commandTransfer.begin(IFC_COMMAND_PORT);
-	IFC_telemetryTransfer.begin(IFC_TELEM_PORT);
-	IFC_lidarTransfer.begin(IFC_LIDAR_PORT);
+	commandTransfer.begin(IFC_COMMAND_PORT);
+	telemetryTransfer.begin(IFC_TELEM_PORT);
+	lidarTransfer.begin(IFC_LIDAR_PORT);
 	IFC_DEBUG_PORT.println(F("\tTransfer classes initialized"));
 
 
@@ -112,7 +90,7 @@ void IFC_Class::begin()
 
 	//initialize GPS
 	IFC_DEBUG_PORT.println(F("Initializing GPS..."));
-	myGPS.begin(IFC_GPS_PORT);
+	gps.begin(IFC_GPS_PORT);
 	IFC_DEBUG_PORT.println(F("\tGPS initialized"));
 
 
@@ -181,32 +159,40 @@ void IFC_Class::begin()
 
 bool IFC_Class::handleSerialEvents()
 {
-	lidarEvent_IFC();
-	return commEvent_IFC();
+	lidarEvent();
+	return commEvent();
 }
 
 
 
 
-bool IFC_Class::commEvent_IFC()
+bool IFC_Class::commEvent()
 {
-	if (IFC_commandTransfer.available())
+	if (commandTransfer.available())
 	{
-		//update controlInputs struct so that the next time the servos can be updated with the latest positions
-		IFC_commandTransfer.rxObj(controlInputs);
+		commandTransfer.rxObj(controlInputs);
 
 		lossLinkTimer.start();
 		linkConnected = true;
 	}
-	else if (IFC_commandTransfer.status < 0)
-	{
-		IFC_DEBUG_PORT.print("Command Link Serial Transfer ERROR: ");
-		IFC_DEBUG_PORT.println(IFC_commandTransfer.status);
-	}
 
+	return linkFailover();
+}
+
+
+
+
+bool IFC_Class::linkFailover()
+{
 	if (lossLinkTimer.fire(false))
 	{
-		linkFailover();
+		controlInputs.pitch_command    = 1500;
+		controlInputs.roll_command     = 1500;
+		controlInputs.yaw_command      = 1500;
+		controlInputs.throttle_command = 1500;
+
+		updateServos();
+
 		linkConnected = false;
 	}
 
@@ -216,57 +202,39 @@ bool IFC_Class::commEvent_IFC()
 
 
 
-void IFC_Class::linkFailover()
+void IFC_Class::lidarEvent()
 {
-	controlInputs.pitch_command    = 1500;
-	controlInputs.roll_command     = 1500;
-	controlInputs.yaw_command      = 1500;
-	controlInputs.throttle_command = 1500;
-
-	updateServos();
-}
-
-
-
-
-void IFC_Class::lidarEvent_IFC()
-{
-	if (IFC_lidarTransfer.available())
+	if (lidarTransfer.available())
 	{
 		//update controlInputs struct so that the next time the servos can be updated with the latest positions
-		IFC_lidarTransfer.rxObj(myIFC.telemetry.altitude);
+		lidarTransfer.rxObj(telemetry.altitude);
 
 		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
 		if (LIDAR_FIXED_MOUNT)
-			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude * cos(myIFC.telemetry.convertedRoll) * cos(myIFC.telemetry.convertedPitch);
+			telemetry.altitude = telemetry.altitude * cos(convertedRoll) * cos(convertedPitch);
 		else
-			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude;
-	}
-	else if (IFC_lidarTransfer.status < 0)
-	{
-		IFC_DEBUG_PORT.print("LiDAR Link Serial Transfer ERROR: ");
-		IFC_DEBUG_PORT.println(IFC_lidarTransfer.status);
+			telemetry.altitude = telemetry.altitude;
 	}
 }
 
 
 
 
-bool IFC_Class::grabData_GPS()
+bool IFC_Class::pollGPS()
 {
 	//if a new packet was processed, update the telemetry struct
-	if (myGPS.available())
+	if (gps.available())
 	{
-		telemetry.latitude         = myGPS.lat_dd;
-		telemetry.longitude        = myGPS.lon_dd;
-		telemetry.UTC_year         = myGPS.utc_year;
-		telemetry.UTC_month        = myGPS.utc_month;
-		telemetry.UTC_day          = myGPS.utc_day;
-		telemetry.UTC_hour         = myGPS.utc_hour;
-		telemetry.UTC_minute       = myGPS.utc_min;
-		telemetry.UTC_second       = myGPS.utc_sec;
-		telemetry.speedOverGround  = myGPS.sog_knots;
-		telemetry.courseOverGround = myGPS.cog_true;
+		telemetry.latitude         = gps.lat_dd;
+		telemetry.longitude        = gps.lon_dd;
+		telemetry.UTC_year         = gps.utc_year;
+		telemetry.UTC_month        = gps.utc_month;
+		telemetry.UTC_day          = gps.utc_day;
+		telemetry.UTC_hour         = gps.utc_hour;
+		telemetry.UTC_minute       = gps.utc_min;
+		telemetry.UTC_second       = gps.utc_sec;
+		telemetry.speedOverGround  = gps.sog_knots;
+		telemetry.courseOverGround = gps.cog_true;
 
 		return true;
 	}
@@ -277,71 +245,42 @@ bool IFC_Class::grabData_GPS()
 
 
 
-int IFC_Class::grabData_IMU()
+void IFC_Class::pollIMU()
 {
 	//get IMU data and convert to degrees
 	auto vect = bno.getQuat().toEuler();
-	telemetry.courseAngle = vect.x() * (180 / M_PI);
-	telemetry.pitchAngle  = vect.z() * (180 / M_PI);
-	telemetry.rollAngle   = vect.y() * (180 / M_PI);
+	telemetry.courseAngleIMU = vect.x() * (180 / M_PI);
+	telemetry.pitchAngle     = vect.z() * (180 / M_PI);
+	telemetry.rollAngle      = vect.y() * (180 / M_PI);
 
 	//convert Euler angles from degrees to radians - ONLY USED FOR LiDAR CORRECTION
-	telemetry.convertedPitch = vect.z();
-	telemetry.convertedRoll  = vect.y();
+	convertedPitch = vect.z();
+	convertedRoll  = vect.y();
 
 	//timestamp the new data - regardless of where this function was called
 	imuTimer.start();
-
-	return 1;
 }
 
 
 
 
-int IFC_Class::grabData_Pitot()
+void IFC_Class::pollPitot()
 {
 	uint16_t rawValue = analogRead(PITOT_PIN);
 
 	telemetry.velocity = rawValue; //(2.0 / 65251.0) * (-24111.0 + sqrt(-5560435134679.0 + 163127500.0 * rawValue));
-
-	return 1;
-}
-
-
-
-
-//send telemetry data to GS
-void IFC_Class::sendTelem()
-{
-	//use timer to send commands to the plane at a fixed rate
-	if (telemTimer.fire())
-	{
-		//send the telemetry data to GS
-		uint16_t sendLen;
-
-		IFC_telemetryTransfer.txObj(telemetry, sizeof(telemetry));
-		sendLen = sizeof(telemetry);
-		
-		IFC_telemetryTransfer.txObj(controlInputs, sizeof(controlInputs), sendLen);
-		sendLen += sizeof(controlInputs);
-		sendLen += TELEMETRY_BUFFER;
-
-		IFC_telemetryTransfer.sendData(sendLen);
-	}
 }
 
 
 
 
 //update servo positions (use controlInputs commands)
-void IFC_Class::updateServos(bool overrideManEn)
+void IFC_Class::updateServos(const bool& overrideManEn)
 {
 	if (controlInputs.manual_control_enable || overrideManEn)
 	{
-		//update ESC speed
 		throttle.write(constrain(controlInputs.throttle_command, THROTTLE_MIN, THROTTLE_MAX));
 
-		//update servo positions
 		elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
 		rudder.writeMicroseconds(constrain(controlInputs.yaw_command,     RUDDER_MIN,   RUDDER_MAX));
 		aileron.writeMicroseconds(constrain(controlInputs.roll_command,   AILERON_MIN,  AILERON_MAX));
@@ -352,18 +291,18 @@ void IFC_Class::updateServos(bool overrideManEn)
 
 
 //update a single servo's position (use controlInputs commands)
-void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
+void IFC_Class::updateSingleServo(const byte& INDEX, const uint16_t& value)
 {
-	if (INDEX == THROTTLE_INDEX)
+	if (INDEX == COMMAND_THROTTLE_INDEX)
 		throttle.write(constrain(value, THROTTLE_MIN, THROTTLE_MAX));
 	
-	else if (INDEX == ELEVATOR_INDEX)
+	else if (INDEX == COMMAND_PITCH_INDEX)
 		elevator.writeMicroseconds(constrain(value, ELEVATOR_MIN, ELEVATOR_MAX));
 	
-	else if (INDEX == RUDDER_INDEX)
+	else if (INDEX == COMMAND_YAW_INDEX)
 		rudder.writeMicroseconds(constrain(value, RUDDER_MIN, RUDDER_MAX));
 	
-	else if (INDEX == AILERON_INDEX)
+	else if (INDEX == COMMAND_ROLL_INDEX)
 	{
 		aileron.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
 	}
@@ -377,23 +316,18 @@ void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
 //keep the plane from pitching or rolling too much in any direction
 void IFC_Class::bankPitchLimiter()
 {
-	//determine if the radio link is healthy and connected
 	if (linkConnected)
 	{
-		//update struct based on euler angles
-		updateControlsLimiter(PITCH_AXIS);	//pitch
-		updateControlsLimiter(ROLL_AXIS);	//roll
+		updateControlsLimiter(PITCH_AXIS);
+		updateControlsLimiter(ROLL_AXIS);
 	}
 	else
 	{
-		//use timer to send commands to the servos at a fixed rate
 		if (limiterTimer.fire())
 		{
-			//update struct based on euler angles
-			updateControlsLimiter(PITCH_AXIS);	//pitch
-			updateControlsLimiter(ROLL_AXIS);	//roll
+			updateControlsLimiter(PITCH_AXIS);
+			updateControlsLimiter(ROLL_AXIS);
 
-			//update servo positions (use controlInputs commands)
 			updateServos();
 		}
 	}
@@ -403,14 +337,14 @@ void IFC_Class::bankPitchLimiter()
 
 
 //update struct based on euler angles
-void IFC_Class::updateControlsLimiter(bool axis)
+void IFC_Class::updateControlsLimiter(const bool& axis)
 {
 	//minimum servo command to get back to safe flight
 	uint16_t minServoCommand;
 
 	//determine if the current IMU data is old - if so, get new IMU data
 	if (imuTimer.fire())
-		grabData_IMU();
+		pollIMU();
 
 	//determine if pitch or roll should be tweaked (axis==true --> pitch, axis==false --> roll)
 	if (axis == PITCH_AXIS)
@@ -460,4 +394,3 @@ void IFC_Class::updateControlsLimiter(bool axis)
 		}
 	}
 }
-/////////////////////////////////////////////////////////////////////////////////////////
