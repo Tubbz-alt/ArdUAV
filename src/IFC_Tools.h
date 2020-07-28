@@ -27,7 +27,6 @@ public:
 	bool pollGPS();
 	void pollIMU();
 	void pollPitot();
-	void sendTelem();
 	void updateServos(const bool& overrideManEn=false);
 	void updateSingleServo(const byte& INDEX, const uint16_t& value);
 	void bankPitchLimiter();
