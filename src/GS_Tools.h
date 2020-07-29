@@ -15,17 +15,15 @@ public:
 	control_inputs_struct controlInputs;
 
 	void begin();
+	bool handleSerialEvents();
+	void computeAndSendCommands();
 	void computeCommands();
 	void sendCommands();
-	void computeAndSendCommands();
-	bool handleSerialEvents();
 
 
 
 
 private:
-	FireTimer commandTimer;
-	
 	struct control_surfaces_struct ailerons
 	{
 		COMMAND_ROLL_INDEX,     //command_index

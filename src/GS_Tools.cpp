@@ -16,71 +16,156 @@ void GS_Class::begin()
 
 
 	//initialize serial streams	
-	GS_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
 	GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
+
+#if USE_DEBUG
+	GS_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
+#endif
+	
+#if USE_TELEM
 	GS_TELEM_PORT.begin(TELEM_PORT_BAUD);
+#endif
 
 
 
 
 	//wait for all serial ports to come online
-	//while (!GS_DEBUG_PORT);
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing serial ports..."));
 	GS_DEBUG_PORT.print(F("Initializing command port at Serial")); GS_DEBUG_PORT.print(GS_COMMAND_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
+#endif
+
 	while (!GS_COMMAND_PORT)
 	{
+#if USE_DEBUG
 		GS_DEBUG_PORT.println(F("Initializing command port..."));
+#endif
 		GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 		delay(500);
 	}
+
+#if USE_DEBUG
 	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial")); GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
+#endif
+
+#if USE_TELEM
 	while (!GS_TELEM_PORT)
 	{
+#if USE_DEBUG
 		GS_DEBUG_PORT.println(F("Initializing telemetry port..."));
+#endif
+
 		GS_TELEM_PORT.begin(TELEM_PORT_BAUD);
 		delay(500);
 	}
+#endif
+
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("\tAll ports sucessfully initialized"));
+#endif
 
 
 
 
 	//turn on PWR LED
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("Turning on PWR LED..."));
+#endif
+
 	pinMode(13, OUTPUT);
 	digitalWrite(13, HIGH);
+
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("\tPWR LED on"));
+#endif
 
 
 
 
 	//set analog to digital conversion resolution (in bits)
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("Setting ADC resolution (default - 16 bits)..."));
+#endif
+
 	analogReadResolution(ANALOG_RESOLUTION);
+
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("\tResolution set"));
+#endif
 
 
 
 
-	//initialize AirComs
-	GS_DEBUG_PORT.println(F("Initializing AirComms..."));
+	//initialize transfer classes
+#if USE_DEBUG
+	GS_DEBUG_PORT.println(F("Initializing transfer classes..."));
+#endif
+
 	commandTransfer.begin(GS_COMMAND_PORT);
+
+#if USE_TELEM
 	telemetryTransfer.begin(GS_TELEM_PORT);
-	GS_DEBUG_PORT.println(F("\tAirComms initialized"));
+#endif
+
+#if USE_DEBUG
+	GS_DEBUG_PORT.println(F("\tTansfer classes initialized"));
+#endif
 
 
 
 
 	//initialize "pass-through" timers
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing timers..."));
+#endif
+
 	commandTimer.begin(REPORT_COMMANDS_PERIOD);
+	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
+	telemTimer.begin(REPORT_TELEM_PERIOD);
+
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("\tTimers initialized..."));
+#endif
 	
 	
 	
 	
+#if USE_DEBUG
 	GS_DEBUG_PORT.println(F("Initialization complete"));
 	GS_DEBUG_PORT.println(F("--------------------------------------------------"));
+#endif
+}
+
+
+
+
+bool GS_Class::handleSerialEvents()
+{
+	if (telemetryTransfer.available())
+	{
+		uint16_t recLen = telemetryTransfer.rxObj(telemetry);
+		telemetryTransfer.rxObj(controlInputs, recLen);
+
+		lossLinkTimer.start();
+		linkConnected = true;
+		telemetry.validFlags = telemetry.validFlags | 0x2;
+	}
+
+	return linkFailover();
+}
+
+
+
+
+//determine each command value based off GS sensor data and send commands to plane
+void GS_Class::computeAndSendCommands()
+{
+	//use timer to send commands to the plane at a fixed rate
+	if (commandTimer.fire())
+	{
+		computeCommands();
+		sendCommands();
+	}
 }
 
 
@@ -106,20 +191,6 @@ void GS_Class::sendCommands()
 	//update the radio's outgoing array with the propper information
 	commandTransfer.txObj(controlInputs);
 	commandTransfer.sendData(sizeof(controlInputs) + COMMAND_BUFFER); //allow extra bytes to send (bytes are user defined)
-}
-
-
-
-
-//determine each command value based off GS sensor data and send commands to plane
-void GS_Class::computeAndSendCommands()
-{
-	//use timer to send commands to the plane at a fixed rate
-	if (commandTimer.fire())
-	{
-		computeCommands();
-		sendCommands();
-	}
 }
 
 
@@ -164,23 +235,6 @@ int16_t GS_Class::updateServoCommand(const control_surfaces_struct& controlSurfa
 
 
 
-bool GS_Class::handleSerialEvents()
-{
-	if (telemetryTransfer.available())
-	{
-		uint16_t recLen = telemetryTransfer.rxObj(telemetry);
-		telemetryTransfer.rxObj(controlInputs, recLen);
-
-		lossLinkTimer.start();
-		linkConnected = true;
-	}
-
-	return linkFailover();
-}
-
-
-
-
 bool GS_Class::linkFailover()
 {
 	if (lossLinkTimer.fire(false))
@@ -188,6 +242,7 @@ bool GS_Class::linkFailover()
 		//do something
 
 		linkConnected = false;
+		telemetry.validFlags = telemetry.validFlags & !0x2;
 	}
 
 	return linkConnected;

@@ -1,12 +1,29 @@
 #pragma once
 #include "Arduino.h"
+#include "Wire.h"
 #include "SerialTransfer.h"
 #include "FireTimer.h"
 
 
 
 
+extern TwoWire Wire1;
+extern TwoWire Wire2;
+
+
+
+
 //macros
+#define USE_DEBUG 1
+#define USE_TELEM 1
+#define USE_IMU   1
+#define USE_GPS   1
+#define USE_PITOT 1
+#define USE_LIDAR 1
+
+#define IMU_PORT Wire
+#define IMU_ID   55
+
 #define DEBUG_PORT_BAUD   115200
 #define COMMAND_PORT_BAUD 115200
 #define GPS_PORT_BAUD     9600
@@ -32,6 +49,7 @@
 #define REPORT_TELEM_PERIOD    (byte)((1.0 / REPORT_TELEM_FREQ)    * 1000) //ms
 
 #define LOSS_LINK_TIMEOUT 1000 //ms
+#define LOSS_GPS_TIMEOUT  1000 //ms
 
 #define ANALOG_RESOLUTION 16
 
@@ -114,13 +132,6 @@
 
 
 
-//shared variables/flags
-extern bool linkConnected;  //false if radio link between GS and IFC is lost
-extern bool packetDetected; //true if packet is detected
-
-
-
-
 //struct to handle control surface commands
 struct control_surfaces_struct
 {
@@ -141,8 +152,8 @@ struct telemetry_struct
 	float courseAngleIMU;   //degrees
 	float rollAngle;        //degrees
 	float pitchAngle;       //degrees
-	float velocity;         //m/s                  MSB                                                                       LSB
-	uint8_t validFlags;     //bit encoded bools (reserved, reserved, reserved, reserved, reserved, fixValid, linkValid, manualControl)
+	float velocity;         //m/s                  MSB                                                                        LSB
+	uint8_t validFlags;     //bit encoded bools (reserved, reserved, reserved, reserved, fixRecent, fixValid, linkValid, manualControl)
 	float latitude;         //dd
 	float longitude;        //dd
 	uint16_t UTC_year;      //y
@@ -177,14 +188,19 @@ struct control_inputs_struct
 class base
 {
 public:
-	SerialTransfer commandTransfer;
+#if USE_TELEM
 	SerialTransfer telemetryTransfer;
+
+	virtual void sendTelem(SerialTransfer connection);
+#endif
+
+	bool linkConnected;
+	SerialTransfer commandTransfer;
 	FireTimer lossLinkTimer;
 	telemetry_struct telemetry;
 	control_inputs_struct controlInputs;
 
 	virtual void begin() = 0;
-	virtual void sendTelem(SerialTransfer connection);
 	virtual bool handleSerialEvents() = 0;
 
 protected:

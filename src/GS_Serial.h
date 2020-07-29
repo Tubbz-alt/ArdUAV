@@ -59,31 +59,24 @@
 
 #if GS_TELEM_PORT_NUMBER == 0
 #define GS_TELEM_PORT Serial
-extern void serialEvent();
 
 #elif GS_TELEM_PORT_NUMBER == 1
 #define GS_TELEM_PORT Serial1
-extern void serialEvent1();
 
 #elif GS_TELEM_PORT_NUMBER == 2
 #define GS_TELEM_PORT Serial2
-extern void serialEvent2();
 
 #elif GS_TELEM_PORT_NUMBER == 3
 #define GS_TELEM_PORT Serial3
-extern void serialEvent3();
 
 #elif GS_TELEM_PORT_NUMBER == 4
 #define GS_TELEM_PORT Serial4
-extern void serialEvent4();
 
 #elif GS_TELEM_PORT_NUMBER == 5
 #define GS_TELEM_PORT Serial5
-extern void serialEvent5();
 
 #elif GS_TELEM_PORT_NUMBER == 6
 #define GS_TELEM_PORT Serial6
-extern void serialEvent6();
 #endif
 
 

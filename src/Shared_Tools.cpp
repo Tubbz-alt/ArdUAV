@@ -4,13 +4,7 @@
 
 
 
-//shared variables/flags
-bool linkConnected = false; //false if radio link between GS and IFC is lost
-bool packetDetected = false; //true if packet is detected
-
-
-
-
+#if USE_TELEM
 void base::sendTelem(SerialTransfer connection)
 {
 	if (telemTimer.fire())
@@ -22,3 +16,4 @@ void base::sendTelem(SerialTransfer connection)
 		connection.sendData(sendLen);
 	}
 }
+#endif
