@@ -15,7 +15,7 @@ public:
 	control_inputs_struct controlInputs;
 
 	void begin();
-	bool handleSerialEvents();
+	bool tick();
 	void computeAndSendCommands();
 	void computeCommands();
 	void sendCommands();

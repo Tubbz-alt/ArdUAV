@@ -33,6 +33,10 @@ void GS_Class::begin()
 #if USE_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing serial ports..."));
 	GS_DEBUG_PORT.print(F("Initializing command port at Serial")); GS_DEBUG_PORT.print(GS_COMMAND_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
+
+#if USE_DEBUG
+	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial")); GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
+#endif
 #endif
 
 	while (!GS_COMMAND_PORT)
@@ -43,10 +47,6 @@ void GS_Class::begin()
 		GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 		delay(500);
 	}
-
-#if USE_DEBUG
-	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial")); GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
-#endif
 
 #if USE_TELEM
 	while (!GS_TELEM_PORT)
@@ -139,8 +139,11 @@ void GS_Class::begin()
 
 
 
-bool GS_Class::handleSerialEvents()
+bool GS_Class::tick()
 {
+	computeAndSendCommands();
+
+#if USE_TELEM
 	if (telemetryTransfer.available())
 	{
 		uint16_t recLen = telemetryTransfer.rxObj(telemetry);
@@ -150,6 +153,7 @@ bool GS_Class::handleSerialEvents()
 		linkConnected = true;
 		telemetry.validFlags = telemetry.validFlags | 0x2;
 	}
+#endif
 
 	return linkFailover();
 }

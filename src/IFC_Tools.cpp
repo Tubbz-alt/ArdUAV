@@ -135,7 +135,7 @@ bool IFC_Class::pollGPS()
 			telemetry.validFlags = telemetry.validFlags | 0x6;
 		}
 		else
-			telemetry.validFlags = telemetry.validFlags & !0x6;
+			telemetry.validFlags = telemetry.validFlags & ~(byte)0x6;
 
 		lossGPSTimer.start();
 		gpsConnected = true;
@@ -153,7 +153,7 @@ bool IFC_Class::gpsFailover()
 	if (lossGPSTimer.fire(false))
 	{
 		gpsConnected = false;
-		telemetry.validFlags = telemetry.validFlags & !0x8;
+		telemetry.validFlags = telemetry.validFlags & ~(byte)0x8;
 	}
 
 	return gpsConnected;
@@ -185,7 +185,11 @@ void IFC_Class::lidarEvent()
 
 		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
 		if (LIDAR_FIXED_MOUNT)
+#if USE_IMU
 			telemetry.altitude = telemetry.altitude * cos(convertedRoll) * cos(convertedPitch);
+#else
+			telemetry.altitude = telemetry.altitude;
+#endif
 		else
 			telemetry.altitude = telemetry.altitude;
 	}
@@ -230,9 +234,18 @@ void IFC_Class::begin()
 #if USE_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing serial ports..."));
 	IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
+
+#if USE_GPS
 	IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial"));     IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);      IFC_DEBUG_PORT.println(F("..."));
+#endif
+
+#if USE_LIDAR
 	IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial"));   IFC_DEBUG_PORT.print(IFC_LIDAR_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
+#endif
+
+#if USE_DEBUG
 	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial"));    IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
+#endif
 #endif
 
 	while (!IFC_COMMAND_PORT)
@@ -322,6 +335,7 @@ void IFC_Class::begin()
 
 #if USE_TELEM
 	telemetryTransfer.begin(IFC_TELEM_PORT);
+	telemetry.validFlags = 0;
 #endif
 
 #if USE_LIDAR
@@ -421,8 +435,11 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.println(F("Initializing timers..."));
 #endif
 
-	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
+#if USE_IMU
 	limiterTimer.begin(LIMITER_PERIOD);
+#endif
+
+	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
 	telemTimer.begin(REPORT_TELEM_PERIOD);
 
 #if USE_GPS
@@ -449,8 +466,24 @@ void IFC_Class::begin()
 
 
 
-bool IFC_Class::handleSerialEvents()
+bool IFC_Class::tick()
 {
+#if USE_TELEM
+	sendTelem(telemetryTransfer);
+#endif
+
+#if USE_IMU
+	pollIMU();
+#endif
+
+#if USE_GPS
+	pollGPS();
+#endif
+
+#if USE_PITOT
+	pollPitot();
+#endif
+
 #if USE_LIDAR
 	lidarEvent();
 #endif
@@ -521,15 +554,15 @@ bool IFC_Class::linkFailover()
 {
 	if (lossLinkTimer.fire(false))
 	{
-		controlInputs.pitch_command = 1500;
-		controlInputs.roll_command = 1500;
-		controlInputs.yaw_command = 1500;
+		controlInputs.pitch_command    = 1500;
+		controlInputs.roll_command     = 1500;
+		controlInputs.yaw_command      = 1500;
 		controlInputs.throttle_command = 1500;
 
 		updateServos();
 
 		linkConnected = false;
-		telemetry.validFlags = telemetry.validFlags & !0x2;
+		telemetry.validFlags = telemetry.validFlags & ~(byte)0x2;
 	}
 
 	return linkConnected;

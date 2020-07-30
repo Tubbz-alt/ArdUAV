@@ -70,18 +70,18 @@ extern TwoWire Wire2;
 
 #define YAW_ANALOG_PIN      A17
 #define THROTTLE_ANALOG_PIN A0
-#define ROLL_ANALOG_PIN     A2
-#define PITCH_ANALOG_PIN    A3
-
-#define THROTTLE_MIN_ADC 23900
-#define AILERON_MIN_ADC  25000
-#define ELEVATOR_MIN_ADC 23600
-#define RUDDER_MIN_ADC   24800
+#define ROLL_ANALOG_PIN     A3
+#define PITCH_ANALOG_PIN    A2
 
 #define THROTTLE_MAX_ADC 40850
 #define AILERON_MAX_ADC  41800
 #define ELEVATOR_MAX_ADC 40900
 #define RUDDER_MAX_ADC   41600
+
+#define THROTTLE_MIN_ADC 23900
+#define AILERON_MIN_ADC  25000
+#define ELEVATOR_MIN_ADC 23600
+#define RUDDER_MIN_ADC   24800
 
 #define AILERON_REVERSE  1
 #define ELEVATOR_REVERSE 1
@@ -201,7 +201,7 @@ public:
 	control_inputs_struct controlInputs;
 
 	virtual void begin() = 0;
-	virtual bool handleSerialEvents() = 0;
+	virtual bool tick()  = 0;
 
 protected:
 	FireTimer commandTimer;
@@ -209,3 +209,8 @@ protected:
 
 	virtual bool linkFailover() = 0;
 };
+
+
+
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);

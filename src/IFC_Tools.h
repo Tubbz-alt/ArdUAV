@@ -40,7 +40,7 @@ public:
 	Servo throttle;
 
 	void begin();
-	bool handleSerialEvents();
+	bool tick();
 	bool commEvent();
 	void updateServos(const bool& overrideManEn=false);
 	void updateSingleServo(const byte& INDEX, const uint16_t& value);
