@@ -2,7 +2,7 @@
 #include "IFC_Serial.h"
 #include "Shared_Tools.h"
 #include "SerialTransfer.h"
-#include "neo6mGPS.h"
+#include "NMEAGPS.h"
 
 
 
@@ -27,7 +27,6 @@ void IFC_Class::pollIMU()
 
 
 
-//keep the plane from pitching or rolling too much in any direction
 void IFC_Class::bankPitchLimiter()
 {
 	if (linkConnected)
@@ -50,7 +49,6 @@ void IFC_Class::bankPitchLimiter()
 
 
 
-//update struct based on euler angles
 void IFC_Class::updateControlsLimiter(const bool& axis)
 {
 	//minimum servo command to get back to safe flight
@@ -116,26 +114,10 @@ void IFC_Class::updateControlsLimiter(const bool& axis)
 #if USE_GPS
 bool IFC_Class::pollGPS()
 {
-	//if a new packet was processed, update the telemetry struct
-	if (gps.available())
+	if (gps.available(IFC_GPS_PORT))
 	{
-		if (gps.navStatus == 'A')
-		{
-			telemetry.latitude         = gps.lat_dd;
-			telemetry.longitude        = gps.lon_dd;
-			telemetry.UTC_year         = gps.utc_year;
-			telemetry.UTC_month        = gps.utc_month;
-			telemetry.UTC_day          = gps.utc_day;
-			telemetry.UTC_hour         = gps.utc_hour;
-			telemetry.UTC_minute       = gps.utc_min;
-			telemetry.UTC_second       = gps.utc_sec;
-			telemetry.speedOverGround  = gps.sog_knots;
-			telemetry.courseOverGround = gps.cog_true;
-
-			telemetry.validFlags = telemetry.validFlags | 0x6;
-		}
-		else
-			telemetry.validFlags = telemetry.validFlags & ~(byte)0x6;
+		fix = gps.read();
+		readGPSData();
 
 		lossGPSTimer.start();
 		gpsConnected = true;
@@ -143,6 +125,175 @@ bool IFC_Class::pollGPS()
 	}
 
 	return gpsFailover();
+}
+
+
+
+
+void IFC_Class::readGPSData()
+{
+	if (fix.valid.status)
+	{
+		if (fix.valid.location)
+		{
+			telemetry.latitude  = fix.latitude();
+			telemetry.longitude = fix.longitude();
+
+			//record that fix data is valid
+			telemetry.validFlags = telemetry.validFlags | 0x6;
+		}
+		else
+		{
+			telemetry.latitude  = 0;
+			telemetry.longitude = 0;
+
+			//record that fix data is not valid
+			telemetry.validFlags = telemetry.validFlags & ~(byte)0x6;
+		}
+
+		if (fix.valid.date)
+		{
+			telemetry.UTC_year  = fix.dateTime.year;
+			telemetry.UTC_month = fix.dateTime.month;
+			telemetry.UTC_day   = fix.dateTime.date;
+		}
+		else
+		{
+			telemetry.UTC_year  = 0;
+			telemetry.UTC_month = 0;
+			telemetry.UTC_day   = 0;
+		}
+		
+		if (fix.valid.time)
+		{
+			telemetry.UTC_hour   = fix.dateTime.hours;
+			telemetry.UTC_minute = fix.dateTime.minutes;
+			telemetry.UTC_second = fix.dateTime.seconds;
+		}
+		else
+		{
+			telemetry.UTC_hour   = 0;
+			telemetry.UTC_minute = 0;
+			telemetry.UTC_second = 0;
+		}
+
+		if (fix.valid.speed)
+			telemetry.speedOverGround = fix.speed_kph();
+		else
+			telemetry.speedOverGround = 0;
+
+		if (fix.valid.heading)
+			telemetry.courseOverGround = fix.heading();
+		else
+			telemetry.courseOverGround = 0;
+	}
+}
+
+
+
+
+void IFC_Class::setupGPS()
+{
+	if (GPS_PORT_BAUD != 9600)
+		changeBaud(GPS_PORT_BAUD);
+
+	changeFreq(GPS_REFRESH);
+
+	//disable all NMEA sentences first
+	setSentence(GPGGA, false);
+	setSentence(GPGLL, false);
+	setSentence(GPGLV, false);
+	setSentence(GPGSA, false);
+	setSentence(GPRMC, false);
+	setSentence(GPVTG, false);
+
+	//then select the ones you want
+	if (GPGGA_ENABLED)
+		setSentence(GPGGA, true);
+	if (GPGLL_ENABLED)
+		setSentence(GPGLL, true);
+	if (GPGLV_ENABLED)
+		setSentence(GPGLV, true);
+	if (GPGSA_ENABLED)
+		setSentence(GPGSA, true);
+	if (GPRMC_ENABLED)
+		setSentence(GPRMC, true);
+	if (GPVTG_ENABLED)
+		setSentence(GPVTG, true);
+}
+
+
+
+
+void changeBaud(uint32_t baud)
+{
+	char configPacket[BAUD_LEN];
+	memcpy(configPacket, CFG_PRT, BAUD_LEN);
+
+	configPacket[BAUD_0] = (char)(baud & 0xFF);
+	configPacket[BAUD_1] = (char)((baud >> 8) & 0xFF);
+	configPacket[BAUD_2] = (char)((baud >> 16) & 0xFF);
+	configPacket[BAUD_3] = (char)((baud >> 24) & 0xFF);
+
+	insertChecksum(configPacket,     BAUD_LEN);
+	IFC_GPS_PORT.write(configPacket, BAUD_LEN);
+
+	delay(100);
+
+	IFC_GPS_PORT.flush();
+	IFC_GPS_PORT.begin(baud);
+}
+
+
+
+
+void setSentence(char NMEA_num, bool enable)
+{
+	char configPacket[NMEA_LEN];
+	memcpy(configPacket, CFG_MSG, NMEA_LEN);
+
+	if (enable)
+		configPacket[SERIAL_1_POS] = 1;
+
+	configPacket[NMEA_ID_POS] = NMEA_num;
+	insertChecksum(configPacket, NMEA_LEN);
+
+	IFC_GPS_PORT.write(configPacket, NMEA_LEN);
+}
+
+
+
+
+void changeFreq(uint16_t hertz)
+{
+	uint16_t normHerz = hertz / (1000 / ((CFG_RATE[MEAS_RATE_2] << 8) | CFG_RATE[MEAS_RATE_1]));
+	char configPacket[FREQ_LEN];
+	memcpy(configPacket, CFG_RATE, FREQ_LEN);
+
+	configPacket[NAV_RATE_1] = (char)(normHerz & 0xFF);
+	configPacket[NAV_RATE_2] = (char)((normHerz >> 8) & 0xFF);
+
+	insertChecksum(configPacket, FREQ_LEN);
+	IFC_GPS_PORT.write(configPacket, FREQ_LEN);
+}
+
+
+
+
+void insertChecksum(char packet[], const byte len)
+{
+	uint8_t ck_a = 0;
+	uint8_t ck_b = 0;
+
+	// exclude the first and last two bytes in packet
+	for (byte i = 2; i < (len - 2); i++)
+	{
+		ck_a += packet[i];
+		ck_b += ck_a;
+	}
+
+	packet[len - 2] = ck_a;
+	packet[len - 1] = ck_b;
 }
 
 
@@ -219,10 +370,6 @@ void IFC_Class::begin()
 	IFC_TELEM_PORT.begin(TELEM_PORT_BAUD);
 #endif
 
-#if USE_GPS
-	IFC_GPS_PORT.begin(GPS_PORT_BAUD);
-#endif
-
 #if USE_LIDAR
 	IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
 #endif
@@ -263,7 +410,7 @@ void IFC_Class::begin()
 #if USE_DEBUG
 		IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial")); IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
 #endif
-		IFC_GPS_PORT.begin(GPS_PORT_BAUD);
+		IFC_GPS_PORT.begin(9600); //GPS defaults to 9600 until we change it in setupGPS() later within begin()
 		delay(500);
 	}
 #endif
@@ -355,7 +502,7 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.println(F("Initializing GPS..."));
 #endif
 
-	gps.begin(IFC_GPS_PORT);
+	setupGPS();
 
 #if USE_DEBUG
 	IFC_DEBUG_PORT.println(F("\tGPS initialized"));

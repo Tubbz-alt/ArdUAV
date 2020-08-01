@@ -109,6 +109,14 @@ extern TwoWire Wire2;
 
 #define LIDAR_FIXED_MOUNT 0  //0 - gimbal mount, 0 - fixed mount
 
+#define GPS_REFRESH   10
+#define GPGGA_ENABLED 0
+#define GPGLL_ENABLED 0
+#define GPGLV_ENABLED 0
+#define GPGSA_ENABLED 0
+#define GPRMC_ENABLED 1
+#define GPVTG_ENABLED 0
+
 #define SERVO_FREQ     60 //Hz
 #define LIMITER_PERIOD REPORT_COMMANDS_PERIOD //ms
 
@@ -128,6 +136,11 @@ extern TwoWire Wire2;
 
 #define MAX_PITCH_UP   -45 //max up pitch angle (in degrees) allowed by flight controller
 #define MAX_PITCH_DOWN 25  //max down pitch angle (in degrees) allowed by flight controller
+
+
+
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
 
 
 
@@ -209,8 +222,3 @@ protected:
 
 	virtual bool linkFailover() = 0;
 };
-
-
-
-
-float mapfloat(float x, float in_min, float in_max, float out_min, float out_max);
