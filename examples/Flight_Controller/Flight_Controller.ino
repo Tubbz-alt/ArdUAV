@@ -19,4 +19,7 @@ void setup()
 void loop()
 {
   IFC.tick();
+  
+  if (IFC.linkConnected)
+    IFC.updateServos();
 }
