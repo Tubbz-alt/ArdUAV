@@ -125,6 +125,12 @@ void insertChecksum(char packet[], const byte len);
 class IFC_Class : public base
 {
 public:
+#if USE_IFC_TELEM
+	SerialTransfer telemetryTransfer;
+
+	void sendTelem();
+#endif
+
 #if USE_IMU
 	Adafruit_BNO055 bno = Adafruit_BNO055(&IMU_PORT, IMU_ID, BNO055_ADDRESS_A);
 	void pollIMU();

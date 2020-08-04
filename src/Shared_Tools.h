@@ -14,12 +14,14 @@ extern TwoWire Wire2;
 
 
 //macros
-#define USE_DEBUG 1
-#define USE_TELEM 1
-#define USE_IMU   1
-#define USE_GPS   1
-#define USE_PITOT 1
-#define USE_LIDAR 1
+#define USE_GS_DEBUG  1
+#define USE_IFC_DEBUG 1
+#define USE_GS_TELEM  1
+#define USE_IFC_TELEM 1
+#define USE_IMU       1
+#define USE_GPS       1
+#define USE_PITOT     1
+#define USE_LIDAR     1
 
 #define IMU_PORT Wire
 #define IMU_ID   55
@@ -54,58 +56,53 @@ extern TwoWire Wire2;
 #define ANALOG_RESOLUTION 16
 
 #define COMMAND_ROLL_INDEX     0
-#define COMMAND_PITCH_INDEX    0
-#define COMMAND_YAW_INDEX      0
-#define COMMAND_THROTTLE_INDEX 0
+#define COMMAND_PITCH_INDEX    1
+#define COMMAND_YAW_INDEX      2
+#define COMMAND_THROTTLE_INDEX 3
 
 #define AILERON_OFFSET  0
 #define ELEVATOR_OFFSET 0
 #define RUDDER_OFFSET   0
 #define THROTTLE_OFFSET 0
 
-#define THROTTLE_PIN 2 //digital ESC signal pin
-#define AILERON_PIN  39 //servo driver output port number
-#define ELEVATOR_PIN 24 //servo driver output port number
-#define RUDDER_PIN   6 //servo driver output port number
+#define AILERON_SERVO_PIN  39 //servo driver output port number
+#define ELEVATOR_SERVO_PIN 24 //servo driver output port number
+#define RUDDER_SERVO_PIN   6 //servo driver output port number
+#define THROTTLE_SERVO_PIN 2 //digital ESC signal pin
 
-#define YAW_ANALOG_PIN      A17
-#define THROTTLE_ANALOG_PIN A0
 #define ROLL_ANALOG_PIN     A3
 #define PITCH_ANALOG_PIN    A2
+#define YAW_ANALOG_PIN      A17
+#define THROTTLE_ANALOG_PIN A0
 
-#define THROTTLE_MAX_ADC 40850
 #define AILERON_MAX_ADC  41800
 #define ELEVATOR_MAX_ADC 40900
 #define RUDDER_MAX_ADC   41600
+#define THROTTLE_MAX_ADC 40850
 
-#define THROTTLE_MIN_ADC 23900
 #define AILERON_MIN_ADC  25000
 #define ELEVATOR_MIN_ADC 23600
 #define RUDDER_MIN_ADC   24800
+#define THROTTLE_MIN_ADC 23900
 
 #define AILERON_REVERSE  1
 #define ELEVATOR_REVERSE 1
 #define RUDDER_REVERSE   1
 #define THROTTLE_REVERSE 0
 
-#define THROTTLE_MAX 170  //full throttle
 #define AILERON_MAX  2000 //roll left
 #define ELEVATOR_MAX 2000 //nose up
 #define RUDDER_MAX   2000 //nose left
+#define THROTTLE_MAX 170  //full throttle
 
-#define THROTTLE_MIN 50   //no throttle
 #define AILERON_MIN  1000 //roll right
 #define ELEVATOR_MIN 1000 //nose down
 #define RUDDER_MIN   1000 //nose right
+#define THROTTLE_MIN 50   //no throttle
 
 #define AILERON_MID  (uint16_t)((AILERON_MAX  + AILERON_MIN)  / 2)
 #define ELEVATOR_MID (uint16_t)((ELEVATOR_MAX + ELEVATOR_MIN) / 2)
 #define RUDDER_MID   (uint16_t)((RUDDER_MAX   + RUDDER_MIN)   / 2)
-
-#define THROTTLE_SERVO_PIN 2 //digital ESC signal pin
-#define AILERON_SERVO_PIN  39 //servo driver output port number
-#define ELEVATOR_SERVO_PIN 24 //servo driver output port number
-#define RUDDER_SERVO_PIN   6 //servo driver output port number
 
 #define LIDAR_FIXED_MOUNT 0  //0 - gimbal mount, 0 - fixed mount
 
@@ -201,12 +198,6 @@ struct control_inputs_struct
 class base
 {
 public:
-#if USE_TELEM
-	SerialTransfer telemetryTransfer;
-
-	virtual void sendTelem(SerialTransfer connection);
-#endif
-
 	bool linkConnected;
 	SerialTransfer commandTransfer;
 	FireTimer lossLinkTimer;

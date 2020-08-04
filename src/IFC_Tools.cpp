@@ -7,6 +7,23 @@
 
 
 
+#if USE_IFC_TELEM
+void IFC_Class::sendTelem()
+{
+	if (telemTimer.fire())
+	{
+		uint16_t sendLen = telemetryTransfer.txObj(telemetry);
+		sendLen += telemetryTransfer.txObj(controlInputs, sendLen);
+		sendLen += TELEMETRY_BUFFER;
+
+		telemetryTransfer.sendData(sendLen);
+	}
+}
+#endif
+
+
+
+
 #if USE_IMU
 void IFC_Class::pollIMU()
 {
@@ -362,11 +379,11 @@ void IFC_Class::begin()
 	//initialize serial streams
 	IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
 #endif
 
-#if USE_TELEM
+#if USE_IFC_TELEM
 	IFC_TELEM_PORT.begin(TELEM_PORT_BAUD);
 #endif
 
@@ -378,7 +395,7 @@ void IFC_Class::begin()
 
 
 	//wait for all serial ports to come online
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing serial ports..."));
 	IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
 
@@ -390,14 +407,14 @@ void IFC_Class::begin()
 	IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial"));   IFC_DEBUG_PORT.print(IFC_LIDAR_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
 #endif
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial"));    IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
 #endif
 #endif
 
 	while (!IFC_COMMAND_PORT)
 	{
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 		IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
 #endif
 		IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
@@ -407,7 +424,7 @@ void IFC_Class::begin()
 #if USE_GPS
 	while (!IFC_GPS_PORT)
 	{
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 		IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial")); IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
 #endif
 		IFC_GPS_PORT.begin(9600); //GPS defaults to 9600 until we change it in setupGPS() later within begin()
@@ -418,7 +435,7 @@ void IFC_Class::begin()
 #if USE_LIDAR
 	while (!IFC_LIDAR_PORT)
 	{
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 		IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial")); IFC_DEBUG_PORT.print(IFC_LIDAR_PORT);  IFC_DEBUG_PORT.println(F("..."));
 #endif
 		IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
@@ -426,7 +443,7 @@ void IFC_Class::begin()
 	}
 #endif
 
-#if USE_TELEM
+#if USE_IFC_TELEM
 	while (!IFC_TELEM_PORT)
 	{
 #if USE_DEBUG
@@ -437,7 +454,7 @@ void IFC_Class::begin()
 	}
 #endif
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tAll ports sucessfully initialized"));
 #endif
 
@@ -445,14 +462,14 @@ void IFC_Class::begin()
 
 
 	//turn on PWR LED
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Turning on PWR LED..."));
 #endif
 
 	pinMode(13, OUTPUT);
 	digitalWrite(13, HIGH);
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tPWR LED on"));
 #endif
 
@@ -460,13 +477,13 @@ void IFC_Class::begin()
 
 
 	//set analog to digital conversion resolution (in bits)
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Setting ADC resolution (default - 16 bits)..."));
 #endif
 
 	analogReadResolution(ANALOG_RESOLUTION);
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tResolution set"));
 #endif
 
@@ -474,13 +491,13 @@ void IFC_Class::begin()
 
 
 	//initialize transfer classes
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing transfer classes..."));
 #endif
 
 	commandTransfer.begin(IFC_COMMAND_PORT);
 
-#if USE_TELEM
+#if USE_IFC_TELEM
 	telemetryTransfer.begin(IFC_TELEM_PORT);
 	telemetry.validFlags = 0;
 #endif
@@ -489,7 +506,7 @@ void IFC_Class::begin()
 	lidarTransfer.begin(IFC_LIDAR_PORT);
 #endif
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tTransfer classes initialized"));
 #endif
 
@@ -498,13 +515,13 @@ void IFC_Class::begin()
 
 	//initialize GPS
 #if USE_GPS
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing GPS..."));
 #endif
 
 	setupGPS();
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tGPS initialized"));
 #endif
 #endif
@@ -514,14 +531,14 @@ void IFC_Class::begin()
 
 	//initialize the IMU and wait for it to "boot up"
 #if USE_IMU
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing IMU..."));
 #endif
 
 	if (!bno.begin())
 	{
 		//there was a problem detecting the BNO055 ... check your connections
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 		IFC_DEBUG_PORT.println(F("\tOoops, no BNO055 detected ... Check your wiring or I2C ADDR!"));
 #endif
 
@@ -533,7 +550,7 @@ void IFC_Class::begin()
 		delay(1000);
 		bno.setExtCrystalUse(true);
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 		IFC_DEBUG_PORT.println(F("\tBNO055 successfully initialized"));
 #endif
 	}
@@ -543,19 +560,19 @@ void IFC_Class::begin()
 
 
 	//initialize each individual servo to their respective center position
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing servos..."));
 #endif
 
-	rudder.attach(RUDDER_PIN);
-	elevator.attach(ELEVATOR_PIN);
-	aileron.attach(AILERON_PIN);
+	rudder.attach(RUDDER_SERVO_PIN);
+	elevator.attach(ELEVATOR_SERVO_PIN);
+	aileron.attach(AILERON_SERVO_PIN);
 
 	rudder.writeMicroseconds(RUDDER_MID);
 	elevator.writeMicroseconds(ELEVATOR_MID);
 	aileron.writeMicroseconds(AILERON_MID);
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tServos initialized..."));
 #endif
 
@@ -563,14 +580,14 @@ void IFC_Class::begin()
 
 
 	//initialize the ESC
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing ESC..."));
 #endif
 
-	throttle.attach(THROTTLE_PIN);
+	throttle.attach(THROTTLE_SERVO_PIN);
 	throttle.write(THROTTLE_MIN);
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tESC initialized..."));
 #endif
 
@@ -578,7 +595,7 @@ void IFC_Class::begin()
 
 
 	//initialize the timers
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initializing timers..."));
 #endif
 
@@ -597,14 +614,14 @@ void IFC_Class::begin()
 	imuTimer.begin(LIMITER_PERIOD);
 #endif
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("\tTimers initialized..."));
 #endif
 
 
 
 
-#if USE_DEBUG
+#if USE_IFC_DEBUG
 	IFC_DEBUG_PORT.println(F("Initialization complete"));
 	IFC_DEBUG_PORT.println(F("--------------------------------------------------"));
 #endif
@@ -615,8 +632,8 @@ void IFC_Class::begin()
 
 bool IFC_Class::tick()
 {
-#if USE_TELEM
-	sendTelem(telemetryTransfer);
+#if USE_IFC_TELEM
+	sendTelem();
 #endif
 
 #if USE_IMU

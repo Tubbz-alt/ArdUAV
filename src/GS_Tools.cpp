@@ -6,6 +6,23 @@
 
 
 
+#if USE_GS_TELEM
+void GS_Class::sendTelem()
+{
+	if (telemTimer.fire())
+	{
+		uint16_t sendLen = telemetryTransfer.txObj(telemetry);
+		sendLen += telemetryTransfer.txObj(controlInputs, sendLen);
+		sendLen += TELEMETRY_BUFFER;
+
+		telemetryTransfer.sendData(sendLen);
+	}
+}
+#endif
+
+
+
+
 void GS_Class::begin()
 {
 	//initialize variables
@@ -18,11 +35,11 @@ void GS_Class::begin()
 	//initialize serial streams	
 	GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
 #endif
 	
-#if USE_TELEM
+#if USE_GS_TELEM
 	GS_TELEM_PORT.begin(TELEM_PORT_BAUD);
 #endif
 
@@ -30,28 +47,28 @@ void GS_Class::begin()
 
 
 	//wait for all serial ports to come online
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing serial ports..."));
 	GS_DEBUG_PORT.print(F("Initializing command port at Serial")); GS_DEBUG_PORT.print(GS_COMMAND_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
 
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial")); GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
 #endif
 #endif
 
 	while (!GS_COMMAND_PORT)
 	{
-#if USE_DEBUG
+#if USE_GS_DEBUG
 		GS_DEBUG_PORT.println(F("Initializing command port..."));
 #endif
 		GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 		delay(500);
 	}
 
-#if USE_TELEM
+#if USE_GS_TELEM
 	while (!GS_TELEM_PORT)
 	{
-#if USE_DEBUG
+#if USE_GS_DEBUG
 		GS_DEBUG_PORT.println(F("Initializing telemetry port..."));
 #endif
 
@@ -60,7 +77,7 @@ void GS_Class::begin()
 	}
 #endif
 
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tAll ports sucessfully initialized"));
 #endif
 
@@ -68,14 +85,14 @@ void GS_Class::begin()
 
 
 	//turn on PWR LED
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Turning on PWR LED..."));
 #endif
 
 	pinMode(13, OUTPUT);
 	digitalWrite(13, HIGH);
 
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tPWR LED on"));
 #endif
 
@@ -83,13 +100,13 @@ void GS_Class::begin()
 
 
 	//set analog to digital conversion resolution (in bits)
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Setting ADC resolution (default - 16 bits)..."));
 #endif
 
 	analogReadResolution(ANALOG_RESOLUTION);
 
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tResolution set"));
 #endif
 
@@ -97,17 +114,17 @@ void GS_Class::begin()
 
 
 	//initialize transfer classes
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing transfer classes..."));
 #endif
 
 	commandTransfer.begin(GS_COMMAND_PORT);
 
-#if USE_TELEM
+#if USE_GS_TELEM
 	telemetryTransfer.begin(GS_TELEM_PORT);
 #endif
 
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tTansfer classes initialized"));
 #endif
 
@@ -115,7 +132,7 @@ void GS_Class::begin()
 
 
 	//initialize "pass-through" timers
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing timers..."));
 #endif
 
@@ -123,14 +140,14 @@ void GS_Class::begin()
 	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
 	telemTimer.begin(REPORT_TELEM_PERIOD);
 
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tTimers initialized..."));
 #endif
 	
 	
 	
 	
-#if USE_DEBUG
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Initialization complete"));
 	GS_DEBUG_PORT.println(F("--------------------------------------------------"));
 #endif
@@ -143,7 +160,7 @@ bool GS_Class::tick()
 {
 	computeAndSendCommands();
 
-#if USE_TELEM
+#if USE_GS_TELEM
 	if (telemetryTransfer.available())
 	{
 		uint16_t recLen = telemetryTransfer.rxObj(telemetry);

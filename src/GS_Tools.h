@@ -11,6 +11,12 @@
 class GS_Class : public base
 {
 public:
+#if USE_GS_TELEM
+	SerialTransfer telemetryTransfer;
+
+	void sendTelem();
+#endif
+
 	bool newTelem = false;
 	control_inputs_struct controlInputs;
 
