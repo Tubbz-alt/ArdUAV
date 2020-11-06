@@ -1,399 +1,63 @@
 #include "IFC_Tools.h"
 #include "IFC_Serial.h"
-
 #include "Shared_Tools.h"
 #include "SerialTransfer.h"
-#include "neo6mGPS.h"
+#include "NMEAGPS.h"
 
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////
-//sensor/actuator classes
-Adafruit_BNO055 bno = Adafruit_BNO055(&Wire, 55, BNO055_ADDRESS_A);
-neo6mGPS myGPS;
-SerialTransfer IFC_commandTransfer;
-SerialTransfer IFC_telemetryTransfer;
-SerialTransfer IFC_lidarTransfer;
-Servo rudder;
-Servo elevator;
-Servo aileron;
-Servo throttle;
-/////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//IFC Class
-IFC_Class myIFC;
-
-void IFC_Class::begin()
+#if USE_IFC_TELEM
+void IFC_Class::sendTelem()
 {
-	//initialize variables
-	controlInputs.limiter_enable        = false;
-	controlInputs.manual_control_enable = true;
-
-
-
-
-	//initialize serial streams
-	IFC_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
-	IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
-	IFC_GPS_PORT.begin(GPS_PORT_BAUD);
-	IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
-	IFC_TELEM_PORT.begin(TELEM_PORT_BAUD);
-
-
-
-
-	//wait for all serial ports to come online
-	IFC_DEBUG_PORT.println(F("Initializing serial ports..."));
-	IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
-	IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial"));     IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);      IFC_DEBUG_PORT.println(F("..."));
-	IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial"));   IFC_DEBUG_PORT.print(IFC_LIDAR_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
-	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial"));    IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
-	//while (!DEBUG_PORT);
-	while (!IFC_COMMAND_PORT)
+	if (telemTimer.fire())
 	{
-		IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
-		IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
-		delay(500);
-	}
-	while (!IFC_GPS_PORT)
-	{
-		IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial")); IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
-		IFC_GPS_PORT.begin(GPS_PORT_BAUD);
-		delay(500);
-	}
-	while (!IFC_LIDAR_PORT)
-	{
-		IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial")); IFC_DEBUG_PORT.print(IFC_LIDAR_PORT);  IFC_DEBUG_PORT.println(F("..."));
-		IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
-		delay(500);
-	}
-	while (!IFC_TELEM_PORT)
-	{
-		IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial")); IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
-		IFC_TELEM_PORT.begin(TELEM_PORT_BAUD);
-		delay(500);
-	}
-	IFC_DEBUG_PORT.println(F("\tAll ports sucessfully initialized"));
+		uint16_t sendLen = telemetryTransfer.txObj(telemetry);
+		sendLen += telemetryTransfer.txObj(controlInputs, sendLen);
+		sendLen += TELEMETRY_BUFFER;
 
-
-
-
-	//turn on PWR LED
-	IFC_DEBUG_PORT.println(F("Turning on PWR LED..."));
-	pinMode(13, OUTPUT);
-	digitalWrite(13, HIGH);
-	IFC_DEBUG_PORT.println(F("\tPWR LED on"));
-
-
-
-
-	//set analog to digital conversion resolution (in bits)
-	IFC_DEBUG_PORT.println(F("Setting ADC resolution (default - 16 bits)..."));
-	analogReadResolution(ANALOG_RESOLUTION);
-	IFC_DEBUG_PORT.println(F("\tResolution set"));
-
-
-
-
-	//initialize AirComs
-	IFC_DEBUG_PORT.println(F("Initializing transfer classes..."));
-	IFC_commandTransfer.begin(IFC_COMMAND_PORT);
-	IFC_telemetryTransfer.begin(IFC_TELEM_PORT);
-	IFC_lidarTransfer.begin(IFC_LIDAR_PORT);
-	IFC_DEBUG_PORT.println(F("\tTransfer classes initialized"));
-
-
-
-
-	//initialize GPS
-	IFC_DEBUG_PORT.println(F("Initializing GPS..."));
-	myGPS.begin(IFC_GPS_PORT);
-	IFC_DEBUG_PORT.println(F("\tGPS initialized"));
-
-
-
-
-	//initialize the IMU and wait for it to "boot up"
-	IFC_DEBUG_PORT.println(F("Initializing IMU..."));
-	if (!bno.begin())
-	{
-		//there was a problem detecting the BNO055 ... check your connections
-		IFC_DEBUG_PORT.println(F("\tOoops, no BNO055 detected ... Check your wiring or I2C ADDR!"));
-		
-		//fatal error - halt code execution
-		while(1);
-	}
-	else
-	{
-		delay(1000);
-		bno.setExtCrystalUse(true);
-		IFC_DEBUG_PORT.println(F("\tBNO055 successfully initialized"));
-	}
-
-
-
-
-	//initialize each individual servo to their respective center position
-	IFC_DEBUG_PORT.println(F("Initializing servos..."));
-	rudder.attach(RUDDER_PIN);
-	elevator.attach(ELEVATOR_PIN);
-	aileron.attach(AILERON_PIN);
-
-	rudder.writeMicroseconds(RUDDER_MID);
-	elevator.writeMicroseconds(ELEVATOR_MID);
-	aileron.writeMicroseconds(AILERON_MID);
-	IFC_DEBUG_PORT.println(F("\tServos initialized..."));
-
-
-
-
-	//initialize the ESC
-	IFC_DEBUG_PORT.println(F("Initializing ESC..."));
-	throttle.attach(THROTTLE_PIN);
-	throttle.write(THROTTLE_MIN);
-	IFC_DEBUG_PORT.println(F("\tESC initialized..."));
-
-
-
-
-	//initialize the timers
-	IFC_DEBUG_PORT.println(F("Initializing timers..."));
-	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
-	limiterTimer.begin(LIMITER_PERIOD);
-	telemTimer.begin(REPORT_TELEM_PERIOD);
-	imuTimer.begin(LIMITER_PERIOD);
-	IFC_DEBUG_PORT.println(F("\tTimers initialized..."));
-
-
-
-
-	IFC_DEBUG_PORT.println(F("Initialization complete"));
-	IFC_DEBUG_PORT.println(F("--------------------------------------------------"));
-}
-
-
-
-
-bool IFC_Class::handleSerialEvents()
-{
-	lidarEvent_IFC();
-	return commEvent_IFC();
-}
-
-
-
-
-bool IFC_Class::commEvent_IFC()
-{
-	if (IFC_commandTransfer.available())
-	{
-		//update controlInputs struct so that the next time the servos can be updated with the latest positions
-		IFC_commandTransfer.rxObj(controlInputs);
-
-		lossLinkTimer.start();
-		linkConnected = true;
-	}
-	else if (IFC_commandTransfer.status < 0)
-	{
-		IFC_DEBUG_PORT.print("Command Link Serial Transfer ERROR: ");
-		IFC_DEBUG_PORT.println(IFC_commandTransfer.status);
-	}
-
-	if (lossLinkTimer.fire(false))
-	{
-		linkFailover();
-		linkConnected = false;
-	}
-
-	return linkConnected;
-}
-
-
-
-
-void IFC_Class::linkFailover()
-{
-	controlInputs.pitch_command    = 1500;
-	controlInputs.roll_command     = 1500;
-	controlInputs.yaw_command      = 1500;
-	controlInputs.throttle_command = 1500;
-
-	updateServos();
-}
-
-
-
-
-void IFC_Class::lidarEvent_IFC()
-{
-	if (IFC_lidarTransfer.available())
-	{
-		//update controlInputs struct so that the next time the servos can be updated with the latest positions
-		IFC_lidarTransfer.rxObj(myIFC.telemetry.altitude);
-
-		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
-		if (LIDAR_FIXED_MOUNT)
-			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude * cos(myIFC.telemetry.convertedRoll) * cos(myIFC.telemetry.convertedPitch);
-		else
-			myIFC.telemetry.convertedAltitude = myIFC.telemetry.altitude;
-	}
-	else if (IFC_lidarTransfer.status < 0)
-	{
-		IFC_DEBUG_PORT.print("LiDAR Link Serial Transfer ERROR: ");
-		IFC_DEBUG_PORT.println(IFC_lidarTransfer.status);
+		telemetryTransfer.sendData(sendLen);
 	}
 }
+#endif
 
 
 
 
-bool IFC_Class::grabData_GPS()
-{
-	//if a new packet was processed, update the telemetry struct
-	if (myGPS.available())
-	{
-		telemetry.latitude         = myGPS.lat_dd;
-		telemetry.longitude        = myGPS.lon_dd;
-		telemetry.UTC_year         = myGPS.utc_year;
-		telemetry.UTC_month        = myGPS.utc_month;
-		telemetry.UTC_day          = myGPS.utc_day;
-		telemetry.UTC_hour         = myGPS.utc_hour;
-		telemetry.UTC_minute       = myGPS.utc_min;
-		telemetry.UTC_second       = myGPS.utc_sec;
-		telemetry.speedOverGround  = myGPS.sog_knots;
-		telemetry.courseOverGround = myGPS.cog_true;
-
-		return true;
-	}
-
-	return false;
-}
-
-
-
-
-int IFC_Class::grabData_IMU()
+#if USE_IMU
+void IFC_Class::pollIMU()
 {
 	//get IMU data and convert to degrees
 	auto vect = bno.getQuat().toEuler();
-	telemetry.courseAngle = vect.x() * (180 / M_PI);
-	telemetry.pitchAngle  = vect.z() * (180 / M_PI);
-	telemetry.rollAngle   = vect.y() * (180 / M_PI);
+	telemetry.courseAngleIMU = vect.x() * (180 / M_PI);
+	telemetry.pitchAngle     = vect.z() * (180 / M_PI);
+	telemetry.rollAngle      = vect.y() * (180 / M_PI);
 
 	//convert Euler angles from degrees to radians - ONLY USED FOR LiDAR CORRECTION
-	telemetry.convertedPitch = vect.z();
-	telemetry.convertedRoll  = vect.y();
+	convertedPitch = vect.z();
+	convertedRoll  = vect.y();
 
 	//timestamp the new data - regardless of where this function was called
 	imuTimer.start();
-
-	return 1;
 }
 
 
 
 
-int IFC_Class::grabData_Pitot()
-{
-	uint16_t rawValue = analogRead(PITOT_PIN);
-
-	telemetry.velocity = rawValue; //(2.0 / 65251.0) * (-24111.0 + sqrt(-5560435134679.0 + 163127500.0 * rawValue));
-
-	return 1;
-}
-
-
-
-
-//send telemetry data to GS
-void IFC_Class::sendTelem()
-{
-	//use timer to send commands to the plane at a fixed rate
-	if (telemTimer.fire())
-	{
-		//send the telemetry data to GS
-		uint16_t sendLen;
-
-		IFC_telemetryTransfer.txObj(telemetry, sizeof(telemetry));
-		sendLen = sizeof(telemetry);
-		
-		IFC_telemetryTransfer.txObj(controlInputs, sizeof(controlInputs), sendLen);
-		sendLen += sizeof(controlInputs);
-		sendLen += TELEMETRY_BUFFER;
-
-		IFC_telemetryTransfer.sendData(sendLen);
-	}
-}
-
-
-
-
-//update servo positions (use controlInputs commands)
-void IFC_Class::updateServos(bool overrideManEn)
-{
-	if (controlInputs.manual_control_enable || overrideManEn)
-	{
-		//update ESC speed
-		throttle.write(constrain(controlInputs.throttle_command, THROTTLE_MIN, THROTTLE_MAX));
-
-		//update servo positions
-		elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
-		rudder.writeMicroseconds(constrain(controlInputs.yaw_command,     RUDDER_MIN,   RUDDER_MAX));
-		aileron.writeMicroseconds(constrain(controlInputs.roll_command,   AILERON_MIN,  AILERON_MAX));
-	}
-}
-
-
-
-
-//update a single servo's position (use controlInputs commands)
-void IFC_Class::updateSingleServo(byte INDEX, uint16_t value)
-{
-	if (INDEX == THROTTLE_INDEX)
-		throttle.write(constrain(value, THROTTLE_MIN, THROTTLE_MAX));
-	
-	else if (INDEX == ELEVATOR_INDEX)
-		elevator.writeMicroseconds(constrain(value, ELEVATOR_MIN, ELEVATOR_MAX));
-	
-	else if (INDEX == RUDDER_INDEX)
-		rudder.writeMicroseconds(constrain(value, RUDDER_MIN, RUDDER_MAX));
-	
-	else if (INDEX == AILERON_INDEX)
-	{
-		aileron.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
-	}
-	else
-		IFC_DEBUG_PORT.println(F("Servo Not recognized"));
-}
-
-
-
-
-//keep the plane from pitching or rolling too much in any direction
 void IFC_Class::bankPitchLimiter()
 {
-	//determine if the radio link is healthy and connected
 	if (linkConnected)
 	{
-		//update struct based on euler angles
-		updateControlsLimiter(PITCH_AXIS);	//pitch
-		updateControlsLimiter(ROLL_AXIS);	//roll
+		updateControlsLimiter(PITCH_AXIS);
+		updateControlsLimiter(ROLL_AXIS);
 	}
 	else
 	{
-		//use timer to send commands to the servos at a fixed rate
 		if (limiterTimer.fire())
 		{
-			//update struct based on euler angles
-			updateControlsLimiter(PITCH_AXIS);	//pitch
-			updateControlsLimiter(ROLL_AXIS);	//roll
+			updateControlsLimiter(PITCH_AXIS);
+			updateControlsLimiter(ROLL_AXIS);
 
-			//update servo positions (use controlInputs commands)
 			updateServos();
 		}
 	}
@@ -402,15 +66,14 @@ void IFC_Class::bankPitchLimiter()
 
 
 
-//update struct based on euler angles
-void IFC_Class::updateControlsLimiter(bool axis)
+void IFC_Class::updateControlsLimiter(const bool& axis)
 {
 	//minimum servo command to get back to safe flight
 	uint16_t minServoCommand;
 
 	//determine if the current IMU data is old - if so, get new IMU data
 	if (imuTimer.fire())
-		grabData_IMU();
+		pollIMU();
 
 	//determine if pitch or roll should be tweaked (axis==true --> pitch, axis==false --> roll)
 	if (axis == PITCH_AXIS)
@@ -420,7 +83,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 		{
 			//determine minimum servo command to get back to safe flight
 			minServoCommand = constrain(map(abs(telemetry.pitchAngle), abs(UNSAFE_PITCH_UP), abs(MAX_PITCH_UP), ELEVATOR_MID, ELEVATOR_MIN), ELEVATOR_MIN, ELEVATOR_MID);
-			
+
 			//determine if minimum servo command is less than current servo command - if so, replace current command with minimum servo command
 			if (minServoCommand < controlInputs.pitch_command)
 				controlInputs.pitch_command = minServoCommand;
@@ -430,7 +93,7 @@ void IFC_Class::updateControlsLimiter(bool axis)
 		{
 			//determine minimum servo command to get back to safe flight
 			minServoCommand = constrain(map(abs(telemetry.pitchAngle), abs(UNSAFE_PITCH_DOWN), abs(MAX_PITCH_DOWN), ELEVATOR_MID, ELEVATOR_MAX), ELEVATOR_MID, ELEVATOR_MAX);
-		
+
 			//determine if minimum servo command is more than current servo command - if so, replace current command with minimum servo command
 			if (minServoCommand > controlInputs.pitch_command)
 				controlInputs.pitch_command = minServoCommand;
@@ -460,4 +123,609 @@ void IFC_Class::updateControlsLimiter(bool axis)
 		}
 	}
 }
-/////////////////////////////////////////////////////////////////////////////////////////
+#endif
+
+
+
+
+#if USE_GPS
+bool IFC_Class::pollGPS()
+{
+	if (gps.available(IFC_GPS_PORT))
+	{
+		fix = gps.read();
+		readGPSData();
+
+		lossGPSTimer.start();
+		gpsConnected = true;
+		telemetry.validFlags = telemetry.validFlags | 0x8;
+	}
+
+	return gpsFailover();
+}
+
+
+
+
+void IFC_Class::readGPSData()
+{
+	if (fix.valid.status)
+	{
+		if (fix.valid.location)
+		{
+			telemetry.latitude  = fix.latitude();
+			telemetry.longitude = fix.longitude();
+
+			//record that fix data is valid
+			telemetry.validFlags = telemetry.validFlags | 0x6;
+		}
+		else
+		{
+			telemetry.latitude  = 0;
+			telemetry.longitude = 0;
+
+			//record that fix data is not valid
+			telemetry.validFlags = telemetry.validFlags & ~(byte)0x6;
+		}
+
+		if (fix.valid.date)
+		{
+			telemetry.UTC_year  = fix.dateTime.year;
+			telemetry.UTC_month = fix.dateTime.month;
+			telemetry.UTC_day   = fix.dateTime.date;
+		}
+		else
+		{
+			telemetry.UTC_year  = 0;
+			telemetry.UTC_month = 0;
+			telemetry.UTC_day   = 0;
+		}
+		
+		if (fix.valid.time)
+		{
+			telemetry.UTC_hour   = fix.dateTime.hours;
+			telemetry.UTC_minute = fix.dateTime.minutes;
+			telemetry.UTC_second = fix.dateTime.seconds;
+		}
+		else
+		{
+			telemetry.UTC_hour   = 0;
+			telemetry.UTC_minute = 0;
+			telemetry.UTC_second = 0;
+		}
+
+		if (fix.valid.speed)
+			telemetry.speedOverGround = fix.speed_kph();
+		else
+			telemetry.speedOverGround = 0;
+
+		if (fix.valid.heading)
+			telemetry.courseOverGround = fix.heading();
+		else
+			telemetry.courseOverGround = 0;
+	}
+}
+
+
+
+
+void IFC_Class::setupGPS()
+{
+	//disable all NMEA sentences first
+	setSentence(GPGGA, false);
+	setSentence(GPGLL, false);
+	setSentence(GPGLV, false);
+	setSentence(GPGSA, false);
+	setSentence(GPRMC, false);
+	setSentence(GPVTG, false);
+
+	//then select the ones you want
+	if (GPGGA_ENABLED)
+		setSentence(GPGGA, true);
+	if (GPGLL_ENABLED)
+		setSentence(GPGLL, true);
+	if (GPGLV_ENABLED)
+		setSentence(GPGLV, true);
+	if (GPGSA_ENABLED)
+		setSentence(GPGSA, true);
+	if (GPRMC_ENABLED)
+		setSentence(GPRMC, true);
+	if (GPVTG_ENABLED)
+		setSentence(GPVTG, true);
+
+	changeFreq(GPS_REFRESH);
+
+	if (GPS_PORT_BAUD != 9600)
+		changeBaud(GPS_PORT_BAUD);
+}
+
+
+
+
+void changeBaud(uint32_t baud)
+{
+	char configPacket[BAUD_LEN];
+	memcpy(configPacket, CFG_PRT, BAUD_LEN);
+
+	configPacket[BAUD_0] = (char)(baud & 0xFF);
+	configPacket[BAUD_1] = (char)((baud >> 8) & 0xFF);
+	configPacket[BAUD_2] = (char)((baud >> 16) & 0xFF);
+	configPacket[BAUD_3] = (char)((baud >> 24) & 0xFF);
+
+	insertChecksum(configPacket,     BAUD_LEN);
+	IFC_GPS_PORT.write(configPacket, BAUD_LEN);
+
+	delay(100);
+
+	IFC_GPS_PORT.flush();
+	IFC_GPS_PORT.begin(baud);
+}
+
+
+
+
+void setSentence(char NMEA_num, bool enable)
+{
+	char configPacket[NMEA_LEN];
+	memcpy(configPacket, CFG_MSG, NMEA_LEN);
+
+	if (enable)
+		configPacket[SERIAL_1_POS] = 1;
+
+	configPacket[NMEA_ID_POS] = NMEA_num;
+	insertChecksum(configPacket, NMEA_LEN);
+
+	IFC_GPS_PORT.write(configPacket, NMEA_LEN);
+}
+
+
+
+
+void changeFreq(uint16_t hertz)
+{
+	uint16_t normHerz = hertz / (1000 / ((CFG_RATE[MEAS_RATE_2] << 8) | CFG_RATE[MEAS_RATE_1]));
+	char configPacket[FREQ_LEN];
+	memcpy(configPacket, CFG_RATE, FREQ_LEN);
+
+	configPacket[NAV_RATE_1] = (char)(normHerz & 0xFF);
+	configPacket[NAV_RATE_2] = (char)((normHerz >> 8) & 0xFF);
+
+	insertChecksum(configPacket, FREQ_LEN);
+	IFC_GPS_PORT.write(configPacket, FREQ_LEN);
+}
+
+
+
+
+void insertChecksum(char packet[], const byte len)
+{
+	uint8_t ck_a = 0;
+	uint8_t ck_b = 0;
+
+	// exclude the first and last two bytes in packet
+	for (byte i = 2; i < (len - 2); i++)
+	{
+		ck_a += packet[i];
+		ck_b += ck_a;
+	}
+
+	packet[len - 2] = ck_a;
+	packet[len - 1] = ck_b;
+}
+
+
+
+
+bool IFC_Class::gpsFailover()
+{
+	if (lossGPSTimer.fire(false))
+	{
+		gpsConnected = false;
+		telemetry.validFlags = telemetry.validFlags & ~(byte)0x8;
+	}
+
+	return gpsConnected;
+}
+#endif
+
+
+
+
+#if USE_PITOT
+void IFC_Class::pollPitot()
+{
+	telemetry.pitotPressure = analogRead(PITOT_PIN);
+}
+#endif
+
+
+
+
+#if USE_LIDAR
+void IFC_Class::lidarEvent()
+{
+	if (lidarTransfer.available())
+	{
+		//update controlInputs struct so that the next time the servos can be updated with the latest positions
+		lidarTransfer.rxObj(telemetry.altitude);
+
+		//use trig to find the triangulated elevation if the LiDAR sensor is not stabilized with a gimbal
+		if (LIDAR_FIXED_MOUNT)
+#if USE_IMU
+			telemetry.altitude = telemetry.altitude * cos(abs(convertedRoll)) * cos(abs(convertedPitch));
+#else
+			telemetry.altitude = telemetry.altitude;
+#endif
+		else
+			telemetry.altitude = telemetry.altitude;
+	}
+}
+#endif
+
+
+
+
+void IFC_Class::begin()
+{
+	//initialize variables
+	controlInputs.limiter_enable = false;
+	controlInputs.manual_control_enable = true;
+
+
+
+
+	//initialize serial streams
+	IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
+#endif
+
+#if USE_IFC_TELEM
+	IFC_TELEM_PORT.begin(TELEM_PORT_BAUD);
+#endif
+
+#if USE_LIDAR
+	IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
+#endif
+
+
+
+
+	//wait for all serial ports to come online
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initializing serial ports..."));
+	IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
+
+#if USE_GPS
+	IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial"));     IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);      IFC_DEBUG_PORT.println(F("..."));
+#endif
+
+#if USE_LIDAR
+	IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial"));   IFC_DEBUG_PORT.print(IFC_LIDAR_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
+#endif
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial"));    IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);    IFC_DEBUG_PORT.println(F("..."));
+#endif
+#endif
+
+	while (!IFC_COMMAND_PORT)
+	{
+#if USE_IFC_DEBUG
+		IFC_DEBUG_PORT.print(F("Initializing command port at Serial")); IFC_DEBUG_PORT.print(IFC_COMMAND_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
+#endif
+		IFC_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
+		delay(500);
+	}
+
+#if USE_GPS
+	while (!IFC_GPS_PORT)
+	{
+#if USE_IFC_DEBUG
+		IFC_DEBUG_PORT.print(F("Initializing GPS port at Serial")); IFC_DEBUG_PORT.print(IFC_GPS_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
+#endif
+		IFC_GPS_PORT.begin(9600); //GPS defaults to 9600 until we change it in setupGPS() later within begin()
+		delay(500);
+	}
+#endif
+
+#if USE_LIDAR
+	while (!IFC_LIDAR_PORT)
+	{
+#if USE_IFC_DEBUG
+		IFC_DEBUG_PORT.print(F("Initializing LiDAR port at Serial")); IFC_DEBUG_PORT.print(IFC_LIDAR_PORT);  IFC_DEBUG_PORT.println(F("..."));
+#endif
+		IFC_LIDAR_PORT.begin(LIDAR_PORT_BAUD);
+		delay(500);
+	}
+#endif
+
+#if USE_IFC_TELEM
+	while (!IFC_TELEM_PORT)
+	{
+#if USE_DEBUG
+		IFC_DEBUG_PORT.print(F("Initializing telemetry at Serial")); IFC_DEBUG_PORT.print(IFC_TELEM_PORT_NUMBER);  IFC_DEBUG_PORT.println(F("..."));
+#endif
+		IFC_TELEM_PORT.begin(TELEM_PORT_BAUD);
+		delay(500);
+	}
+#endif
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tAll ports sucessfully initialized"));
+#endif
+
+
+
+
+	//turn on PWR LED
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Turning on PWR LED..."));
+#endif
+
+	pinMode(13, OUTPUT);
+	digitalWrite(13, HIGH);
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tPWR LED on"));
+#endif
+
+
+
+
+	//set analog to digital conversion resolution (in bits)
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Setting ADC resolution (default - 16 bits)..."));
+#endif
+
+	analogReadResolution(ANALOG_RESOLUTION);
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tResolution set"));
+#endif
+
+
+
+
+	//initialize transfer classes
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initializing transfer classes..."));
+#endif
+
+	commandTransfer.begin(IFC_COMMAND_PORT);
+
+#if USE_IFC_TELEM
+	telemetryTransfer.begin(IFC_TELEM_PORT);
+	telemetry.validFlags = 0;
+#endif
+
+#if USE_LIDAR
+	lidarTransfer.begin(IFC_LIDAR_PORT);
+#endif
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tTransfer classes initialized"));
+#endif
+
+
+
+
+	//initialize GPS
+#if USE_GPS
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initializing GPS..."));
+#endif
+
+	setupGPS();
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tGPS initialized"));
+#endif
+#endif
+
+
+
+
+	//initialize the IMU and wait for it to "boot up"
+#if USE_IMU
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initializing IMU..."));
+#endif
+
+	if (!bno.begin())
+	{
+		//there was a problem detecting the BNO055 ... check your connections
+#if USE_IFC_DEBUG
+		IFC_DEBUG_PORT.println(F("\tOoops, no BNO055 detected ... Check your wiring or I2C ADDR!"));
+#endif
+
+		//fatal error - halt code execution
+		while (1);
+	}
+	else
+	{
+		delay(1000);
+		bno.setExtCrystalUse(true);
+
+#if USE_IFC_DEBUG
+		IFC_DEBUG_PORT.println(F("\tBNO055 successfully initialized"));
+#endif
+	}
+#endif
+
+
+
+
+	//initialize each individual servo to their respective center position
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initializing servos..."));
+#endif
+
+	rudder.attach(RUDDER_SERVO_PIN);
+	elevator.attach(ELEVATOR_SERVO_PIN);
+	aileron.attach(AILERON_SERVO_PIN);
+
+	rudder.writeMicroseconds(RUDDER_MID);
+	elevator.writeMicroseconds(ELEVATOR_MID);
+	aileron.writeMicroseconds(AILERON_MID);
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tServos initialized..."));
+#endif
+
+
+
+
+	//initialize the ESC
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initializing ESC..."));
+#endif
+
+	throttle.attach(THROTTLE_SERVO_PIN);
+	throttle.write(THROTTLE_MIN);
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tESC initialized..."));
+#endif
+
+
+
+
+	//initialize the timers
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initializing timers..."));
+#endif
+
+#if USE_IMU
+	limiterTimer.begin(LIMITER_PERIOD);
+#endif
+
+	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
+	telemTimer.begin(REPORT_TELEM_PERIOD);
+
+#if USE_GPS
+	lossGPSTimer.begin(LOSS_GPS_TIMEOUT);
+#endif
+
+#if USE_IMU
+	imuTimer.begin(LIMITER_PERIOD);
+#endif
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("\tTimers initialized..."));
+#endif
+
+
+
+
+#if USE_IFC_DEBUG
+	IFC_DEBUG_PORT.println(F("Initialization complete"));
+	IFC_DEBUG_PORT.println(F("--------------------------------------------------"));
+#endif
+}
+
+
+
+
+bool IFC_Class::tick()
+{
+#if USE_IFC_TELEM
+	sendTelem();
+#endif
+
+#if USE_IMU
+	pollIMU();
+#endif
+
+#if USE_GPS
+	pollGPS();
+#endif
+
+#if USE_PITOT
+	pollPitot();
+#endif
+
+#if USE_LIDAR
+	lidarEvent();
+#endif
+
+	return commEvent();
+}
+
+
+
+
+bool IFC_Class::commEvent()
+{
+	if (commandTransfer.available())
+	{
+		commandTransfer.rxObj(controlInputs);
+
+		lossLinkTimer.start();
+		linkConnected = true;
+		telemetry.validFlags = telemetry.validFlags | 0x2;
+	}
+
+	return linkFailover();
+}
+
+
+
+
+//update servo positions (use controlInputs commands)
+void IFC_Class::updateServos(const bool& overrideManEn)
+{
+	if (controlInputs.manual_control_enable || overrideManEn)
+	{
+		throttle.write(constrain(controlInputs.throttle_command, THROTTLE_MIN, THROTTLE_MAX));
+
+		elevator.writeMicroseconds(constrain(controlInputs.pitch_command, ELEVATOR_MIN, ELEVATOR_MAX));
+		rudder.writeMicroseconds(constrain(controlInputs.yaw_command,     RUDDER_MIN,   RUDDER_MAX));
+		aileron.writeMicroseconds(constrain(controlInputs.roll_command,   AILERON_MIN,  AILERON_MAX));
+	}
+}
+
+
+
+
+//update a single servo's position (use controlInputs commands)
+void IFC_Class::updateSingleServo(const byte& INDEX, const uint16_t& value)
+{
+	if (INDEX == COMMAND_THROTTLE_INDEX)
+		throttle.write(constrain(value, THROTTLE_MIN, THROTTLE_MAX));
+	
+	else if (INDEX == COMMAND_PITCH_INDEX)
+		elevator.writeMicroseconds(constrain(value, ELEVATOR_MIN, ELEVATOR_MAX));
+	
+	else if (INDEX == COMMAND_YAW_INDEX)
+		rudder.writeMicroseconds(constrain(value, RUDDER_MIN, RUDDER_MAX));
+	
+	else if (INDEX == COMMAND_ROLL_INDEX)
+	{
+		aileron.writeMicroseconds(constrain(value, AILERON_MIN, AILERON_MAX));
+	}
+	else
+		IFC_DEBUG_PORT.println(F("Servo Not recognized"));
+}
+
+
+
+
+bool IFC_Class::linkFailover()
+{
+	if (lossLinkTimer.fire(false))
+	{
+		controlInputs.pitch_command    = 1500;
+		controlInputs.roll_command     = 1500;
+		controlInputs.yaw_command      = 1500;
+		controlInputs.throttle_command = 1500;
+
+		updateServos();
+
+		linkConnected = false;
+		telemetry.validFlags = telemetry.validFlags & ~(byte)0x2;
+	}
+
+	return linkConnected;
+}

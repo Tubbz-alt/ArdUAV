@@ -1,24 +1,27 @@
 #include "GS_Tools.h"
 #include "GS_Serial.h"
-
 #include "Shared_Tools.h"
 #include "SerialTransfer.h"
 
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////
-//radio classes
-SerialTransfer GS_commandTransfer;
-SerialTransfer GS_telemetryTransfer;
-/////////////////////////////////////////////////////////////////////////////////////////
+#if USE_GS_TELEM
+void GS_Class::sendTelem()
+{
+	if (telemTimer.fire())
+	{
+		uint16_t sendLen = telemetryTransfer.txObj(telemetry);
+		sendLen += telemetryTransfer.txObj(controlInputs, sendLen);
+		sendLen += TELEMETRY_BUFFER;
+
+		telemetryTransfer.sendData(sendLen);
+	}
+}
+#endif
 
 
 
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//GS Class
-GS_Class myGS;
 
 void GS_Class::begin()
 {
@@ -30,101 +33,160 @@ void GS_Class::begin()
 
 
 	//initialize serial streams	
-	GS_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
 	GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
+
+#if USE_GS_DEBUG
+	GS_DEBUG_PORT.begin(DEBUG_PORT_BAUD);
+#endif
+	
+#if USE_GS_TELEM
 	GS_TELEM_PORT.begin(TELEM_PORT_BAUD);
+#endif
 
 
 
 
 	//wait for all serial ports to come online
-	//while (!GS_DEBUG_PORT);
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing serial ports..."));
 	GS_DEBUG_PORT.print(F("Initializing command port at Serial")); GS_DEBUG_PORT.print(GS_COMMAND_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
+
+#if USE_GS_DEBUG
+	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial")); GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
+#endif
+#endif
+
 	while (!GS_COMMAND_PORT)
 	{
+#if USE_GS_DEBUG
 		GS_DEBUG_PORT.println(F("Initializing command port..."));
+#endif
 		GS_COMMAND_PORT.begin(COMMAND_PORT_BAUD);
 		delay(500);
 	}
-	GS_DEBUG_PORT.print(F("Initializing telemetry at Serial")); GS_DEBUG_PORT.print(GS_TELEM_PORT_NUMBER); GS_DEBUG_PORT.println(F("..."));
+
+#if USE_GS_TELEM
 	while (!GS_TELEM_PORT)
 	{
+#if USE_GS_DEBUG
 		GS_DEBUG_PORT.println(F("Initializing telemetry port..."));
+#endif
+
 		GS_TELEM_PORT.begin(TELEM_PORT_BAUD);
 		delay(500);
 	}
+#endif
+
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tAll ports sucessfully initialized"));
+#endif
 
 
 
 
 	//turn on PWR LED
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Turning on PWR LED..."));
+#endif
+
 	pinMode(13, OUTPUT);
 	digitalWrite(13, HIGH);
+
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tPWR LED on"));
+#endif
 
 
 
 
 	//set analog to digital conversion resolution (in bits)
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Setting ADC resolution (default - 16 bits)..."));
+#endif
+
 	analogReadResolution(ANALOG_RESOLUTION);
+
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tResolution set"));
+#endif
 
 
 
 
-	//initialize AirComs
-	GS_DEBUG_PORT.println(F("Initializing AirComms..."));
-	GS_commandTransfer.begin(GS_COMMAND_PORT);
-	GS_telemetryTransfer.begin(GS_TELEM_PORT);
-	GS_DEBUG_PORT.println(F("\tAirComms initialized"));
+	//initialize transfer classes
+#if USE_GS_DEBUG
+	GS_DEBUG_PORT.println(F("Initializing transfer classes..."));
+#endif
+
+	commandTransfer.begin(GS_COMMAND_PORT);
+
+#if USE_GS_TELEM
+	telemetryTransfer.begin(GS_TELEM_PORT);
+#endif
+
+#if USE_GS_DEBUG
+	GS_DEBUG_PORT.println(F("\tTansfer classes initialized"));
+#endif
 
 
 
 
 	//initialize "pass-through" timers
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Initializing timers..."));
+#endif
+
 	commandTimer.begin(REPORT_COMMANDS_PERIOD);
+	lossLinkTimer.begin(LOSS_LINK_TIMEOUT);
+	telemTimer.begin(REPORT_TELEM_PERIOD);
+
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("\tTimers initialized..."));
+#endif
 	
 	
 	
 	
+#if USE_GS_DEBUG
 	GS_DEBUG_PORT.println(F("Initialization complete"));
 	GS_DEBUG_PORT.println(F("--------------------------------------------------"));
+#endif
 }
 
 
 
 
-//send data to datalogging computer via debugging port
-void GS_Class::sendTelem()
+bool GS_Class::tick()
 {
-	if (newTelem)
+	computeAndSendCommands();
+
+#if USE_GS_TELEM
+	if (telemetryTransfer.available())
 	{
-		newTelem = false;
+		uint16_t recLen = telemetryTransfer.rxObj(telemetry);
+		telemetryTransfer.rxObj(controlInputs, recLen);
 
-		GS_DEBUG_PORT.println("New Telem:");
-		GS_DEBUG_PORT.print("Alt: ");   GS_DEBUG_PORT.println(telemetry.altitude, 5);
-		GS_DEBUG_PORT.print("Roll: ");  GS_DEBUG_PORT.println(telemetry.rollAngle, 5);
-		GS_DEBUG_PORT.print("Pitch: "); GS_DEBUG_PORT.println(telemetry.pitchAngle, 5);
-		GS_DEBUG_PORT.print("Vel: ");   GS_DEBUG_PORT.println(telemetry.velocity, 5);
-		GS_DEBUG_PORT.print("Lat: ");   GS_DEBUG_PORT.println(telemetry.latitude, 5);
-		GS_DEBUG_PORT.print("Lon: ");   GS_DEBUG_PORT.println(telemetry.longitude, 5);
-		GS_DEBUG_PORT.print("UTC_y: "); GS_DEBUG_PORT.println(telemetry.UTC_year);
-		GS_DEBUG_PORT.print("UTC_M: "); GS_DEBUG_PORT.println(telemetry.UTC_month);
-		GS_DEBUG_PORT.print("UTC_d: "); GS_DEBUG_PORT.println(telemetry.UTC_day);
-		GS_DEBUG_PORT.print("UTC_h: "); GS_DEBUG_PORT.println(telemetry.UTC_hour);
-		GS_DEBUG_PORT.print("UTC_m: "); GS_DEBUG_PORT.println(telemetry.UTC_minute);
-		GS_DEBUG_PORT.print("UTC_s: "); GS_DEBUG_PORT.println(telemetry.UTC_second);
-		GS_DEBUG_PORT.print("SOG: ");   GS_DEBUG_PORT.println(telemetry.speedOverGround, 3);
-		GS_DEBUG_PORT.print("COG: ");   GS_DEBUG_PORT.println(telemetry.courseOverGround, 3);
-		GS_DEBUG_PORT.println();
+		lossLinkTimer.start();
+		linkConnected = true;
+		telemetry.validFlags = telemetry.validFlags | 0x2;
 	}
+#endif
 
+	return linkFailover();
+}
+
+
+
+
+//determine each command value based off GS sensor data and send commands to plane
+void GS_Class::computeAndSendCommands()
+{
+	//use timer to send commands to the plane at a fixed rate
+	if (commandTimer.fire())
+	{
+		computeCommands();
+		sendCommands();
+	}
 }
 
 
@@ -148,37 +210,14 @@ void GS_Class::computeCommands()
 void GS_Class::sendCommands()
 {
 	//update the radio's outgoing array with the propper information
-	GS_commandTransfer.txObj(controlInputs);
-	GS_commandTransfer.sendData(sizeof(controlInputs) + COMMAND_BUFFER); //allow extra bytes to send (bytes are user defined)
+	commandTransfer.txObj(controlInputs);
+	commandTransfer.sendData(sizeof(controlInputs) + COMMAND_BUFFER); //allow extra bytes to send (bytes are user defined)
 }
 
 
 
 
-//determine each command value based off GS sensor data and send commands to plane
-void GS_Class::computeAndSendCommands()
-{
-	//use timer to send commands to the plane at a fixed rate
-	if (commandTimer.fire())
-	{
-		computeCommands();
-		sendCommands();
-	}
-}
-
-
-
-
-//check to see if there is a loss of radio link between GS and IFC
-bool GS_Class::checkRadioLink()
-{
-	return linkConnected;
-}
-
-
-
-
-int16_t GS_Class::updateServoCommand(controlSurfaces controlSurface)
+int16_t GS_Class::updateServoCommand(const control_surfaces_struct& controlSurface)
 {
 	//value to be sent to plane
 	uint16_t commandValue = 0;
@@ -189,28 +228,43 @@ int16_t GS_Class::updateServoCommand(controlSurfaces controlSurface)
 	if (controlSurface.reverse)
 	{
 		//convert to a servo command format
-		commandValue = map(analogValue,                           //value to be mapped
-		                   controlSurface.ADC_min,                //input minimum expected value
-			               controlSurface.ADC_max,                //input maximum expected value
-		                   controlSurface.high_rates_surface_max, //output maximum value
-		                   controlSurface.high_rates_surface_min  //output minimum value
-		               ) + controlSurface._offset;                //add the offset (bias)
+		commandValue = map(analogValue,                //value to be mapped
+		                   controlSurface.ADC_min,     //input minimum expected value
+			               controlSurface.ADC_max,     //input maximum expected value
+		                   controlSurface.surface_max, //output maximum value
+		                   controlSurface.surface_min  //output minimum value
+		               ) + controlSurface._offset;     //add the offset (bias)
 	}
 	else
 	{
 		//convert to a servo command format
-		commandValue = map(analogValue,                           //value to be mapped
-			               controlSurface.ADC_min,                //input minimum expected value
-			               controlSurface.ADC_max,                //input maximum expected value
-			               controlSurface.high_rates_surface_min, //output minimum value
-			               controlSurface.high_rates_surface_max  //output maximum value
-		                   ) + controlSurface._offset;            //add the offset (bias)
+		commandValue = map(analogValue,                //value to be mapped
+			               controlSurface.ADC_min,     //input minimum expected value
+			               controlSurface.ADC_max,     //input maximum expected value
+			               controlSurface.surface_min, //output minimum value
+			               controlSurface.surface_max  //output maximum value
+		                   ) + controlSurface._offset; //add the offset (bias)
 	}
 
-	commandValue = constrain(commandValue,                           //value to be constrained
-		                     controlSurface.high_rates_surface_min,	 //minimum value
-		                     controlSurface.high_rates_surface_max); //maximum value
+	commandValue = constrain(commandValue,                //value to be constrained
+		                     controlSurface.surface_min,  //minimum value
+		                     controlSurface.surface_max); //maximum value
 
 	return commandValue;
 }
-/////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+bool GS_Class::linkFailover()
+{
+	if (lossLinkTimer.fire(false))
+	{
+		//do something
+
+		linkConnected = false;
+		telemetry.validFlags = telemetry.validFlags & !0x2;
+	}
+
+	return linkConnected;
+}

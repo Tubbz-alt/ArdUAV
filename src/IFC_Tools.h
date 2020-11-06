@@ -1,100 +1,192 @@
 #pragma once
 #include "Arduino.h"
 #include "Servo.h"
+#include "NMEAGPS.h"
 #include "FireTimer.h"
-
 #include "IFC_Serial.h"
 #include "Shared_Tools.h"
 #include "SerialTransfer.h"
-#include "neo6mGPS.h"
 #include "ArdUAV_Adafruit_BNO055.h"
 
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////
-//macros
-#define IFC
+#if USE_GPS
+#define NMEA_LEN 16
+#define FREQ_LEN 14
+#define BAUD_LEN 28
 
-#define LIDAR_FIXED_MOUNT  0  //0 - gimbal mount, 0 - fixed mount
+#define GPGGA 0
+#define GPGLL 1
+#define GPGLV 2
+#define GPGSA 3
+#define GPRMC 4
+#define GPVTG 5
 
-#define SERVO_FREQ         60 //Hz
-#define LIMITER_PERIOD     REPORT_COMMANDS_PERIOD //ms
+#define NMEA_ID_POS  7
+#define DDC_POS      8
+#define SERIAL_1_POS 9
+#define SERIAL_2_POS 10
+#define USB_POS      11
+#define SPI_POS      12
 
-#define PITOT_PIN          A17 //analog input pin
+#define BAUD_0 14
+#define BAUD_1 15
+#define BAUD_2 16
+#define BAUD_3 17
 
-#define THROTTLE_PIN       2 //digital ESC signal pin
-#define AILERON_PIN        39 //servo driver output port number
-#define ELEVATOR_PIN       24 //servo driver output port number
-#define RUDDER_PIN         6 //servo driver output port number
-
-#define PITCH_AXIS         true  //
-#define ROLL_AXIS          false //
-
-#define UNSAFE_ROLL_R      -35 //unsafe right bank angle threshold (in degrees)
-#define UNSAFE_ROLL_L      35  //unsafe left bank angle threshold (in degrees)
-
-#define MAX_ROLL_R         -50 //max right bank angle (in degrees) allowed by flight controller
-#define MAX_ROLL_L         50  //max left bank angle (in degrees) allowed by flight controller
-
-#define UNSAFE_PITCH_UP    -30 //unsafe up pitch angle threshold (in degrees)
-#define UNSAFE_PITCH_DOWN  10  //unsafe down pitch angle threshold (in degrees)
-
-#define MAX_PITCH_UP       -45 //max up pitch angle (in degrees) allowed by flight controller
-#define MAX_PITCH_DOWN     25  //max down pitch angle (in degrees) allowed by flight controller
-/////////////////////////////////////////////////////////////////////////////////////////
+#define MEAS_RATE_1 6
+#define MEAS_RATE_2 7
+#define NAV_RATE_1  8
+#define NAV_RATE_2  9
 
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////
-//IFC Class
-class IFC_Class
+const char CFG_MSG[NMEA_LEN] = {
+	0xB5, // Header char 1
+	0x62, // Header char 2
+	0x06, // class
+	0x01, // id
+	0x08, // length LSB
+	0x00, // length MSB
+	0xF0, // payload (NMEA sentence ID char 1)
+	0x00, // payload (NMEA sentence ID char 2)
+	0x00, // payload I/O Target 0 - DDC           - (1 - enable sentence, 0 - disable)
+	0x00, // payload I/O Target 1 - Serial Port 1 - (1 - enable sentence, 0 - disable)
+	0x00, // payload I/O Target 2 - Serial Port 2 - (1 - enable sentence, 0 - disable)
+	0x00, // payload I/O Target 3 - USB           - (1 - enable sentence, 0 - disable)
+	0x00, // payload I/O Target 4 - SPI           - (1 - enable sentence, 0 - disable)
+	0x00, // payload I/O Target 5 - Reserved      - (1 - enable sentence, 0 - disable)
+	0x00, // CK_A
+	0x00  // CK_B
+};
+
+const char CFG_RATE[FREQ_LEN] = {
+	0xB5, // sync char 1
+	0x62, // sync char 2
+	0x06, // class
+	0x08, // id
+	0x06, // length LSB
+	0x00, // length MSB
+	0x64, // payload measRate (ms) 1
+	0x00, // payload measRate (ms) 2
+	0x00, // payload navRate (cycles) 1
+	0x00, // payload navRate (cycles) 2
+	0x01, // payload timeRef 1
+	0x00, // payload timeRef 2
+	0x00, // CK_A
+	0x00  // CK_B
+};
+
+const char CFG_PRT[BAUD_LEN] = {
+	0xB5, // sync char 1
+	0x62, // sync char 2
+	0x06, // class
+	0x00, // id
+	0x14, // length LSB
+	0x00, // length MSB
+	0x01, // payload portID
+	0x00, // payload reserved0
+	0x00, // payload txReady 1
+	0x00, // payload txReady 2
+	0xD0, // payload mode 1
+	0x08, // payload mode 2
+	0x00, // payload mode 3
+	0x00, // payload mode 4
+	0x00, // payload baudRate 0 (LSB)
+	0x00, // payload baudRate 1
+	0x00, // payload baudRate 2
+	0x00, // payload baudRate 3 (MSB)
+	0x07, // payload inProtoMask 1
+	0x00, // payload inProtoMask 2
+	0x03, // payload outProtoMask 1
+	0x00, // payload outProtoMask 2
+	0x00, // payload reserved4 1
+	0x00, // payload reserved4 2
+	0x00, // payload reserved5 1
+	0x00, // payload reserved5 2
+	0x00, // CK_A
+	0x00  // CK_B
+};
+
+
+
+
+void changeBaud(uint32_t baud);
+void changeFreq(uint16_t hertz);
+void setSentence(char NMEA_num, bool enable);
+void insertChecksum(char packet[], const byte len);
+#endif
+
+
+
+
+class IFC_Class : public base
 {
 public:
-	FireTimer lossLinkTimer;
-	telemetry_struct telemetry;
-	controlInputs_struct controlInputs;
+#if USE_IFC_TELEM
+	SerialTransfer telemetryTransfer;
 
+	void sendTelem();
+#endif
 
+#if USE_IMU
+	Adafruit_BNO055 bno = Adafruit_BNO055(&IMU_PORT, IMU_ID, BNO055_ADDRESS_A);
+	void pollIMU();
+	void bankPitchLimiter();
+#endif
 
+#if USE_GPS
+	bool gpsConnected;
+	NMEAGPS gps;
+	gps_fix fix;
+	bool pollGPS();
+#endif
+
+#if USE_PITOT
+	void pollPitot();
+#endif
+
+#if USE_LIDAR
+	SerialTransfer lidarTransfer;
+#endif
+
+	Servo rudder;
+	Servo elevator;
+	Servo aileron;
+	Servo throttle;
 
 	void begin();
-	bool handleSerialEvents();
-	bool grabData_GPS();
-	int grabData_IMU();
-	int grabData_Pitot();
-	void sendTelem();
-	void updateServos(bool overrideManEn=false);
-	void updateSingleServo(byte INDEX, uint16_t value);
-	void bankPitchLimiter();
+	bool tick();
+	bool commEvent();
+	void updateServos(const bool& overrideManEn=false);
+	void updateSingleServo(const byte& INDEX, const uint16_t& value);
 
 
 
 
 private:
-	//byte used to determine if LiDAR reading needs to include bias correction
-	byte LiDAR_Counter;
+#if USE_IMU
+	float convertedPitch;
+	float convertedRoll;
 	unsigned long dataTimestamp_IMU;
 	FireTimer limiterTimer;
-	FireTimer telemTimer;
 	FireTimer imuTimer;
+	void updateControlsLimiter(const bool& axis);
+#endif
 
+#if USE_GPS
+	FireTimer lossGPSTimer;
+	void setupGPS();
+	void readGPSData();
+	bool gpsFailover();
+#endif
 
+#if USE_LIDAR
+	byte LiDAR_Counter;
+	void lidarEvent();
+#endif
 
-
-	bool commEvent_IFC();
-	void lidarEvent_IFC();
-	void linkFailover();
-	void updateControlsLimiter(bool axis);
+	bool linkFailover();
 };
-
-extern IFC_Class myIFC;
-extern neo6mGPS myGPS;
-extern SerialTransfer IFC_commandTransfer;
-extern SerialTransfer IFC_telemetryTransfer;
-extern SerialTransfer IFC_lidarTransfer;
-
-extern TwoWire Wire1;
-extern TwoWire Wire2;
-/////////////////////////////////////////////////////////////////////////////////////////
